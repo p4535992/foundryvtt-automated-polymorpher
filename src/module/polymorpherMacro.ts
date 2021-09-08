@@ -1,10 +1,10 @@
 import { polymorpherEffectMacro } from './polymorpherEffectMacro';
 import { getCanvas, getGame } from './settings';
 
-export const polymorpherMacro = async function () {
+export const polymorpherMacro = async function (target: Token) {
   // Declare the target
-  const target = <Token>getCanvas().tokens?.controlled[0];
-  const token = target;
+  // const target = <Token>getCanvas().tokens?.controlled[0];
+  // const token = target;
   // Get the ID of your the actual target (current Actor Form)
   const currentFormActorId = <string>target.actor?.data._id;
   const actor = <Actor>getGame().actors?.get(currentFormActorId);

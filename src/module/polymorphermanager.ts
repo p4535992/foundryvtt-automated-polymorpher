@@ -15,7 +15,7 @@ export class PolymorpherManager extends FormApplication {
       ...super.defaultOptions,
       title: i18n('AP.dialogs.polymorpherManager.title'),
       id: 'polymorpherManager',
-      template: `modules/automated-evocations/templates/polymorphermanager.hbs`,
+      template: `modules/${APCONSTS.MN}/templates/polymorphermanager.hbs`,
       resizable: true,
       width: 300,
       height: window.innerHeight > 400 ? 400 : window.innerHeight - 100,
@@ -94,10 +94,9 @@ export class PolymorpherManager extends FormApplication {
 
     // Get the target actor
     let sourceActor = actor;
-    //@ts-ignore
-    // if (data?.pack) {
+    // if (data.pack) {
     //   const pack = getGame().packs.find(p => p.collection === data.pack);
-    //   sourceActor = await pack?.getDocument(data.id);
+    //   sourceActor = await pack.getEntity(data.id);
     // } else {
     //   sourceActor = getGame().actors.get(data.id);
     // }
@@ -120,43 +119,45 @@ export class PolymorpherManager extends FormApplication {
         title: i18n('DND5E.PolymorphPromptTitle'),
         //@ts-ignore
         content: {
-          options: <any>getGame().settings.get('dnd5e', 'polymorphSettings'),
+          options: getGame().settings.get('dnd5e', 'polymorphSettings'),
           //@ts-ignore
-          i18n: <string>DND5E.polymorphSettings,
-          isToken: actor.isToken,
+          i18n: CONFIG.DND5E.polymorphSettings,
+          isToken: this.actor.isToken,
         },
         default: 'accept',
         buttons: {
           accept: {
             icon: '<i class="fas fa-check"></i>',
             label: i18n('DND5E.PolymorphAcceptSettings'),
-            //@ts-ignore
-            callback: (html) => actor.transformInto(sourceActor, rememberOptions(html)),
+            callback: (html) => {
+              //@ts-ignore
+              this.actor.transformInto(sourceActor, rememberOptions(html));
+            },
           },
           wildshape: {
             icon: '<i class="fas fa-paw"></i>',
             label: i18n('DND5E.PolymorphWildShape'),
-            //@ts-ignore
-            callback: (html) =>
+            callback: (html) => {
               //@ts-ignore
-              actor.transformInto(sourceActor, {
+              this.actor.transformInto(sourceActor, {
                 keepBio: true,
                 keepClass: true,
                 keepMental: true,
                 mergeSaves: true,
                 mergeSkills: true,
                 transformTokens: rememberOptions(html).transformTokens,
-              }),
+              });
+            },
           },
           polymorph: {
             icon: '<i class="fas fa-pastafarianism"></i>',
             label: i18n('DND5E.Polymorph'),
-            //@ts-ignore
-            callback: (html) =>
+            callback: (html) => {
               //@ts-ignore
-              actor.transformInto(sourceActor, {
+              this.actor.transformInto(sourceActor, {
                 transformTokens: rememberOptions(html).transformTokens,
-              }),
+              });
+            },
           },
           cancel: {
             icon: '<i class="fas fa-times"></i>',
@@ -173,7 +174,7 @@ export class PolymorpherManager extends FormApplication {
     /*
     const posData = await warpgate.crosshairs.show(
       Math.max(tokenData.width, tokenData.height) * tokenData.scale,
-      'modules/automated-evocations/assets/black-hole-bolas.webp',
+      'modules/automated-polymorpher/assets/black-hole-bolas.webp',
       '',
     );
     if (posData.cancelled) {

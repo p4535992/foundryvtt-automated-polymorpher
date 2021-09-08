@@ -25,7 +25,8 @@ export const polymorpherEffectMacro = function (
   // transferDAEEffects(actor);
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   //@ts-ignore
-  if (actor.data.flags.dnd5e?.isPolymorphed && shapeOnOff === 'off') {
+  if (actor.data.flags.dnd5e?.isPolymorphed) {
+    // && shapeOnOff === 'off'
     actorOriginalFormImagePath = <string>actorOriginalForm.data.token.img;
     const paramsBack = [
       {

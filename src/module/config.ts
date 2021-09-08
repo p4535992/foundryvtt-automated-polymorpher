@@ -1,11 +1,12 @@
 //@ts-ignore
-import { Sequence } from '/modules/sequencer/scripts/module/sequencer.js';
+// import { Sequence } from '../../sequencer/scripts/module/sequencer.js';
 export const APCONSTS = {
-  MN: 'automated-evocations',
+  MN: 'automated-polymorpher',
   animations: {},
   animationFunctions: {
     fire: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/fire_spiral_CIRCLE_01.webm`)
@@ -27,6 +28,7 @@ export const APCONSTS = {
     },
     air: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/air_infinity_RECTANGLE_01.webm`)
@@ -54,6 +56,7 @@ export const APCONSTS = {
     },
     lightning: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/ring_CIRCLE_01.webm`)
@@ -76,6 +79,7 @@ export const APCONSTS = {
     },
     lightning2: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/JB2A/LightningBall_01_Regular_Blue_400x400.webm`)
@@ -104,6 +108,7 @@ export const APCONSTS = {
     },
     water: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/water_blast_RAY_01.webm`)
@@ -126,6 +131,7 @@ export const APCONSTS = {
     },
     ice1: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/JB2A/SnowflakeBurst_01_Regular_BlueWhite_Burst_600x600.webm`)
@@ -151,6 +157,7 @@ export const APCONSTS = {
     },
     darkness: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/JB2A/Whirlwind_01_BlueGrey_01_400x400.webm`)
@@ -182,6 +189,7 @@ export const APCONSTS = {
     },
     energy1: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/energy_spark_CIRCLE_01.webm`)
@@ -204,6 +212,7 @@ export const APCONSTS = {
     },
     magic1: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/magic_explosion_symbol_CIRCLE.webm`)
@@ -217,6 +226,7 @@ export const APCONSTS = {
     },
     magic2: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/JB2A/Conjuration_01_Yellow_Circle_800x800.webm`)
@@ -242,6 +252,7 @@ export const APCONSTS = {
     },
     heart: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/heart_red_SQUARE.webm`)
@@ -253,6 +264,7 @@ export const APCONSTS = {
     },
     music: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/music_RECTANGLE.webm`)
@@ -274,6 +286,7 @@ export const APCONSTS = {
     },
     music2: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/JB2A/OutPulse_01_Regular_BlueWhite_Burst_600x600.webm`)
@@ -292,6 +305,7 @@ export const APCONSTS = {
     },
     fourelements: {
       fn: async (template, tokenData) => {
+        //@ts-ignore
         await new Sequence()
           .effect()
           .file(`modules/${APCONSTS.MN}/assets/animations/four_element_strike_SQUARE_01.webm`)
