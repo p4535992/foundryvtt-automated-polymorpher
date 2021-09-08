@@ -1,10 +1,9 @@
-import { i18n } from "../automated-polymorpher";
-import { APCONSTS } from "./main";
-import { getGame } from "./settings";
+import { i18n } from '../automated-polymorpher';
+import { APCONSTS } from './config';
+import { getGame } from './settings';
 
 export class PolymorpherManager extends FormApplication {
-
-  actor:Actor;
+  actor: Actor;
 
   constructor(actor) {
     super({});
@@ -24,7 +23,7 @@ export class PolymorpherManager extends FormApplication {
     };
   }
 
-  getData():any {
+  getData(): any {
     return {};
   }
 
@@ -73,8 +72,9 @@ export class PolymorpherManager extends FormApplication {
         target.before($(li));
       }
     }
-    if (!data?.type){ // || data?.type !== 'Actor'){
-       return;
+    if (!data?.type) {
+      // || data?.type !== 'Actor'){
+      return;
     }
     this.element.find('#polymorpher-list').append(this.generateLi({ id: data.id }));
     this.saveData();
@@ -106,7 +106,7 @@ export class PolymorpherManager extends FormApplication {
     await this.wait(APCONSTS.animationFunctions[animation].time);
     //get custom data macro
     const customTokenData = await getGame().macros
-      .getName(`AE_Polymorpher_Macro(${actor.data.name})`)
+      .getName(`AP_Polymorpher_Macro(${actor.data.name})`)
       ?.execute({
         summon: actor,
         spellLevel: this.spellLevel || 0,
@@ -143,8 +143,9 @@ export class PolymorpherManager extends FormApplication {
   }
 
   async loadPolymorphers() {
-    const data:any =
-      this.actor && (<boolean>this.actor.getFlag(APCONSTS.MN, 'isLocal') || getGame().settings.get(APCONSTS.MN, 'storeonactor'))
+    const data: any =
+      this.actor &&
+      (<boolean>this.actor.getFlag(APCONSTS.MN, 'isLocal') || getGame().settings.get(APCONSTS.MN, 'storeonactor'))
         ? this.actor.getFlag(APCONSTS.MN, 'polymorphers') || []
         : getGame().user?.getFlag(APCONSTS.MN, 'polymorphers');
     if (data) {
@@ -196,7 +197,7 @@ export class PolymorpherManager extends FormApplication {
   }
 
   async saveData() {
-    const data:any[] = [];
+    const data: any[] = [];
     for (const polymorpher of this.element.find('.polymorpher-item')) {
       data.push({
         id: polymorpher.dataset.aid,
@@ -215,16 +216,15 @@ export class PolymorpherManager extends FormApplication {
     super.close();
   }
 
-  _updateObject(event):any{
+  _updateObject(event): any {
     // DO NOTHING
   }
 }
 
 export class SimplePolymorpherManager extends PolymorpherManager {
-
-  caster:Actor;
-  summons:any[];
-  spellLevel:number;
+  caster: Actor;
+  summons: any[];
+  spellLevel: number;
 
   constructor(summonData, spellLevel, actor) {
     super({});

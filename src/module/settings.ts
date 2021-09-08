@@ -1,5 +1,5 @@
 import { i18n } from '../automated-polymorpher';
-import { APCONSTS } from './main';
+import { APCONSTS } from './config';
 // import ImagePicker from "./libs/ImagePicker";
 // import SoundPicker from "./libs/SoundPicker";
 
@@ -38,8 +38,7 @@ export function getGame(): Game {
 }
 
 export const registerSettings = function () {
-
-  getGame().settings.register(APCONSTS.MN, 'companions', {
+  getGame().settings.register(APCONSTS.MN, 'polymorphers', {
     name: '',
     hint: '',
     scope: 'client',
@@ -103,5 +102,4 @@ export const registerSettings = function () {
     type: Boolean,
     default: false,
   });
-
 };

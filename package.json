@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "foundryvtt-arms-reach",
-  "version": "2.0.6",
-  "description": "Allows the GM to limit the distance that a player can interate with a placeable object like door, journal, stairway, token, ecc..",
+  "name": "automated-polymorpher",
+  "description": "A user interface to manage polymorpher with summoning animations and automated summoning for spells",
+  "version": "1.0.0",
   "scripts": {
     "package": "gulp package",
     "build": "gulp build && gulp link",

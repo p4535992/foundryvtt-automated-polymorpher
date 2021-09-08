@@ -128,9 +128,7 @@ export const APCONSTS = {
       fn: async (template, tokenData) => {
         await new Sequence()
           .effect()
-          .file(
-            `modules/${APCONSTS.MN}/assets/animations/JB2A/SnowflakeBurst_01_Regular_BlueWhite_Burst_600x600.webm`,
-          )
+          .file(`modules/${APCONSTS.MN}/assets/animations/JB2A/SnowflakeBurst_01_Regular_BlueWhite_Burst_600x600.webm`)
           .belowTokens()
           .fadeIn(500, { ease: 'easeOutCubic', delay: 500 })
           .fadeOut(1500)
@@ -142,9 +140,7 @@ export const APCONSTS = {
           .scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
           .wait(650)
           .effect()
-          .file(
-            `modules/${APCONSTS.MN}/assets/animations/JB2A/IceSpikesRadialBurst_01_Regular_White_1000x1000.webm`,
-          )
+          .file(`modules/${APCONSTS.MN}/assets/animations/JB2A/IceSpikesRadialBurst_01_Regular_White_1000x1000.webm`)
           .randomRotation()
           .atLocation(template)
           .scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.55)
@@ -287,9 +283,7 @@ export const APCONSTS = {
           .scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
           .wait(100)
           .effect()
-          .file(
-            `modules/${APCONSTS.MN}/assets/animations/JB2A/BardicInspiration_01_Regular_GreenOrange_400x400.webm`,
-          )
+          .file(`modules/${APCONSTS.MN}/assets/animations/JB2A/BardicInspiration_01_Regular_GreenOrange_400x400.webm`)
           .atLocation(template)
           .scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.45)
           .play();

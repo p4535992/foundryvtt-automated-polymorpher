@@ -15,28 +15,28 @@
 import { getGame, registerSettings } from './module/settings';
 import { preloadTemplates } from './module/preloadTemplates';
 import { initHooks, readyHooks, setupHooks } from './module/Hooks';
-import { APCONSTS } from './module/main';
+import { APCONSTS } from './module/config';
 
 export let debugEnabled = 0;
 // 0 = none, warnings = 1, debug = 2, all = 3
-export let debug = (...args) => {
+export const debug = (...args) => {
   if (debugEnabled > 1) console.log(`DEBUG:${APCONSTS.MN} | `, ...args);
 };
-export let log = (...args) => console.log(`${APCONSTS.MN} | `, ...args);
-export let warn = (...args) => {
+export const log = (...args) => console.log(`${APCONSTS.MN} | `, ...args);
+export const warn = (...args) => {
   if (debugEnabled > 0) console.warn(`${APCONSTS.MN} | `, ...args);
 };
-export let error = (...args) => console.error(`${APCONSTS.MN} | `, ...args);
-export let timelog = (...args) => warn(`${APCONSTS.MN} | `, Date.now(), ...args);
+export const error = (...args) => console.error(`${APCONSTS.MN} | `, ...args);
+export const timelog = (...args) => warn(`${APCONSTS.MN} | `, Date.now(), ...args);
 
-export let i18n = (key) => {
+export const i18n = (key) => {
   return getGame().i18n.localize(key);
 };
-export let i18nFormat = (key, data = {}) => {
+export const i18nFormat = (key, data = {}) => {
   return getGame().i18n.format(key, data);
 };
 
-export let setDebugLevel = (debugText: string) => {
+export const setDebugLevel = (debugText: string) => {
   debugEnabled = { none: 0, warn: 1, debug: 2, all: 3 }[debugText] || 0;
   // 0 = none, warnings = 1, debug = 2, all = 3
   if (debugEnabled >= 3) CONFIG.debug.hooks = true;
@@ -78,15 +78,11 @@ Hooks.once('setup', function () {
 Hooks.once('ready', () => {
   // Do anything once the module is ready
   if (!getGame().modules.get('lib-wrapper')?.active && getGame().user?.isGM) {
-    ui.notifications?.error(
-      `The '${APCONSTS.MN}' module requires to install and activate the 'libWrapper' module.`,
-    );
+    ui.notifications?.error(`The '${APCONSTS.MN}' module requires to install and activate the 'libWrapper' module.`);
     return;
   }
   if (!getGame().modules.get('sequencer')?.active && getGame().user?.isGM) {
-    ui.notifications?.error(
-      `The '${APCONSTS.MN}' module requires to install and activate the 'sequencer' module.`,
-    );
+    ui.notifications?.error(`The '${APCONSTS.MN}' module requires to install and activate the 'sequencer' module.`);
     return;
   }
   readyHooks();
