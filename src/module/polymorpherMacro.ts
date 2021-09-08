@@ -1,5 +1,5 @@
-import { polymorpherEffectMacro } from "./polymorpherEffectMacro";
-import { getCanvas, getGame } from "./settings";
+import { polymorpherEffectMacro } from './polymorpherEffectMacro';
+import { getCanvas, getGame } from './settings';
 
 export const polymorpherMacro = async function () {
   // Declare the target

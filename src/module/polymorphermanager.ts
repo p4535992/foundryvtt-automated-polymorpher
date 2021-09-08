@@ -87,6 +87,89 @@ export class PolymorpherManager extends FormApplication {
     const actor = <Actor>getGame().actors?.get(aId);
     const duplicates = $(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
     const tokenData = await actor.getTokenData();
+
+    const canPolymorph =
+      getGame().user?.isGM || (this.actor.isOwner && getGame().settings.get('dnd5e', 'allowPolymorphing'));
+    if (!canPolymorph) return false;
+
+    // Get the target actor
+    let sourceActor = actor;
+    //@ts-ignore
+    // if (data?.pack) {
+    //   const pack = getGame().packs.find(p => p.collection === data.pack);
+    //   sourceActor = await pack?.getDocument(data.id);
+    // } else {
+    //   sourceActor = getGame().actors.get(data.id);
+    // }
+    if (!sourceActor) return;
+
+    // Define a function to record polymorph settings for future use
+    const rememberOptions = (html) => {
+      const options = {};
+      html.find('input').each((i, el) => {
+        options[el.name] = el.checked;
+      });
+      const settings = mergeObject(<any>getGame().settings.get('dnd5e', 'polymorphSettings') || {}, options);
+      getGame().settings.set('dnd5e', 'polymorphSettings', settings);
+      return settings;
+    };
+
+    // Create and render the Dialog
+    return new Dialog(
+      {
+        title: i18n('DND5E.PolymorphPromptTitle'),
+        //@ts-ignore
+        content: {
+          options: <any>getGame().settings.get('dnd5e', 'polymorphSettings'),
+          //@ts-ignore
+          i18n: <string>DND5E.polymorphSettings,
+          isToken: actor.isToken,
+        },
+        default: 'accept',
+        buttons: {
+          accept: {
+            icon: '<i class="fas fa-check"></i>',
+            label: i18n('DND5E.PolymorphAcceptSettings'),
+            //@ts-ignore
+            callback: (html) => actor.transformInto(sourceActor, rememberOptions(html)),
+          },
+          wildshape: {
+            icon: '<i class="fas fa-paw"></i>',
+            label: i18n('DND5E.PolymorphWildShape'),
+            //@ts-ignore
+            callback: (html) =>
+              //@ts-ignore
+              actor.transformInto(sourceActor, {
+                keepBio: true,
+                keepClass: true,
+                keepMental: true,
+                mergeSaves: true,
+                mergeSkills: true,
+                transformTokens: rememberOptions(html).transformTokens,
+              }),
+          },
+          polymorph: {
+            icon: '<i class="fas fa-pastafarianism"></i>',
+            label: i18n('DND5E.Polymorph'),
+            //@ts-ignore
+            callback: (html) =>
+              //@ts-ignore
+              actor.transformInto(sourceActor, {
+                transformTokens: rememberOptions(html).transformTokens,
+              }),
+          },
+          cancel: {
+            icon: '<i class="fas fa-times"></i>',
+            label: i18n('Cancel'),
+          },
+        },
+      },
+      {
+        classes: ['dialog', 'dnd5e'],
+        width: 600,
+        template: 'systems/dnd5e/templates/apps/polymorph-prompt.html',
+      },
+    ).render(true);
     /*
     const posData = await warpgate.crosshairs.show(
       Math.max(tokenData.width, tokenData.height) * tokenData.scale,
