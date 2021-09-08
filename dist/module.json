@@ -38,22 +38,7 @@
       "path": "lang/en.json"
     }
   ],
-  "packs": [
-    {
-      "name": "automated-polymorpher-macros",
-      "label": "Automated Polymorpher Macros",
-      "path": "packs/macros.db",
-      "entity": "Macro",
-      "module": "automated-polymorpher"
-    },
-    {
-      "name": "automated-polymorpher-actors",
-      "label": "Automated Polymorpher Summons",
-      "path": "packs/actors.db",
-      "entity": "Actor",
-      "module": "automated-polymorpher"
-    }
-  ],
+  "packs": [],
   "systems": ["dnd5e"],
   "scripts": [],
   "esmodules": ["automated-polymorpher.js"],

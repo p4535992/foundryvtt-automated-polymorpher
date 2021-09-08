@@ -116,17 +116,25 @@ export class PolymorpherManager extends FormApplication {
                 accept: {
                     icon: '<i class="fas fa-check"></i>',
                     label: i18n('DND5E.PolymorphAcceptSettings'),
-                    callback: (html) => {
+                    callback: async (html) => {
                         //@ts-ignore
-                        this.actor.transformInto(sourceActor, rememberOptions(html));
+                        await this.actor.transformInto(
+                        // await this._transformIntoCustom(
+                        sourceActor, rememberOptions(html));
+                        if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                            this.close();
+                        else
+                            this.maximize();
                     },
                 },
                 wildshape: {
                     icon: '<i class="fas fa-paw"></i>',
                     label: i18n('DND5E.PolymorphWildShape'),
-                    callback: (html) => {
+                    callback: async (html) => {
                         //@ts-ignore
-                        this.actor.transformInto(sourceActor, {
+                        await this.actor.transformInto(
+                        // await this._transformIntoCustom(
+                        sourceActor, {
                             keepBio: true,
                             keepClass: true,
                             keepMental: true,
@@ -134,16 +142,26 @@ export class PolymorpherManager extends FormApplication {
                             mergeSkills: true,
                             transformTokens: rememberOptions(html).transformTokens,
                         });
+                        if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                            this.close();
+                        else
+                            this.maximize();
                     },
                 },
                 polymorph: {
                     icon: '<i class="fas fa-pastafarianism"></i>',
                     label: i18n('DND5E.Polymorph'),
-                    callback: (html) => {
+                    callback: async (html) => {
                         //@ts-ignore
-                        this.actor.transformInto(sourceActor, {
+                        await this.actor.transformInto(
+                        // await this._transformIntoCustom(
+                        sourceActor, {
                             transformTokens: rememberOptions(html).transformTokens,
                         });
+                        if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                            this.close();
+                        else
+                            this.maximize();
                     },
                 },
                 cancel: {
@@ -171,7 +189,6 @@ export class PolymorpherManager extends FormApplication {
         } else {
           APCONSTS.animationFunctions[animation].fn(posData, tokenData);
         }
-    
         await this.wait(APCONSTS.animationFunctions[animation].time);
         //get custom data macro
         const customTokenData = await getGame().macros
@@ -183,11 +200,9 @@ export class PolymorpherManager extends FormApplication {
             assignedActor: this.caster || getGame().user.character || _token.actor,
           });
         warpgate.spawnAt({ x: posData.x, y: posData.y }, tokenData, customTokenData || {}, {}, { duplicates });
+        if (getGame().settings.get(APCONSTS.MN, 'autoclose')) this.close();
+        else this.maximize();
         */
-        if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
-            this.close();
-        else
-            this.maximize();
     }
     async _onRemovePolymorpher(event) {
         Dialog.confirm({
