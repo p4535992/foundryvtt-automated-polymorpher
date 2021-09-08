@@ -1,5 +1,7 @@
+import { SimplePolymorpherManager } from "../polymorphermanager";
+
 Hooks.on('createChatMessage', async (chatMessage) => {
-  if (chatMessage.data.user !== game.user.id || !game.settings.get(AECONSTS.MN, 'enableautomations')) return;
+  if (chatMessage.data.user !== game.user.id || !game.settings.get(APCONSTS.MN, 'enableautomations')) return;
   let spellName =
     chatMessage.data.flavor ||
     canvas.tokens
@@ -32,7 +34,7 @@ Hooks.on('createChatMessage', async (chatMessage) => {
         });
       }
     }
-    new SimpleCompanionManager(
+    new SimplePolymorpherManager(
       summonData,
       spellLevel,
       canvas.tokens.get(chatMessage?.data?.speaker?.token)?.actor,

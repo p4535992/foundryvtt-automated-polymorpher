@@ -14,20 +14,20 @@
 // Import TypeScript modules
 import { getGame, registerSettings } from './module/settings';
 import { preloadTemplates } from './module/preloadTemplates';
-import { ARMS_REACH_MODULE_NAME } from './module/settings';
 import { initHooks, readyHooks, setupHooks } from './module/Hooks';
+import { APCONSTS } from './module/main';
 
 export let debugEnabled = 0;
 // 0 = none, warnings = 1, debug = 2, all = 3
 export let debug = (...args) => {
-  if (debugEnabled > 1) console.log(`DEBUG:${ARMS_REACH_MODULE_NAME} | `, ...args);
+  if (debugEnabled > 1) console.log(`DEBUG:${APCONSTS.MN} | `, ...args);
 };
-export let log = (...args) => console.log(`${ARMS_REACH_MODULE_NAME} | `, ...args);
+export let log = (...args) => console.log(`${APCONSTS.MN} | `, ...args);
 export let warn = (...args) => {
-  if (debugEnabled > 0) console.warn(`${ARMS_REACH_MODULE_NAME} | `, ...args);
+  if (debugEnabled > 0) console.warn(`${APCONSTS.MN} | `, ...args);
 };
-export let error = (...args) => console.error(`${ARMS_REACH_MODULE_NAME} | `, ...args);
-export let timelog = (...args) => warn(`${ARMS_REACH_MODULE_NAME} | `, Date.now(), ...args);
+export let error = (...args) => console.error(`${APCONSTS.MN} | `, ...args);
+export let timelog = (...args) => warn(`${APCONSTS.MN} | `, Date.now(), ...args);
 
 export let i18n = (key) => {
   return getGame().i18n.localize(key);
@@ -46,7 +46,7 @@ export let setDebugLevel = (debugText: string) => {
 /* Initialize module					*/
 /* ------------------------------------ */
 Hooks.once('init', async () => {
-  console.log(`${ARMS_REACH_MODULE_NAME} | Initializing ${ARMS_REACH_MODULE_NAME}`);
+  console.log(`${APCONSTS.MN} | Initializing ${APCONSTS.MN}`);
 
   // Register custom module settings
   registerSettings();
@@ -79,13 +79,13 @@ Hooks.once('ready', () => {
   // Do anything once the module is ready
   if (!getGame().modules.get('lib-wrapper')?.active && getGame().user?.isGM) {
     ui.notifications?.error(
-      `The '${ARMS_REACH_MODULE_NAME}' module requires to install and activate the 'libWrapper' module.`,
+      `The '${APCONSTS.MN}' module requires to install and activate the 'libWrapper' module.`,
     );
     return;
   }
   if (!getGame().modules.get('sequencer')?.active && getGame().user?.isGM) {
     ui.notifications?.error(
-      `The '${ARMS_REACH_MODULE_NAME}' module requires to install and activate the 'sequencer' module.`,
+      `The '${APCONSTS.MN}' module requires to install and activate the 'sequencer' module.`,
     );
     return;
   }

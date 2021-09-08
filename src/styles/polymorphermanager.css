@@ -1,17 +1,17 @@
-#companionManager{
+#polymorpherManager{
     min-width: 320px;
 }
 
-#companionManager .window-content{
+#polymorpherManager .window-content{
     padding: 0px;
 }
 
-#companionManager .form-group{
+#polymorpherManager .form-group{
     flex-direction: column;
     padding: 0px;
 }
 
-#companion-list{
+#polymorpher-list{
     width: -webkit-fill-available;
     margin: 0;
     padding: 0;
@@ -30,7 +30,7 @@
     opacity: 0.3;
 }
 
-.companion-item{
+.polymorpher-item{
     display: flex;
     align-items: center;
     width: -webkit-fill-available;
@@ -39,7 +39,7 @@
     padding: 8px;
 }
 
-.companion-item:hover{
+.polymorpher-item:hover{
     background: rgba(0, 0, 0, 0.3);
 }
 
@@ -80,7 +80,7 @@
     margin-right: 10px;
 }
 
-.companion-number{
+.polymorpher-number{
     width: 25px;
     min-width: 25px;
     text-align: center;
@@ -88,14 +88,14 @@
     margin-right: -13px;
 }
 
-#companion-list input{
+#polymorpher-list input{
     border-right: 0;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
     height: 27px;
 }
 
-#companion-list select{
+#polymorpher-list select{
     border-left: 0;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
@@ -115,7 +115,7 @@
     text-shadow: rgba(255, 0, 0, 0.75) 0 0 5px;
 }
 
-#remove-companion:hover{
+#remove-polymorpher:hover{
     cursor: pointer;
     text-shadow: rgba(255, 0, 0, 0.75) 0 0 5px;
 }

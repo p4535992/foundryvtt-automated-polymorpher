@@ -1,15 +1,22 @@
-class CompanionManager extends FormApplication {
+import { i18n } from "../automated-polymorpher";
+import { APCONSTS } from "./main";
+import { getGame } from "./settings";
+
+export class PolymorpherManager extends FormApplication {
+
+  actor:Actor;
+
   constructor(actor) {
-    super();
+    super({});
     this.actor = actor;
   }
 
   static get defaultOptions() {
     return {
       ...super.defaultOptions,
-      title: game.i18n.localize('AE.dialogs.companionManager.title'),
-      id: 'companionManager',
-      template: `modules/automated-evocations/templates/companionmanager.hbs`,
+      title: i18n('AP.dialogs.polymorpherManager.title'),
+      id: 'polymorpherManager',
+      template: `modules/automated-evocations/templates/polymorphermanager.hbs`,
       resizable: true,
       width: 300,
       height: window.innerHeight > 400 ? 400 : window.innerHeight - 100,
@@ -17,31 +24,31 @@ class CompanionManager extends FormApplication {
     };
   }
 
-  getData() {
+  getData():any {
     return {};
   }
 
   async activateListeners(html) {
     html
-      .find('#companion-list')
+      .find('#polymorpher-list')
       .before(
         `<div class="searchbox"><input type="text" class="searchinput" placeholder="Drag and Drop an actor to add it to the list."></div>`,
       );
-    this.loadCompanions();
+    this.loadPolymorphers();
     html.on('input', '.searchinput', this._onSearch.bind(this));
-    html.on('click', '#remove-companion', this._onRemoveCompanion.bind(this));
-    html.on('click', '#summon-companion', this._onSummonCompanion.bind(this));
+    html.on('click', '#remove-polymorpher', this._onRemovePolymorpher.bind(this));
+    html.on('click', '#summon-polymorpher', this._onSummonPolymorpher.bind(this));
     html.on('click', '.actor-name', this._onOpenSheet.bind(this));
-    html.on('dragstart', '#companion', async (event) => {
+    html.on('dragstart', '#polymorpher', async (event) => {
       event.originalEvent.dataTransfer.setData('text/plain', event.currentTarget.dataset.elid);
     });
-    html.on('dragend', '#companion', async (event) => {
+    html.on('dragend', '#polymorpher', async (event) => {
       event.originalEvent.dataTransfer.setData('text/plain', event.currentTarget.dataset.elid);
     });
   }
 
   _onSearch(event) {
-    const search = $(event.currentTarget).val();
+    const search = <string>$(event.currentTarget).val();
     this.element.find('.actor-name').each(function () {
       if ($(this).text().toLowerCase().includes(search.toLowerCase())) {
         $(this).parent().slideDown(200);
@@ -60,24 +67,27 @@ class CompanionManager extends FormApplication {
     }
     const li = this.element.find(`[data-elid="${data}"]`);
     if (li.length && !$(event.target).hasClass('nodrop')) {
-      let target = $(event.target).closest('li');
+      const target = $(event.target).closest('li');
       if (target.length && target[0].dataset.elid != data) {
         $(li).remove();
         target.before($(li));
       }
     }
-    if (!data.type === 'Actor') return;
-    this.element.find('#companion-list').append(this.generateLi({ id: data.id }));
+    if (!data?.type){ // || data?.type !== 'Actor'){
+       return;
+    }
+    this.element.find('#polymorpher-list').append(this.generateLi({ id: data.id }));
     this.saveData();
   }
 
-  async _onSummonCompanion(event) {
+  async _onSummonPolymorpher(event) {
     this.minimize();
     const animation = $(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
     const aId = event.currentTarget.dataset.aid;
-    const actor = game.actors.get(aId);
-    const duplicates = $(event.currentTarget.parentElement.parentElement).find('#companion-number-val').val();
+    const actor = <Actor>getGame().actors?.get(aId);
+    const duplicates = $(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
     const tokenData = await actor.getTokenData();
+    /*
     const posData = await warpgate.crosshairs.show(
       Math.max(tokenData.width, tokenData.height) * tokenData.scale,
       'modules/automated-evocations/assets/black-hole-bolas.webp',
@@ -87,79 +97,82 @@ class CompanionManager extends FormApplication {
       this.maximize();
       return;
     }
-    if (typeof AECONSTS.animationFunctions[animation].fn == 'string') {
-      game.macros.getName(AECONSTS.animationFunctions[animation].fn).execute(posData, tokenData);
+    if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+      getGame().macros.getName(APCONSTS.animationFunctions[animation].fn).execute(posData, tokenData);
     } else {
-      AECONSTS.animationFunctions[animation].fn(posData, tokenData);
+      APCONSTS.animationFunctions[animation].fn(posData, tokenData);
     }
 
-    await this.wait(AECONSTS.animationFunctions[animation].time);
+    await this.wait(APCONSTS.animationFunctions[animation].time);
     //get custom data macro
-    const customTokenData = await game.macros
-      .getName(`AE_Companion_Macro(${actor.data.name})`)
+    const customTokenData = await getGame().macros
+      .getName(`AE_Polymorpher_Macro(${actor.data.name})`)
       ?.execute({
         summon: actor,
         spellLevel: this.spellLevel || 0,
         duplicates: duplicates,
-        assignedActor: this.caster || game.user.character || _token.actor,
+        assignedActor: this.caster || getGame().user.character || _token.actor,
       });
     warpgate.spawnAt({ x: posData.x, y: posData.y }, tokenData, customTokenData || {}, {}, { duplicates });
-    if (game.settings.get(AECONSTS.MN, 'autoclose')) this.close();
+    */
+    if (getGame().settings.get(APCONSTS.MN, 'autoclose')) this.close();
     else this.maximize();
   }
 
-  async _onRemoveCompanion(event) {
+  async _onRemovePolymorpher(event) {
     Dialog.confirm({
-      title: game.i18n.localize('AE.dialogs.companionManager.confirm.title'),
-      content: game.i18n.localize('AE.dialogs.companionManager.confirm.content'),
+      title: i18n('AP.dialogs.polymorpherManager.confirm.title'),
+      content: i18n('AP.dialogs.polymorpherManager.confirm.content'),
       yes: () => {
         event.currentTarget.parentElement.remove();
         this.saveData();
       },
-      no: () => {},
+      no: () => {
+        // DO NOTHING
+      },
       defaultYes: false,
     });
   }
 
   async _onOpenSheet(event) {
     const actorId = event.currentTarget.parentElement.dataset.aid;
-    const actor = game.actors.get(actorId);
+    const actor = getGame().actors?.get(actorId);
     if (actor) {
-      actor.sheet.render(true);
+      actor.sheet?.render(true);
     }
   }
 
-  async loadCompanions() {
-    let data =
-      this.actor && (this.actor.getFlag(AECONSTS.MN, 'isLocal') || game.settings.get(AECONSTS.MN, 'storeonactor'))
-        ? this.actor.getFlag(AECONSTS.MN, 'companions') || []
-        : game.user.getFlag(AECONSTS.MN, 'companions');
+  async loadPolymorphers() {
+    const data:any =
+      this.actor && (<boolean>this.actor.getFlag(APCONSTS.MN, 'isLocal') || getGame().settings.get(APCONSTS.MN, 'storeonactor'))
+        ? this.actor.getFlag(APCONSTS.MN, 'polymorphers') || []
+        : getGame().user?.getFlag(APCONSTS.MN, 'polymorphers');
     if (data) {
-      for (let companion of data) {
-        this.element.find('#companion-list').append(this.generateLi(companion));
+      for (const polymorpher of data) {
+        this.element.find('#polymorpher-list').append(this.generateLi(polymorpher));
       }
     }
   }
 
   generateLi(data) {
-    const actor = game.actors.get(data.id) || game.actors.getName(data.id);
+    const actor = getGame().actors?.get(data.id) || getGame().actors?.getName(data.id);
     if (!actor) return '';
-    const restricted = game.settings.get(AECONSTS.MN, 'restrictOwned');
+    const restricted = getGame().settings.get(APCONSTS.MN, 'restrictOwned');
     if (restricted && !actor.isOwner) return '';
-    let $li = $(`
-	<li id="companion" class="companion-item" data-aid="${actor.id}" data-elid="${randomID()}" draggable="true">
+    const $li = $(`
+	<li id="polymorpher" class="polymorpher-item" data-aid="${actor.id}" data-elid="${randomID()}" draggable="true">
 		<div class="summon-btn">
 			<img class="actor-image" src="${actor.data.img}" alt="">
-			<div class="warpgate-btn" id="summon-companion" data-aid="${actor.id}"></div>
+			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actor.id}"></div>
 		</div>
     	<span class="actor-name">${actor.data.name}</span>
-		<div class="companion-number"><input type="number" min="1" max="99" class="fancy-input" step="1" id="companion-number-val" value="${
+		<div class="polymorpher-number"><input type="number" min="1" max="99" class="fancy-input" step="1" id="polymorpher-number-val" value="${
       data.number || 1
     }"></div>
     	<select class="anim-dropdown">
         	${this.getAnimations(data.animation)}
     	</select>
-		<i id="remove-companion" class="fas fa-trash"></i>
+		<i id="remove-polymorpher" class="fas fa-trash"></i>
 	</li>
 	`);
     //    <i id="advanced-params" class="fas fa-edit"></i>
@@ -168,10 +181,10 @@ class CompanionManager extends FormApplication {
 
   getAnimations(anim) {
     let animList = '';
-    for (let [group, animations] of Object.entries(AECONSTS.animations)) {
-      const localGroup = game.i18n.localize(`AE.groups.${group}`);
-      animList += `<optgroup label="${localGroup == `AE.groups.${group}` ? group : localGroup}">`;
-      for (let a of animations) {
+    for (const [group, animations] of Object.entries(APCONSTS.animations)) {
+      const localGroup = i18n(`AP.groups.${group}`);
+      animList += `<optgroup label="${localGroup == `AP.groups.${group}` ? group : localGroup}">`;
+      for (const a of <any[]>animations) {
         animList += `<option value="${a.key}" ${a.key == anim ? 'selected' : ''}>${a.name}</option>`;
       }
       animList += '</optgroup>';
@@ -183,43 +196,55 @@ class CompanionManager extends FormApplication {
   }
 
   async saveData() {
-    let data = [];
-    for (let companion of this.element.find('.companion-item')) {
+    const data:any[] = [];
+    for (const polymorpher of this.element.find('.polymorpher-item')) {
       data.push({
-        id: companion.dataset.aid,
-        animation: $(companion).find('.anim-dropdown').val(),
-        number: $(companion).find('#companion-number-val').val(),
+        id: polymorpher.dataset.aid,
+        animation: $(polymorpher).find('.anim-dropdown').val(),
+        number: $(polymorpher).find('#polymorpher-number-val').val(),
       });
     }
-    this.actor && (this.actor.getFlag(AECONSTS.MN, 'isLocal') || game.settings.get(AECONSTS.MN, 'storeonactor'))
-      ? this.actor.setFlag(AECONSTS.MN, 'companions', data)
-      : game.user.setFlag(AECONSTS.MN, 'companions', data);
+    this.actor && (this.actor.getFlag(APCONSTS.MN, 'isLocal') || getGame().settings.get(APCONSTS.MN, 'storeonactor'))
+      ? this.actor.setFlag(APCONSTS.MN, 'polymorphers', data)
+      : getGame().user?.setFlag(APCONSTS.MN, 'polymorphers', data);
   }
 
+  //@ts-ignore
   close(noSave = false) {
     if (!noSave) this.saveData();
     super.close();
   }
+
+  _updateObject(event):any{
+    // DO NOTHING
+  }
 }
 
-class SimpleCompanionManager extends CompanionManager {
+export class SimplePolymorpherManager extends PolymorpherManager {
+
+  caster:Actor;
+  summons:any[];
+  spellLevel:number;
+
   constructor(summonData, spellLevel, actor) {
-    super();
+    super({});
     this.caster = actor;
     this.summons = summonData;
     this.spellLevel = spellLevel;
   }
 
   async activateListeners(html) {
-    for (let summon of this.summons) {
-      this.element.find('#companion-list').append(this.generateLi(summon));
+    for (const summon of this.summons) {
+      this.element.find('#polymorpher-list').append(this.generateLi(summon));
     }
 
-    html.on('click', '#summon-companion', this._onSummonCompanion.bind(this));
+    html.on('click', '#summon-polymorpher', this._onSummonPolymorpher.bind(this));
     html.on('click', '.actor-name', this._onOpenSheet.bind(this));
   }
 
-  _onDrop(event) {}
+  _onDrop(event) {
+    // DO NOTHING
+  }
 
   close() {
     super.close(true);
