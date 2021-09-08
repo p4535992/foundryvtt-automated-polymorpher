@@ -40,28 +40,28 @@
   ],
   "packs": [
     {
-        "name": "automated-polymorpher-macros",
-        "label": "Automated Polymorpher Macros",
-        "path": "packs/macros.db",
-        "entity": "Macro",
-        "module": "automated-polymorpher"
+      "name": "automated-polymorpher-macros",
+      "label": "Automated Polymorpher Macros",
+      "path": "packs/macros.db",
+      "entity": "Macro",
+      "module": "automated-polymorpher"
     },
     {
-        "name": "automated-polymorpher-actors",
-        "label": "Automated Polymorpher Summons",
-        "path": "packs/actors.db",
-        "entity": "Actor",
-        "module": "automated-polymorpher"
+      "name": "automated-polymorpher-actors",
+      "label": "Automated Polymorpher Summons",
+      "path": "packs/actors.db",
+      "entity": "Actor",
+      "module": "automated-polymorpher"
     }
   ],
   "systems": ["dnd5e"],
   "scripts": [],
-  "esmodules": ["main.js"],
+  "esmodules": ["automated-polymorpher.js"],
   "styles": ["styles/polymorphermanager.css"],
   "url": "https://github.com/p4535992/foundryvtt-automated-polymorpher",
   "manifest": "https://raw.githubusercontent.com/p4535992/foundryvtt-automated-polymorpher/main/src/module.json",
   "download": "https://raw.githubusercontent.com/p4535992/foundryvtt-automated-polymorpher/main/package/foundryvtt-automated-polymorpher-v1.0.0.zip",
-  "minimumCoreVersion": "0.8.6",
+  "minimumCoreVersion": "0.8.9",
   "compatibleCoreVersion": "0.8.9",
   "manifestPlusVersion": "1.2.1",
   "changelog": "https://raw.githubusercontent.com/p4535992/foundryvtt-automated-polymorpher/main/changelog.md",
@@ -70,6 +70,9 @@
   "dependencies": [
     {
       "name": "lib-wrapper"
+    },
+    {
+      "name": "sequencer"
     }
   ]
 }
