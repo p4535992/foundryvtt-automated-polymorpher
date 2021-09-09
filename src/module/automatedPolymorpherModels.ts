@@ -10,7 +10,7 @@ export class Creature {
   creature: string;
   number: number;
   level?: number;
-  animation?:string;
+  animation?: string;
 }
 
 // export class CreatureData{

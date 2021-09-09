@@ -1,3 +1,4 @@
+import { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
 import { i18n } from '../automated-polymorpher';
 import { APCONSTS } from './config';
 import { getCanvas, getGame } from './settings';
@@ -82,11 +83,12 @@ export class PolymorpherManager extends FormApplication {
 
   async _onSummonPolymorpher(event) {
     this.minimize();
-    const animation = $(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
+    const animation = <string>$(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
     const aId = event.currentTarget.dataset.aid;
     const actor = <Actor>getGame().actors?.get(aId);
-    const duplicates = $(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
-    const tokenData = await actor.getTokenData();
+    const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
+    const tokenData = <TokenData>await actor.getTokenData();
+    const posData = <Token>actor.token?.object;
 
     const canPolymorph =
       getGame().user?.isGM || (this.actor.isOwner && getGame().settings.get('dnd5e', 'allowPolymorphing'));
@@ -130,6 +132,14 @@ export class PolymorpherManager extends FormApplication {
             icon: '<i class="fas fa-check"></i>',
             label: i18n('DND5E.PolymorphAcceptSettings'),
             callback: async (html) => {
+              if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                //@ts-ignore
+                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+              } else {
+                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+              }
+              await this.wait(APCONSTS.animationFunctions[animation].time);
+
               //@ts-ignore
               await this.actor.transformInto(
                 // await this._transformIntoCustom(
@@ -144,6 +154,14 @@ export class PolymorpherManager extends FormApplication {
             icon: '<i class="fas fa-paw"></i>',
             label: i18n('DND5E.PolymorphWildShape'),
             callback: async (html) => {
+              if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                //@ts-ignore
+                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+              } else {
+                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+              }
+              await this.wait(APCONSTS.animationFunctions[animation].time);
+
               //@ts-ignore
               await this.actor.transformInto(
                 // await this._transformIntoCustom(
@@ -165,6 +183,14 @@ export class PolymorpherManager extends FormApplication {
             icon: '<i class="fas fa-pastafarianism"></i>',
             label: i18n('DND5E.Polymorph'),
             callback: async (html) => {
+              if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                //@ts-ignore
+                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+              } else {
+                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+              }
+              await this.wait(APCONSTS.animationFunctions[animation].time);
+
               //@ts-ignore
               await this.actor.transformInto(
                 // await this._transformIntoCustom(
@@ -173,6 +199,7 @@ export class PolymorpherManager extends FormApplication {
                   transformTokens: rememberOptions(html).transformTokens,
                 },
               );
+
               if (getGame().settings.get(APCONSTS.MN, 'autoclose')) this.close();
               else this.maximize();
             },

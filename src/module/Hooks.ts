@@ -4,7 +4,7 @@ import { APCONSTS } from './config';
 import { PolymorpherManager, SimplePolymorpherManager } from './polymorphermanager';
 import { getCanvas, getGame } from './settings';
 
-let automatedpolymorphers:SystemCreatures;
+let automatedpolymorphers: SystemCreatures;
 
 export const readyHooks = async () => {
   // setup all the hooks
@@ -64,7 +64,7 @@ export const readyHooks = async () => {
     if (chatMessage.data.user !== getGame().user?.id || !getGame().settings.get(APCONSTS.MN, 'enableautomations')) {
       return;
     }
-    const spellName:string =
+    const spellName: string =
       chatMessage.data.flavor ||
       getCanvas()
         .tokens?.get(chatMessage?.data?.speaker?.token)
@@ -92,7 +92,8 @@ export const readyHooks = async () => {
       spellLevel = parseInt(spellLevel);
       const summonData: any[] = [];
       const data = { level: spellLevel };
-      const creatures:Creature[] = typeof creaturesCollection === 'function' ? creaturesCollection(data) : system[spellName];
+      const creatures: Creature[] =
+        typeof creaturesCollection === 'function' ? creaturesCollection(data) : system[spellName];
       for (const creature of creatures) {
         if (creature.level && spellLevel && creature.level >= spellLevel) {
           continue;

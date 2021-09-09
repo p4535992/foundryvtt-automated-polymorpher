@@ -1,11 +1,14 @@
 //@ts-ignore
+
+import { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
+
 // import { Sequence } from '../../sequencer/scripts/module/sequencer.js';
 export const APCONSTS = {
   MN: 'automated-polymorpher',
   animations: {},
   animationFunctions: {
     fire: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -27,7 +30,7 @@ export const APCONSTS = {
       group: 'elemental',
     },
     air: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -55,7 +58,7 @@ export const APCONSTS = {
       group: 'elemental',
     },
     lightning: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -78,7 +81,7 @@ export const APCONSTS = {
       group: 'elemental',
     },
     lightning2: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -107,7 +110,7 @@ export const APCONSTS = {
       group: 'elemental',
     },
     water: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -130,7 +133,7 @@ export const APCONSTS = {
       group: 'elemental',
     },
     ice1: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -156,7 +159,7 @@ export const APCONSTS = {
       group: 'elemental',
     },
     darkness: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -188,7 +191,7 @@ export const APCONSTS = {
       group: 'magical',
     },
     energy1: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -211,7 +214,7 @@ export const APCONSTS = {
       group: 'magical',
     },
     magic1: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -225,7 +228,7 @@ export const APCONSTS = {
       group: 'magical',
     },
     magic2: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -251,7 +254,7 @@ export const APCONSTS = {
       group: 'magical',
     },
     heart: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -263,7 +266,7 @@ export const APCONSTS = {
       time: 400,
     },
     music: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -285,7 +288,7 @@ export const APCONSTS = {
       time: 1350,
     },
     music2: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
@@ -304,7 +307,7 @@ export const APCONSTS = {
       time: 600,
     },
     fourelements: {
-      fn: async (template, tokenData) => {
+      fn: async (template: Token, tokenData: TokenData) => {
         //@ts-ignore
         await new Sequence()
           .effect()
