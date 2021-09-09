@@ -1,9 +1,10 @@
+import { Creature, SystemCreatures } from './automatedPolymorpherModels';
 import { warn, error, debug, i18n, i18nFormat, log } from '../automated-polymorpher';
 import { APCONSTS } from './config';
 import { PolymorpherManager, SimplePolymorpherManager } from './polymorphermanager';
 import { getCanvas, getGame } from './settings';
 
-let automatedpolymorphers: any = {};
+let automatedpolymorphers:SystemCreatures;
 
 export const readyHooks = async () => {
   // setup all the hooks
@@ -34,8 +35,8 @@ export const readyHooks = async () => {
     automatedpolymorphers = {};
   }
   if (getGame().system.id == 'dnd5e') {
-    automatedpolymorphers.dnd5e = {
-      // TODO ADD SOME PRESET ???
+    automatedpolymorphers['dnd5e'] = {
+      // TODO PREPARE SOME PRESET
     };
   }
 
@@ -63,7 +64,7 @@ export const readyHooks = async () => {
     if (chatMessage.data.user !== getGame().user?.id || !getGame().settings.get(APCONSTS.MN, 'enableautomations')) {
       return;
     }
-    const spellName =
+    const spellName:string =
       chatMessage.data.flavor ||
       getCanvas()
         .tokens?.get(chatMessage?.data?.speaker?.token)
@@ -72,7 +73,10 @@ export const readyHooks = async () => {
     if (!system) {
       return;
     }
-    if (system[spellName]) {
+
+    const creaturesCollection = system[spellName];
+
+    if (creaturesCollection) {
       //attempt to get spell level
       let spellLevel;
       //@ts-ignore
@@ -88,7 +92,7 @@ export const readyHooks = async () => {
       spellLevel = parseInt(spellLevel);
       const summonData: any[] = [];
       const data = { level: spellLevel };
-      const creatures = typeof system[spellName] === 'function' ? system[spellName](data) : system[spellName];
+      const creatures:Creature[] = typeof creaturesCollection === 'function' ? creaturesCollection(data) : system[spellName];
       for (const creature of creatures) {
         if (creature.level && spellLevel && creature.level >= spellLevel) {
           continue;

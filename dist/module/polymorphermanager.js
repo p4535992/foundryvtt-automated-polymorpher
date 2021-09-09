@@ -82,7 +82,7 @@ export class PolymorpherManager extends FormApplication {
         if (!canPolymorph)
             return false;
         // Get the target actor
-        let sourceActor = actor;
+        const sourceActor = actor;
         // if (data.pack) {
         //   const pack = getGame().packs.find(p => p.collection === data.pack);
         //   sourceActor = await pack.getEntity(data.id);
@@ -250,7 +250,7 @@ export class PolymorpherManager extends FormApplication {
 			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actor.id}"></div>
 		</div>
     	<span class="actor-name">${actor.data.name}</span>
-		<div class="polymorpher-number"><input type="number" min="1" max="99" class="fancy-input" step="1" id="polymorpher-number-val" value="${data.number || 1}"></div>
+		<div class="polymorpher-number" style="display:none"><input type="number" min="1" max="99" class="fancy-input" step="1" id="polymorpher-number-val" value="${data.number || 1}"></div>
     	<select class="anim-dropdown">
         	${this.getAnimations(data.animation)}
     	</select>
