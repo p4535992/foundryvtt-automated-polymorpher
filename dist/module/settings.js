@@ -2,7 +2,6 @@ import { i18n } from "../automated-polymorpher.js";
 import { APCONSTS } from "./config.js";
 // import ImagePicker from "./libs/ImagePicker";
 // import SoundPicker from "./libs/SoundPicker";
-export const AUTOMATED_POLYMORPHER_MODULE_NAME = 'automated-polymorpher';
 /**
  * Because typescript doesn't know when in the lifecycle of foundry your code runs, we have to assume that the
  * canvas is potentially not yet initialized, so it's typed as declare let canvas: Canvas | {ready: false}.
@@ -59,40 +58,40 @@ export const registerSettings = function () {
         default: {},
     });
     getGame().settings.register(APCONSTS.MN, 'autoclose', {
-        name: i18n(`${APCONSTS.MN}.settings.autoclose.title`),
-        hint: i18n(`${APCONSTS.MN}.settings.autoclose.hint`),
+        name: i18n(`AP.settings.autoclose.title`),
+        hint: i18n(`AP.settings.autoclose.hint`),
         scope: 'world',
         config: true,
         type: Boolean,
         default: false,
     });
     getGame().settings.register(APCONSTS.MN, 'enableautomations', {
-        name: i18n(`${APCONSTS.MN}.settings.enableautomations.title`),
-        hint: i18n(`${APCONSTS.MN}.settings.enableautomations.hint`),
+        name: i18n(`AP.settings.enableautomations.title`),
+        hint: i18n(`AP.settings.enableautomations.hint`),
         scope: 'world',
         config: true,
         type: Boolean,
         default: true,
     });
     getGame().settings.register(APCONSTS.MN, 'storeonactor', {
-        name: i18n(`${APCONSTS.MN}.settings.storeonactor.title`),
-        hint: i18n(`${APCONSTS.MN}.settings.storeonactor.hint`),
+        name: i18n(`AP.settings.storeonactor.title`),
+        hint: i18n(`AP.settings.storeonactor.hint`),
         scope: 'world',
         config: true,
         type: Boolean,
         default: false,
     });
     getGame().settings.register(APCONSTS.MN, 'hidebutton', {
-        name: i18n(`${APCONSTS.MN}.settings.hidebutton.title`),
-        hint: i18n(`${APCONSTS.MN}.settings.hidebutton.hint`),
+        name: i18n(`AP.settings.hidebutton.title`),
+        hint: i18n(`AP.settings.hidebutton.hint`),
         scope: 'world',
         config: true,
         type: Boolean,
         default: false,
     });
     getGame().settings.register(APCONSTS.MN, 'restrictOwned', {
-        name: i18n(`${APCONSTS.MN}.settings.restrictOwned.title`),
-        hint: i18n(`${APCONSTS.MN}.settings.restrictOwned.hint`),
+        name: i18n(`AP.settings.restrictOwned.title`),
+        hint: i18n(`AP.settings.restrictOwned.hint`),
         scope: 'world',
         config: true,
         type: Boolean,

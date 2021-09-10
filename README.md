@@ -30,7 +30,7 @@ To install this module manually:
 
 ### sequencer
 
-This module uses the [sequencer](https://github.com/fantasycalendar/FoundryVTT-Sequencer/) library. It is a hard dependency and it is recommended for the best experience and compatibility with other modules.
+This module uses the [sequencer](https://github.com/fantasycalendar/FoundryVTT-Sequencer/) library. It is a hard dependency.
 
 ### warpgate
 

@@ -94,7 +94,8 @@ export class PolymorpherManager extends FormApplication {
     const actor = <Actor>getGame().actors?.get(aId);
     // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
     const tokenData = <TokenData>await actor.getTokenData();
-    const posData = <Token>getCanvas().tokens?.placeables.find((t:Token) => t.actor?.id === this.actor.id) || undefined;
+    const posData =
+      <Token>getCanvas().tokens?.placeables.find((t: Token) => t.actor?.id === this.actor.id) || undefined;
     // Get the target actor
     const sourceActor = actor;
     // if (data.pack) {
@@ -138,7 +139,7 @@ export class PolymorpherManager extends FormApplication {
               icon: '<i class="fas fa-check"></i>',
               label: i18n('DND5E.PolymorphAcceptSettings'),
               callback: async (html) => {
-                if(posData){
+                if (posData) {
                   if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
                     //@ts-ignore
                     getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
@@ -161,7 +162,7 @@ export class PolymorpherManager extends FormApplication {
               icon: '<i class="fas fa-paw"></i>',
               label: i18n('DND5E.PolymorphWildShape'),
               callback: async (html) => {
-                if(posData){
+                if (posData) {
                   if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
                     //@ts-ignore
                     getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
@@ -191,7 +192,7 @@ export class PolymorpherManager extends FormApplication {
               icon: '<i class="fas fa-pastafarianism"></i>',
               label: i18n('DND5E.Polymorph'),
               callback: async (html) => {
-                if(posData){
+                if (posData) {
                   if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
                     //@ts-ignore
                     getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
@@ -301,7 +302,6 @@ export class PolymorpherManager extends FormApplication {
 			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actor.id}"></div>
 		</div>
     	<span class="actor-name">${actor.data.name}</span>
-		<div class="polymorpher-number"></div>
     	<select class="anim-dropdown">
         	${this.getAnimations(data.animation)}
     	</select>

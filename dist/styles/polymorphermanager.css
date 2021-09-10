@@ -96,9 +96,11 @@
 }
 
 #polymorpher-list select {
-  border-left: 0;
+  /* border-left: 0; */
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
   height: 27px;
 }
 

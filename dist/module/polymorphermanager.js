@@ -284,7 +284,6 @@ export class PolymorpherManager extends FormApplication {
 			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actor.id}"></div>
 		</div>
     	<span class="actor-name">${actor.data.name}</span>
-		<div class="polymorpher-number"></div>
     	<select class="anim-dropdown">
         	${this.getAnimations(data.animation)}
     	</select>

@@ -38,8 +38,7 @@
       "path": "lang/en.json"
     }
   ],
-  "packs": [
-  ],
+  "packs": [],
   "systems": [],
   "scripts": [],
   "esmodules": ["automated-polymorpher.js"],
