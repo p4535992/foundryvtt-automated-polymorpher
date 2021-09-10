@@ -41,8 +41,8 @@
     "gulp-sass": "^4.1.0",
     "gulp-typescript": "^6.0.0-alpha.1",
     "json-stringify-pretty-compact": "^2.0.0",
-    "prettier": "^2.3.2",
-    "sass": "^1.38.0",
+    "prettier": "^2.4.0",
+    "sass": "^1.39.2",
     "yargs": "^15.4.1"
   },
   "lint-staged": {
