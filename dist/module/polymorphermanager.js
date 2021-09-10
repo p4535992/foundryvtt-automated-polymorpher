@@ -215,7 +215,9 @@ export class PolymorpherManager extends FormApplication {
             }
             await this.wait(APCONSTS.animationFunctions[animation].time);
             //get custom data macro
-            const customTokenData = await getGame().macros?.getName(`AP_Polymorpher_Macro(${actor.data.name})`)?.execute({
+            const customTokenData = await getGame()
+                .macros?.getName(`AP_Polymorpher_Macro(${actor.data.name})`)
+                ?.execute({
                 //@ts-ignore
                 summon: actor,
                 spellLevel: this.spellLevel || 0,
@@ -223,42 +225,12 @@ export class PolymorpherManager extends FormApplication {
                 assignedActor: this.caster || getGame().user?.character || _token?.actor,
             });
             //@ts-ignore
-            warpgate
-                .mutate(posData.document, customTokenData || {}, {}, { duplicates });
+            warpgate.mutate(posData.document, customTokenData || {}, {}, { duplicates });
             if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
                 this.close();
             else
                 this.maximize();
         }
-        /*
-        const posData = await warpgate.crosshairs.show(
-          Math.max(tokenData.width, tokenData.height) * tokenData.scale,
-          'modules/automated-polymorpher/assets/black-hole-bolas.webp',
-          '',
-        );
-        if (posData.cancelled) {
-          this.maximize();
-          return;
-        }
-        if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
-          getGame().macros.getName(APCONSTS.animationFunctions[animation].fn).execute(posData, tokenData);
-        } else {
-          APCONSTS.animationFunctions[animation].fn(posData, tokenData);
-        }
-        await this.wait(APCONSTS.animationFunctions[animation].time);
-        //get custom data macro
-        const customTokenData = await getGame().macros
-          .getName(`AP_Polymorpher_Macro(${actor.data.name})`)
-          ?.execute({
-            summon: actor,
-            spellLevel: this.spellLevel || 0,
-            duplicates: duplicates,
-            assignedActor: this.caster || getGame().user.character || _token.actor,
-          });
-        warpgate.spawnAt({ x: posData.x, y: posData.y }, tokenData, customTokenData || {}, {}, { duplicates });
-        if (getGame().settings.get(APCONSTS.MN, 'autoclose')) this.close();
-        else this.maximize();
-        */
     }
     async _onRemovePolymorpher(event) {
         Dialog.confirm({
