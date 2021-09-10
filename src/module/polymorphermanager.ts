@@ -92,7 +92,7 @@ export class PolymorpherManager extends FormApplication {
     const animation = <string>$(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
     const aId = event.currentTarget.dataset.aid;
     const actor = <Actor>getGame().actors?.get(aId);
-    const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
+    // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
     const tokenData = <TokenData>await actor.getTokenData();
     const posData = <Token>actor.token?.object;
     // Get the target actor
@@ -239,11 +239,11 @@ export class PolymorpherManager extends FormApplication {
           //@ts-ignore
           summon: actor,
           spellLevel: this.spellLevel || 0,
-          duplicates: duplicates,
+          // duplicates: duplicates,
           assignedActor: this.caster || getGame().user?.character || _token?.actor,
         });
       //@ts-ignore
-      warpgate.mutate(posData.document, customTokenData || {}, {}, { duplicates });
+      warpgate.mutate(posData.document, customTokenData || {}, {}, {});
 
       if (getGame().settings.get(APCONSTS.MN, 'autoclose')) this.close();
       else this.maximize();

@@ -31,12 +31,69 @@ This module uses the [sequencer](https://github.com/fantasycalendar/FoundryVTT-S
 
 This module uses the [warpgate](https://github.com/trioderegion/warpgate) library. It is a optional dependency and it is recommended for the best experience and compatibility with other modules.
 
-**NOTE: you need this only if the system is not DnD5e**
+**NOTE: you need this only if the system is not DnD5e, not tested**
+
+### advanced-macros
+
+This module uses the [advanced-macros](https://github.com/League-of-Foundry-Developers/fvtt-advanced-macros) library. It is a optional dependency and it is recommended for the best experience and compatibility with other modules.
+
+**NOTE: you need this only for the custom macro feature, i don't suggest it is much easier to create the actors and set them up, but it's up to you**
 
 ## Features 
 
+Open any character sheet, in the header of the window you will see the polymorphers button
 
-## Hooks
+![image](https://user-images.githubusercontent.com/1346839/130644498-3b14fe5d-79ff-489c-8593-ea61f2d9f752.png)
+
+Upon opening you will be welcomed by a window, from here you can drag and drop actor into it to add them.
+
+After adding actor to the window you will have some options:
+
+- To mutate click on the actor image
+- The dropdown will let you chose the summoning animation
+
+![image](https://user-images.githubusercontent.com/1346839/130645621-2da0dcd2-bd7f-4599-bfb7-712441734aef.png)
+
+## Store polymorphers on actor
+
+By default polymorphers are stored per user (so each actor will have the same summon list). If you want a particular actor to have it's own summon list you can use the included macro to switch the actor from global storage to local (on the actor). Simply place a linked actor on the scene, select it and run the macro. Using the other macro to switch it to global again will not wipe the saved polymorphers so setting it to local at a later date will restore the previous list.
+
+For more advanced users you can set the flag with the following command : `actor.setFlag(APCONSTS.MN,"isLocal", false)` (set true\false to enable disable local storage)
+
+## Custom Macros (requires the Advanced Macro Module)
+
+You can assign custom macros to specific actors
+
+1. Create a macro with this exact name `AP_Polymorpher_Macro(ActorName)` eg. `AP_Polymorpher_Macro(Bat)`, this will get fired any time a creature with that name is summoned
+2. Add code for the custom data, in the context of the macro args[0] contains the following data: 
+
+`summon`: the actor that's getting summoned
+
+`spellLevel`: the level of the spell that triggered the summoning (requires midiqol)
+
+`assignedActor`: the actor assigned to the player doing the summoning (this will be the selected token actor if no assigned actor is found, this is always the case for GMs)
+
+The macro must return the custom data.
+
+Example (XXX auto scaling)
+
+Macro name: `AP_Polymorpher_Macro(XXX)`
+
+```js
+return {
+  item: {
+    "Clenched Fist": {
+      "data.attackBonus": args[0].assignedActor?.data.data.attributes.spelldc-8+args[0].assignedActor?.data.data.bonuses.msak.attack,
+      "data.damage.parts":[[`${((args[0].spellLevel || 5)-5)*2+4}d8`,"force"]]
+    },
+    "Grasping Hand":{
+      "data.damage.parts":[[`${((args[0].spellLevel || 5)-5)*2+4}d6 + ${args[0].assignedActor?.data.data.abilities[args[0].assignedActor?.data.data.attributes.spellcasting]?.mod || ""}`,"bludgeoning"]]
+    }
+  }
+}
+```
+
+Every time an actor named `XXX` is summoned, the custom data will be applied
 
 # Build
 
@@ -121,11 +178,33 @@ Any issues, bugs, or feature requests are always welcome to be reported directly
 
 ## License
 
-This package is under an [MIT license](LICENSE) and the [Foundry Virtual Tabletop Limited License Agreement for module development](https://foundryvtt.com/article/license/).
+- **Jack Kerouac's**: [GPL-3.0 License](https://github.com/jackkerouac/animated-tokens/blob/main/LICENSE)
 
-## Credit
+- **JB2A**: ???
 
-Thanks to anyone who helps me with this code! I appreciate the user community's feedback on this project!
+- **Sequencer**: [Mit License](https://github.com/fantasycalendar/FoundryVTT-Sequencer/blob/master/LICENSE)
+
+- **Warpgate**: [GPL-3.0 License](https://github.com/trioderegion/warpgate/blob/master/LICENSE)
+
+- **Automated Evocations**: ???
+
+- **Game Icons**: [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+
+This package is under an [GPL-3.0 License](LICENSE) and the [Foundry Virtual Tabletop Limited License Agreement for module development](https://foundryvtt.com/article/license/).
+
+## Credits
+
+- **Jack Kerouac's**: The Fire, Air, Lightning, Water, Energy, Magic, Heart, Crescendo, Four Elements animations assets are from Jack Kerouac's amazing https://github.com/jackkerouac/animated-spell-effects-cartoon module. (used with permission)
+
+- **JB2A**: The  Chord, Darkness, Ice, Conjuration, Storm animations assets are courtesy of JB2A (Free animated assets), i strongly reccomend checking out their patreon for many more amazing animations and variations. (used with permission) https://discord.gg/A59GAZwB9M https://www.patreon.com/JB2A
+
+- **Sequencer**: This module is used to play the animations https://github.com/fantasycalendar/FoundryVTT-Sequencer
+
+- **Warpgate**: This module is used for the spawning https://github.com/trioderegion/warpgate
+
+- **Automated Evocations**: This module is used for the inspiration and base functionality https://github.com/theripper93/automated-evocations
+
+- **Game Icons**: Some images used are from https://game-icons.net/
 
 ## Acknowledgements
 

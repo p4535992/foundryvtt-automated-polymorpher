@@ -4,7 +4,7 @@ import { APCONSTS } from './config';
 import { PolymorpherManager, SimplePolymorpherManager } from './polymorphermanager';
 import { getCanvas, getGame } from './settings';
 
-let automatedpolymorphers: SystemCreatures;
+// let automatedpolymorphers: SystemCreatures;
 
 export const readyHooks = async () => {
   // setup all the hooks
@@ -30,7 +30,7 @@ export const readyHooks = async () => {
       return obj;
     }, {});
   //new PolymorpherManager().render(true)
-
+  /*
   if (!automatedpolymorphers) {
     automatedpolymorphers = {};
   }
@@ -44,7 +44,7 @@ export const readyHooks = async () => {
     automatedpolymorphers[getGame().system.id],
     <any>getGame().settings.get(APCONSTS.MN, 'customautospells'),
   );
-
+  */
   Hooks.on('getActorSheetHeaderButtons', (app, buttons) => {
     if (getGame().settings.get(APCONSTS.MN, 'hidebutton')) return;
     buttons.unshift({
@@ -59,7 +59,7 @@ export const readyHooks = async () => {
       },
     });
   });
-
+  /*
   Hooks.on('createChatMessage', async (chatMessage) => {
     if (chatMessage.data.user !== getGame().user?.id || !getGame().settings.get(APCONSTS.MN, 'enableautomations')) {
       return;
@@ -114,6 +114,7 @@ export const readyHooks = async () => {
       ).render(true);
     }
   });
+  */
 };
 
 export const setupHooks = () => {

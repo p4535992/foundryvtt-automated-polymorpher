@@ -39,13 +39,6 @@
     }
   ],
   "packs": [
-    {
-      "name": "automated-polymorpher-macros",
-      "label": "Automated Polymorpher Macros",
-      "path": "packs/automated-polymorpher-macros.db",
-      "entity": "Macro",
-      "module": "automated-polymorpher"
-    }
   ],
   "systems": [],
   "scripts": [],
