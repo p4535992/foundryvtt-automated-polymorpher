@@ -4,16 +4,16 @@ import { APCONSTS } from './config';
 import { getCanvas, getGame } from './settings';
 
 export class PolymorpherManager extends FormApplication {
-  caster: Actor;
+  // caster: Actor;
   summons: any[] | undefined;
-  spellLevel: number | undefined;
+  // spellLevel: number | undefined;
   actor: Actor;
 
-  constructor(actor: Actor, summonData?: any[], spellLevel?: number) {
+  constructor(actor: Actor, summonData?: any[]) {
     super({});
-    this.caster = actor;
+    // this.caster = actor;
     this.summons = summonData;
-    this.spellLevel = spellLevel;
+    // this.spellLevel = spellLevel;
     this.actor = actor;
   }
 
@@ -237,10 +237,10 @@ export class PolymorpherManager extends FormApplication {
         .macros?.getName(`AP_Polymorpher_Macro(${actor.data.name})`)
         ?.execute({
           //@ts-ignore
-          summon: actor,
-          spellLevel: this.spellLevel || 0,
+          polymorpherActor: actor,
+          // spellLevel: this.spellLevel || 0,
           // duplicates: duplicates,
-          assignedActor: this.caster || getGame().user?.character || _token?.actor,
+          assignedActor: this.actor || getGame().user?.character || _token?.actor,
         });
       //@ts-ignore
       warpgate.mutate(posData.document, customTokenData || {}, {}, {});
@@ -298,9 +298,7 @@ export class PolymorpherManager extends FormApplication {
 			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actor.id}"></div>
 		</div>
     	<span class="actor-name">${actor.data.name}</span>
-		<div class="polymorpher-number" style="display:none"><input type="number" min="1" max="99" class="fancy-input" step="1" id="polymorpher-number-val" value="${
-      data.number || 1
-    }"></div>
+		<div class="polymorpher-number"></div>
     	<select class="anim-dropdown">
         	${this.getAnimations(data.animation)}
     	</select>
@@ -357,8 +355,8 @@ export class SimplePolymorpherManager extends PolymorpherManager {
   // summons: any[];
   // spellLevel: number;
 
-  constructor(actor, summonData, spellLevel) {
-    super(actor, summonData, spellLevel);
+  constructor(actor, summonData) {
+    super(actor, summonData);
     // this.caster = actor;
     // this.summons = summonData;
     // this.spellLevel = spellLevel;

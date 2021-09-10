@@ -1,10 +1,10 @@
-![](https://img.shields.io/badge/Foundry-v0.8.6-informational)
+![](https://img.shields.io/badge/Foundry-v0.8.9-informational)
 
 #  FoundryVTT Automated Polymorpher
 
 A user interface to manage polymorpher of the actor.
 
-Should work with all system supported form the [warpgate](https://github.com/trioderegion/warpgate) module "mutate" function, but for now the module is only use with the Dnd5e system and the polymorph mechanism.
+Should work with all system supported from the [warpgate](https://github.com/trioderegion/warpgate) module "mutate" function, but for now the module is only used and tested with the Dnd5e system and the polymorph mechanism.
 
 ## NOTE: If you are a javascript developer and not a typescript developer, you can just use the javascript files under the dist folder
 
@@ -60,16 +60,14 @@ By default polymorphers are stored per user (so each actor will have the same su
 
 For more advanced users you can set the flag with the following command : `actor.setFlag(APCONSTS.MN,"isLocal", false)` (set true\false to enable disable local storage)
 
-## Custom Macros (requires the Advanced Macro Module)
+## Custom Macros (requires the Advanced Macro Module and a game system is not Dnd5e)
 
 You can assign custom macros to specific actors
 
 1. Create a macro with this exact name `AP_Polymorpher_Macro(ActorName)` eg. `AP_Polymorpher_Macro(Bat)`, this will get fired any time a creature with that name is summoned
 2. Add code for the custom data, in the context of the macro args[0] contains the following data: 
 
-`summon`: the actor that's getting summoned
-
-`spellLevel`: the level of the spell that triggered the summoning (requires midiqol)
+`polymorpherActor`: the actor that's getting summoned
 
 `assignedActor`: the actor assigned to the player doing the summoning (this will be the selected token actor if no assigned actor is found, this is always the case for GMs)
 
