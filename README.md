@@ -48,7 +48,7 @@ This module uses the [advanced-macros](https://github.com/League-of-Foundry-Deve
 
 Open any character sheet, in the header of the window you will see the polymorphers button
 
-![image](https://user-images.githubusercontent.com/1346839/130644498-3b14fe5d-79ff-489c-8593-ea61f2d9f752.png)
+![image](./wiki/Image1.png)
 
 Upon opening you will be welcomed by a window, from here you can drag and drop actor into it to add them.
 
@@ -57,7 +57,7 @@ After adding actor to the window you will have some options:
 - To mutate click on the actor image
 - The dropdown will let you chose the summoning animation
 
-![image](https://user-images.githubusercontent.com/1346839/130645621-2da0dcd2-bd7f-4599-bfb7-712441734aef.png)
+![image](./wiki/Image2.png)
 
 ## Store polymorphers on actor
 
