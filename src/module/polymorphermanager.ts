@@ -94,7 +94,7 @@ export class PolymorpherManager extends FormApplication {
     const actor = <Actor>getGame().actors?.get(aId);
     // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
     const tokenData = <TokenData>await actor.getTokenData();
-    const posData = <Token>actor.token?.object;
+    const posData = <Token>getCanvas().tokens?.placeables.find((t:Token) => t.actor?.id === this.actor.id) || undefined;
     // Get the target actor
     const sourceActor = actor;
     // if (data.pack) {
@@ -138,14 +138,15 @@ export class PolymorpherManager extends FormApplication {
               icon: '<i class="fas fa-check"></i>',
               label: i18n('DND5E.PolymorphAcceptSettings'),
               callback: async (html) => {
-                if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
-                  //@ts-ignore
-                  getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-                } else {
-                  APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                if(posData){
+                  if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                    //@ts-ignore
+                    getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                  } else {
+                    APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                  }
+                  await this.wait(APCONSTS.animationFunctions[animation].time);
                 }
-                await this.wait(APCONSTS.animationFunctions[animation].time);
-
                 //@ts-ignore
                 await this.actor.transformInto(
                   // await this._transformIntoCustom(
@@ -160,14 +161,15 @@ export class PolymorpherManager extends FormApplication {
               icon: '<i class="fas fa-paw"></i>',
               label: i18n('DND5E.PolymorphWildShape'),
               callback: async (html) => {
-                if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
-                  //@ts-ignore
-                  getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-                } else {
-                  APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                if(posData){
+                  if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                    //@ts-ignore
+                    getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                  } else {
+                    APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                  }
+                  await this.wait(APCONSTS.animationFunctions[animation].time);
                 }
-                await this.wait(APCONSTS.animationFunctions[animation].time);
-
                 //@ts-ignore
                 await this.actor.transformInto(
                   // await this._transformIntoCustom(
@@ -189,14 +191,15 @@ export class PolymorpherManager extends FormApplication {
               icon: '<i class="fas fa-pastafarianism"></i>',
               label: i18n('DND5E.Polymorph'),
               callback: async (html) => {
-                if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
-                  //@ts-ignore
-                  getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-                } else {
-                  APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                if(posData){
+                  if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                    //@ts-ignore
+                    getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                  } else {
+                    APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                  }
+                  await this.wait(APCONSTS.animationFunctions[animation].time);
                 }
-                await this.wait(APCONSTS.animationFunctions[animation].time);
-
                 //@ts-ignore
                 await this.actor.transformInto(
                   // await this._transformIntoCustom(

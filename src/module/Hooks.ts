@@ -49,7 +49,7 @@ export const readyHooks = async () => {
     if (getGame().settings.get(APCONSTS.MN, 'hidebutton')) return;
     buttons.unshift({
       icon: 'fas fa-users',
-      class: 'open-cm',
+      class: 'open-pm',
       label: i18n('AP.actorSheetBtn'),
       onclick: function openCM(event) {
         const appId = event.currentTarget.offsetParent.dataset.appid;

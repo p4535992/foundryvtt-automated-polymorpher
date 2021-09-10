@@ -1,12 +1,12 @@
 import { i18n } from "../automated-polymorpher.js";
 import { APCONSTS } from "./config.js";
-import { getGame } from "./settings.js";
+import { getCanvas, getGame } from "./settings.js";
 export class PolymorpherManager extends FormApplication {
-    constructor(actor, summonData, spellLevel) {
+    constructor(actor, summonData) {
         super({});
-        this.caster = actor;
+        // this.caster = actor;
         this.summons = summonData;
-        this.spellLevel = spellLevel;
+        // this.spellLevel = spellLevel;
         this.actor = actor;
     }
     static get defaultOptions() {
@@ -79,9 +79,9 @@ export class PolymorpherManager extends FormApplication {
         const animation = $(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
         const aId = event.currentTarget.dataset.aid;
         const actor = getGame().actors?.get(aId);
-        const duplicates = $(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
+        // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
         const tokenData = await actor.getTokenData();
-        const posData = actor.token?.object;
+        const posData = getCanvas().tokens?.placeables.find((t) => t.actor?.id === this.actor.id) || undefined;
         // Get the target actor
         const sourceActor = actor;
         // if (data.pack) {
@@ -122,14 +122,16 @@ export class PolymorpherManager extends FormApplication {
                         icon: '<i class="fas fa-check"></i>',
                         label: i18n('DND5E.PolymorphAcceptSettings'),
                         callback: async (html) => {
-                            if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
-                                //@ts-ignore
-                                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                            if (posData) {
+                                if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                                    //@ts-ignore
+                                    getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                                }
+                                else {
+                                    APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                                }
+                                await this.wait(APCONSTS.animationFunctions[animation].time);
                             }
-                            else {
-                                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
-                            }
-                            await this.wait(APCONSTS.animationFunctions[animation].time);
                             //@ts-ignore
                             await this.actor.transformInto(
                             // await this._transformIntoCustom(
@@ -144,14 +146,16 @@ export class PolymorpherManager extends FormApplication {
                         icon: '<i class="fas fa-paw"></i>',
                         label: i18n('DND5E.PolymorphWildShape'),
                         callback: async (html) => {
-                            if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
-                                //@ts-ignore
-                                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                            if (posData) {
+                                if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                                    //@ts-ignore
+                                    getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                                }
+                                else {
+                                    APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                                }
+                                await this.wait(APCONSTS.animationFunctions[animation].time);
                             }
-                            else {
-                                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
-                            }
-                            await this.wait(APCONSTS.animationFunctions[animation].time);
                             //@ts-ignore
                             await this.actor.transformInto(
                             // await this._transformIntoCustom(
@@ -173,14 +177,16 @@ export class PolymorpherManager extends FormApplication {
                         icon: '<i class="fas fa-pastafarianism"></i>',
                         label: i18n('DND5E.Polymorph'),
                         callback: async (html) => {
-                            if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
-                                //@ts-ignore
-                                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                            if (posData) {
+                                if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                                    //@ts-ignore
+                                    getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                                }
+                                else {
+                                    APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                                }
+                                await this.wait(APCONSTS.animationFunctions[animation].time);
                             }
-                            else {
-                                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
-                            }
-                            await this.wait(APCONSTS.animationFunctions[animation].time);
                             //@ts-ignore
                             await this.actor.transformInto(
                             // await this._transformIntoCustom(
@@ -219,13 +225,13 @@ export class PolymorpherManager extends FormApplication {
                 .macros?.getName(`AP_Polymorpher_Macro(${actor.data.name})`)
                 ?.execute({
                 //@ts-ignore
-                summon: actor,
-                spellLevel: this.spellLevel || 0,
-                duplicates: duplicates,
-                assignedActor: this.caster || getGame().user?.character || _token?.actor,
+                polymorpherActor: actor,
+                // spellLevel: this.spellLevel || 0,
+                // duplicates: duplicates,
+                assignedActor: this.actor || getGame().user?.character || _token?.actor,
             });
             //@ts-ignore
-            warpgate.mutate(posData.document, customTokenData || {}, {}, { duplicates });
+            warpgate.mutate(posData.document, customTokenData || {}, {}, {});
             if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
                 this.close();
             else
@@ -278,7 +284,7 @@ export class PolymorpherManager extends FormApplication {
 			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actor.id}"></div>
 		</div>
     	<span class="actor-name">${actor.data.name}</span>
-		<div class="polymorpher-number" style="display:none"><input type="number" min="1" max="99" class="fancy-input" step="1" id="polymorpher-number-val" value="${data.number || 1}"></div>
+		<div class="polymorpher-number"></div>
     	<select class="anim-dropdown">
         	${this.getAnimations(data.animation)}
     	</select>
@@ -330,8 +336,8 @@ export class SimplePolymorpherManager extends PolymorpherManager {
     // caster: Actor;
     // summons: any[];
     // spellLevel: number;
-    constructor(actor, summonData, spellLevel) {
-        super(actor, summonData, spellLevel);
+    constructor(actor, summonData) {
+        super(actor, summonData);
         // this.caster = actor;
         // this.summons = summonData;
         // this.spellLevel = spellLevel;

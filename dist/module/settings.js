@@ -42,14 +42,14 @@ export const registerSettings = function () {
         type: Array,
         default: [],
     });
-    getGame().settings.register(APCONSTS.MN, 'customautospells', {
-        name: '',
-        hint: '',
-        scope: 'world',
-        config: false,
-        type: Object,
-        default: {},
-    });
+    // getGame().settings.register(APCONSTS.MN, 'customautospells', {
+    //   name: '',
+    //   hint: '',
+    //   scope: 'world',
+    //   config: false,
+    //   type: Object,
+    //   default: {},
+    // });
     getGame().settings.register(APCONSTS.MN, 'customanimations', {
         name: '',
         hint: '',
