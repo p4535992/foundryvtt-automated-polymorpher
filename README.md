@@ -19,9 +19,15 @@ To install this module manually:
 4.  Click 'Install' and wait for installation to complete
 5.  Don't forget to enable the module in game using the "Manage Module" button
 
-### libWrapper
+### sequencer
 
-This module uses the [libWrapper](https://github.com/ruipin/fvtt-lib-wrapper) library for wrapping core methods. It is a hard dependency and it is recommended for the best experience and compatibility with other modules.
+This module uses the [sequencer](https://github.com/fantasycalendar/FoundryVTT-Sequencer/) library. It is a hard dependency and it is recommended for the best experience and compatibility with other modules.
+
+### warpgate
+
+This module uses the [warpgate](https://github.com/trioderegion/warpgate) library. It is a optional dependency and it is recommended for the best experience and compatibility with other modules.
+
+**NOTE: you need this only if the system is not DnD5e**
 
 ## Features 
 

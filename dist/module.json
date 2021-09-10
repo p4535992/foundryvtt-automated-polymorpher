@@ -54,9 +54,6 @@
   "allowBugReporter": true,
   "dependencies": [
     {
-      "name": "lib-wrapper"
-    },
-    {
       "name": "sequencer"
     }
   ]

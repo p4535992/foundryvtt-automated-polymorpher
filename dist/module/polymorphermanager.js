@@ -2,8 +2,11 @@ import { i18n } from "../automated-polymorpher.js";
 import { APCONSTS } from "./config.js";
 import { getGame } from "./settings.js";
 export class PolymorpherManager extends FormApplication {
-    constructor(actor) {
+    constructor(actor, summonData, spellLevel) {
         super({});
+        this.caster = actor;
+        this.summons = summonData;
+        this.spellLevel = spellLevel;
         this.actor = actor;
     }
     static get defaultOptions() {
@@ -79,9 +82,6 @@ export class PolymorpherManager extends FormApplication {
         const duplicates = $(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
         const tokenData = await actor.getTokenData();
         const posData = actor.token?.object;
-        const canPolymorph = getGame().user?.isGM || (this.actor.isOwner && getGame().settings.get('dnd5e', 'allowPolymorphing'));
-        if (!canPolymorph)
-            return false;
         // Get the target actor
         const sourceActor = actor;
         // if (data.pack) {
@@ -92,113 +92,144 @@ export class PolymorpherManager extends FormApplication {
         // }
         if (!sourceActor)
             return;
-        // Define a function to record polymorph settings for future use
-        const rememberOptions = (html) => {
-            const options = {};
-            html.find('input').each((i, el) => {
-                options[el.name] = el.checked;
-            });
-            const settings = mergeObject(getGame().settings.get('dnd5e', 'polymorphSettings') || {}, options);
-            getGame().settings.set('dnd5e', 'polymorphSettings', settings);
-            return settings;
-        };
-        // Create and render the Dialog
-        return new Dialog({
-            title: i18n('DND5E.PolymorphPromptTitle'),
-            //@ts-ignore
-            content: {
-                options: getGame().settings.get('dnd5e', 'polymorphSettings'),
+        if (getGame().system.id == 'dnd5e') {
+            const canPolymorph = getGame().user?.isGM || (this.actor.isOwner && getGame().settings.get('dnd5e', 'allowPolymorphing'));
+            if (!canPolymorph)
+                return false;
+            // Define a function to record polymorph settings for future use
+            const rememberOptions = (html) => {
+                const options = {};
+                html.find('input').each((i, el) => {
+                    options[el.name] = el.checked;
+                });
+                const settings = mergeObject(getGame().settings.get('dnd5e', 'polymorphSettings') || {}, options);
+                getGame().settings.set('dnd5e', 'polymorphSettings', settings);
+                return settings;
+            };
+            // Create and render the Dialog
+            return new Dialog({
+                title: i18n('DND5E.PolymorphPromptTitle'),
                 //@ts-ignore
-                i18n: CONFIG.DND5E.polymorphSettings,
-                isToken: this.actor.isToken,
-            },
-            default: 'accept',
-            buttons: {
-                accept: {
-                    icon: '<i class="fas fa-check"></i>',
-                    label: i18n('DND5E.PolymorphAcceptSettings'),
-                    callback: async (html) => {
-                        if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                content: {
+                    options: getGame().settings.get('dnd5e', 'polymorphSettings'),
+                    //@ts-ignore
+                    i18n: CONFIG.DND5E.polymorphSettings,
+                    isToken: this.actor.isToken,
+                },
+                default: 'accept',
+                buttons: {
+                    accept: {
+                        icon: '<i class="fas fa-check"></i>',
+                        label: i18n('DND5E.PolymorphAcceptSettings'),
+                        callback: async (html) => {
+                            if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                                //@ts-ignore
+                                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                            }
+                            else {
+                                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                            }
+                            await this.wait(APCONSTS.animationFunctions[animation].time);
                             //@ts-ignore
-                            getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-                        }
-                        else {
-                            APCONSTS.animationFunctions[animation].fn(posData, tokenData);
-                        }
-                        await this.wait(APCONSTS.animationFunctions[animation].time);
-                        //@ts-ignore
-                        await this.actor.transformInto(
-                        // await this._transformIntoCustom(
-                        sourceActor, rememberOptions(html));
-                        if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
-                            this.close();
-                        else
-                            this.maximize();
+                            await this.actor.transformInto(
+                            // await this._transformIntoCustom(
+                            sourceActor, rememberOptions(html));
+                            if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                                this.close();
+                            else
+                                this.maximize();
+                        },
+                    },
+                    wildshape: {
+                        icon: '<i class="fas fa-paw"></i>',
+                        label: i18n('DND5E.PolymorphWildShape'),
+                        callback: async (html) => {
+                            if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                                //@ts-ignore
+                                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                            }
+                            else {
+                                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                            }
+                            await this.wait(APCONSTS.animationFunctions[animation].time);
+                            //@ts-ignore
+                            await this.actor.transformInto(
+                            // await this._transformIntoCustom(
+                            sourceActor, {
+                                keepBio: true,
+                                keepClass: true,
+                                keepMental: true,
+                                mergeSaves: true,
+                                mergeSkills: true,
+                                transformTokens: rememberOptions(html).transformTokens,
+                            });
+                            if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                                this.close();
+                            else
+                                this.maximize();
+                        },
+                    },
+                    polymorph: {
+                        icon: '<i class="fas fa-pastafarianism"></i>',
+                        label: i18n('DND5E.Polymorph'),
+                        callback: async (html) => {
+                            if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                                //@ts-ignore
+                                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                            }
+                            else {
+                                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                            }
+                            await this.wait(APCONSTS.animationFunctions[animation].time);
+                            //@ts-ignore
+                            await this.actor.transformInto(
+                            // await this._transformIntoCustom(
+                            sourceActor, {
+                                transformTokens: rememberOptions(html).transformTokens,
+                            });
+                            if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                                this.close();
+                            else
+                                this.maximize();
+                        },
+                    },
+                    cancel: {
+                        icon: '<i class="fas fa-times"></i>',
+                        label: i18n('Cancel'),
                     },
                 },
-                wildshape: {
-                    icon: '<i class="fas fa-paw"></i>',
-                    label: i18n('DND5E.PolymorphWildShape'),
-                    callback: async (html) => {
-                        if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
-                            //@ts-ignore
-                            getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-                        }
-                        else {
-                            APCONSTS.animationFunctions[animation].fn(posData, tokenData);
-                        }
-                        await this.wait(APCONSTS.animationFunctions[animation].time);
-                        //@ts-ignore
-                        await this.actor.transformInto(
-                        // await this._transformIntoCustom(
-                        sourceActor, {
-                            keepBio: true,
-                            keepClass: true,
-                            keepMental: true,
-                            mergeSaves: true,
-                            mergeSkills: true,
-                            transformTokens: rememberOptions(html).transformTokens,
-                        });
-                        if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
-                            this.close();
-                        else
-                            this.maximize();
-                    },
-                },
-                polymorph: {
-                    icon: '<i class="fas fa-pastafarianism"></i>',
-                    label: i18n('DND5E.Polymorph'),
-                    callback: async (html) => {
-                        if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
-                            //@ts-ignore
-                            getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-                        }
-                        else {
-                            APCONSTS.animationFunctions[animation].fn(posData, tokenData);
-                        }
-                        await this.wait(APCONSTS.animationFunctions[animation].time);
-                        //@ts-ignore
-                        await this.actor.transformInto(
-                        // await this._transformIntoCustom(
-                        sourceActor, {
-                            transformTokens: rememberOptions(html).transformTokens,
-                        });
-                        if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
-                            this.close();
-                        else
-                            this.maximize();
-                    },
-                },
-                cancel: {
-                    icon: '<i class="fas fa-times"></i>',
-                    label: i18n('Cancel'),
-                },
-            },
-        }, {
-            classes: ['dialog', 'dnd5e'],
-            width: 600,
-            template: 'systems/dnd5e/templates/apps/polymorph-prompt.html',
-        }).render(true);
+            }, {
+                classes: ['dialog', 'dnd5e'],
+                width: 600,
+                template: 'systems/dnd5e/templates/apps/polymorph-prompt.html',
+            }).render(true);
+        }
+        else {
+            // If system is not dnd5e we can use warpgate
+            if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                //@ts-ignore
+                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+            }
+            else {
+                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+            }
+            await this.wait(APCONSTS.animationFunctions[animation].time);
+            //get custom data macro
+            const customTokenData = await getGame().macros?.getName(`AP_Polymorpher_Macro(${actor.data.name})`)?.execute({
+                //@ts-ignore
+                summon: actor,
+                spellLevel: this.spellLevel || 0,
+                duplicates: duplicates,
+                assignedActor: this.caster || getGame().user?.character || _token?.actor,
+            });
+            //@ts-ignore
+            warpgate
+                .mutate(posData.document, customTokenData || {}, {}, { duplicates });
+            if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                this.close();
+            else
+                this.maximize();
+        }
         /*
         const posData = await warpgate.crosshairs.show(
           Math.max(tokenData.width, tokenData.height) * tokenData.scale,
@@ -324,11 +355,14 @@ export class PolymorpherManager extends FormApplication {
     }
 }
 export class SimplePolymorpherManager extends PolymorpherManager {
-    constructor(summonData, spellLevel, actor) {
-        super({});
-        this.caster = actor;
-        this.summons = summonData;
-        this.spellLevel = spellLevel;
+    // caster: Actor;
+    // summons: any[];
+    // spellLevel: number;
+    constructor(actor, summonData, spellLevel) {
+        super(actor, summonData, spellLevel);
+        // this.caster = actor;
+        // this.summons = summonData;
+        // this.spellLevel = spellLevel;
     }
     async activateListeners(html) {
         for (const summon of this.summons) {

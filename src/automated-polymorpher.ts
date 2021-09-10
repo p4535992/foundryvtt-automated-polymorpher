@@ -77,13 +77,15 @@ Hooks.once('setup', function () {
 /* ------------------------------------ */
 Hooks.once('ready', () => {
   // Do anything once the module is ready
-  if (!getGame().modules.get('lib-wrapper')?.active && getGame().user?.isGM) {
-    ui.notifications?.error(`The '${APCONSTS.MN}' module requires to install and activate the 'libWrapper' module.`);
-    return;
-  }
   if (!getGame().modules.get('sequencer')?.active && getGame().user?.isGM) {
     ui.notifications?.error(`The '${APCONSTS.MN}' module requires to install and activate the 'sequencer' module.`);
     return;
+  }
+  if (getGame().system.id != 'dnd5e') {
+    if (!getGame().modules.get('warpgate')?.active && getGame().user?.isGM) {
+      ui.notifications?.error(`The '${APCONSTS.MN}' module requires to install and activate the 'warpgate' module.`);
+      return;
+    }
   }
   readyHooks();
 });
