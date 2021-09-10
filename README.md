@@ -2,6 +2,10 @@
 
 #  FoundryVTT Automated Polymorpher
 
+A user interface to manage polymorpher of the actor.
+
+Should work with all system supported form the [warpgate](https://github.com/trioderegion/warpgate) module "mutate" function, but for now the module is only use with the Dnd5e system and the polymorph mechanism.
+
 ## NOTE: If you are a javascript developer and not a typescript developer, you can just use the javascript files under the dist folder
 
 ## Known issue/Limitation
