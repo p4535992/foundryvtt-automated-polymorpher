@@ -2,7 +2,7 @@
 
 #  FoundryVTT Automated Polymorpher
 
-A user interface to manage the polymorph feature of Dnd5e with summoning animations and preset collection of creature.
+A user interface to manage the polymorph feature of Dnd5e with summoning animations.
 
 **Note: This is a "replica" of the wonderful work done by [theRipper93](https://github.com/theripper93) with its [automated-evocations](https://github.com/theripper93/automated-evocations) module, from which I have taken a good part of the starting code.
 If you want to support more modules of this kind, I invite you to go and support his patreon**
@@ -58,6 +58,10 @@ After adding actor to the window you will have some options:
 - The dropdown will let you chose the summoning animation
 
 ![image](./wiki/Image2.png)
+
+Then you interact with the standard panel of the Polymorph (if the system is dnd5e)
+
+![image](./wiki/Image3.png)
 
 ## Store polymorphers on actor
 
