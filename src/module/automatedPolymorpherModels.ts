@@ -23,3 +23,15 @@ export class Creature {
 // }
 
 // type FunctionCreature = ReturnType<typeof createCreature>
+
+export enum PolymorpherFlags {
+  IS_LOCAL = 'isLocal',
+  STORE_ON_ACTOR = 'storeonactor',
+  POLYMORPHERS = 'polymorphers',
+}
+
+export class PolymorpherData {
+  id: string;
+  animation: string;
+  number: number;
+}

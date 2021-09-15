@@ -1,6 +1,7 @@
 ![](https://img.shields.io/badge/Foundry-v0.8.9-informational)
 
 #  FoundryVTT Automated Polymorpher
+## THIS IS NOT A OPERATIONAL MODULE, I'm just learning how to write code for Foundry VTT.
 
 A user interface to manage the polymorph feature of Dnd5e with summoning animations.
 

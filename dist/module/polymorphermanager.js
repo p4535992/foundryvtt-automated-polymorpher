@@ -1,6 +1,7 @@
 import { i18n } from "../automated-polymorpher.js";
-import { APCONSTS } from "./config.js";
-import { getCanvas, getGame } from "./settings.js";
+import { ANIMATIONS } from "./animations.js";
+import { PolymorpherFlags } from "./automatedPolymorpherModels.js";
+import { AUTOMATED_POLYMORPHER_MODULE_NAME, getCanvas, getGame } from "./settings.js";
 export class PolymorpherManager extends FormApplication {
     constructor(actor, summonData) {
         super({});
@@ -12,9 +13,9 @@ export class PolymorpherManager extends FormApplication {
     static get defaultOptions() {
         return {
             ...super.defaultOptions,
-            title: i18n('AP.dialogs.polymorpherManager.title'),
+            title: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.dialogs.polymorpherManager.title`),
             id: 'polymorpherManager',
-            template: `modules/${APCONSTS.MN}/templates/polymorphermanager.hbs`,
+            template: `modules/${AUTOMATED_POLYMORPHER_MODULE_NAME}/templates/polymorphermanager.hbs`,
             resizable: true,
             width: 300,
             height: window.innerHeight > 400 ? 400 : window.innerHeight - 100,
@@ -123,20 +124,20 @@ export class PolymorpherManager extends FormApplication {
                         label: i18n('DND5E.PolymorphAcceptSettings'),
                         callback: async (html) => {
                             if (posData) {
-                                if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                                if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                                     //@ts-ignore
-                                    getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                                    getGame().macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
                                 }
                                 else {
-                                    APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                                    ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
                                 }
-                                await this.wait(APCONSTS.animationFunctions[animation].time);
+                                await this.wait(ANIMATIONS.animationFunctions[animation].time);
                             }
                             //@ts-ignore
                             await this.actor.transformInto(
                             // await this._transformIntoCustom(
                             sourceActor, rememberOptions(html));
-                            if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                            if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose'))
                                 this.close();
                             else
                                 this.maximize();
@@ -147,14 +148,14 @@ export class PolymorpherManager extends FormApplication {
                         label: i18n('DND5E.PolymorphWildShape'),
                         callback: async (html) => {
                             if (posData) {
-                                if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                                if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                                     //@ts-ignore
-                                    getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                                    getGame().macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
                                 }
                                 else {
-                                    APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                                    ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
                                 }
-                                await this.wait(APCONSTS.animationFunctions[animation].time);
+                                await this.wait(ANIMATIONS.animationFunctions[animation].time);
                             }
                             //@ts-ignore
                             await this.actor.transformInto(
@@ -167,7 +168,7 @@ export class PolymorpherManager extends FormApplication {
                                 mergeSkills: true,
                                 transformTokens: rememberOptions(html).transformTokens,
                             });
-                            if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                            if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose'))
                                 this.close();
                             else
                                 this.maximize();
@@ -178,14 +179,14 @@ export class PolymorpherManager extends FormApplication {
                         label: i18n('DND5E.Polymorph'),
                         callback: async (html) => {
                             if (posData) {
-                                if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+                                if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                                     //@ts-ignore
-                                    getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                                    getGame().macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
                                 }
                                 else {
-                                    APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                                    ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
                                 }
-                                await this.wait(APCONSTS.animationFunctions[animation].time);
+                                await this.wait(ANIMATIONS.animationFunctions[animation].time);
                             }
                             //@ts-ignore
                             await this.actor.transformInto(
@@ -193,7 +194,7 @@ export class PolymorpherManager extends FormApplication {
                             sourceActor, {
                                 transformTokens: rememberOptions(html).transformTokens,
                             });
-                            if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+                            if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose'))
                                 this.close();
                             else
                                 this.maximize();
@@ -212,14 +213,14 @@ export class PolymorpherManager extends FormApplication {
         }
         else {
             // If system is not dnd5e we can use warpgate
-            if (typeof APCONSTS.animationFunctions[animation].fn == 'string') {
+            if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                 //@ts-ignore
-                getGame().macros?.getName(APCONSTS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                getGame().macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
             }
             else {
-                APCONSTS.animationFunctions[animation].fn(posData, tokenData);
+                ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
             }
-            await this.wait(APCONSTS.animationFunctions[animation].time);
+            await this.wait(ANIMATIONS.animationFunctions[animation].time);
             //get custom data macro
             const customTokenData = await getGame()
                 .macros?.getName(`AP_Polymorpher_Macro(${actor.data.name})`)
@@ -232,7 +233,7 @@ export class PolymorpherManager extends FormApplication {
             });
             //@ts-ignore
             warpgate.mutate(posData.document, customTokenData || {}, {}, {});
-            if (getGame().settings.get(APCONSTS.MN, 'autoclose'))
+            if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose'))
                 this.close();
             else
                 this.maximize();
@@ -240,8 +241,8 @@ export class PolymorpherManager extends FormApplication {
     }
     async _onRemovePolymorpher(event) {
         Dialog.confirm({
-            title: i18n('AP.dialogs.polymorpherManager.confirm.title'),
-            content: i18n('AP.dialogs.polymorpherManager.confirm.content'),
+            title: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.dialogs.polymorpherManager.confirm.title`),
+            content: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.dialogs.polymorpherManager.confirm.content`),
             yes: () => {
                 event.currentTarget.parentElement.remove();
                 this.saveData();
@@ -261,9 +262,10 @@ export class PolymorpherManager extends FormApplication {
     }
     async loadPolymorphers() {
         const data = this.actor &&
-            (this.actor.getFlag(APCONSTS.MN, 'isLocal') || getGame().settings.get(APCONSTS.MN, 'storeonactor'))
-            ? this.actor.getFlag(APCONSTS.MN, 'polymorphers') || []
-            : getGame().user?.getFlag(APCONSTS.MN, 'polymorphers');
+            (this.actor.getFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+                getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
+            ? this.actor.getFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
+            : getGame().user?.getFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.POLYMORPHERS);
         if (data) {
             for (const polymorpher of data) {
                 this.element.find('#polymorpher-list').append(this.generateLi(polymorpher));
@@ -274,7 +276,7 @@ export class PolymorpherManager extends FormApplication {
         const actor = getGame().actors?.get(data.id) || getGame().actors?.getName(data.id);
         if (!actor)
             return '';
-        const restricted = getGame().settings.get(APCONSTS.MN, 'restrictOwned');
+        const restricted = getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOwned');
         if (restricted && !actor.isOwner)
             return '';
         const $li = $(`
@@ -295,9 +297,9 @@ export class PolymorpherManager extends FormApplication {
     }
     getAnimations(anim) {
         let animList = '';
-        for (const [group, animations] of Object.entries(APCONSTS.animations)) {
-            const localGroup = i18n(`AP.groups.${group}`);
-            animList += `<optgroup label="${localGroup == `AP.groups.${group}` ? group : localGroup}">`;
+        for (const [group, animations] of Object.entries(ANIMATIONS.animations)) {
+            const localGroup = i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.groups.${group}`);
+            animList += `<optgroup label="${localGroup == `${AUTOMATED_POLYMORPHER_MODULE_NAME}.groups.${group}` ? group : localGroup}">`;
             for (const a of animations) {
                 animList += `<option value="${a.key}" ${a.key == anim ? 'selected' : ''}>${a.name}</option>`;
             }
@@ -317,9 +319,11 @@ export class PolymorpherManager extends FormApplication {
                 number: $(polymorpher).find('#polymorpher-number-val').val(),
             });
         }
-        this.actor && (this.actor.getFlag(APCONSTS.MN, 'isLocal') || getGame().settings.get(APCONSTS.MN, 'storeonactor'))
-            ? this.actor.setFlag(APCONSTS.MN, 'polymorphers', data)
-            : getGame().user?.setFlag(APCONSTS.MN, 'polymorphers', data);
+        this.actor &&
+            (this.actor.getFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+                getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
+            ? this.actor.setFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data)
+            : getGame().user?.setFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data);
     }
     //@ts-ignore
     close(noSave = false) {

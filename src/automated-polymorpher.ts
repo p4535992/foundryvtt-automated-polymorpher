@@ -12,22 +12,21 @@
 // Import JavaScript modules
 
 // Import TypeScript modules
-import { getGame, registerSettings } from './module/settings';
+import { AUTOMATED_POLYMORPHER_MODULE_NAME, getGame, registerSettings } from './module/settings';
 import { preloadTemplates } from './module/preloadTemplates';
 import { initHooks, readyHooks, setupHooks } from './module/Hooks';
-import { APCONSTS } from './module/config';
 
 export let debugEnabled = 0;
 // 0 = none, warnings = 1, debug = 2, all = 3
 export const debug = (...args) => {
-  if (debugEnabled > 1) console.log(`DEBUG:${APCONSTS.MN} | `, ...args);
+  if (debugEnabled > 1) console.log(`DEBUG:${AUTOMATED_POLYMORPHER_MODULE_NAME} | `, ...args);
 };
-export const log = (...args) => console.log(`${APCONSTS.MN} | `, ...args);
+export const log = (...args) => console.log(`${AUTOMATED_POLYMORPHER_MODULE_NAME} | `, ...args);
 export const warn = (...args) => {
-  if (debugEnabled > 0) console.warn(`${APCONSTS.MN} | `, ...args);
+  if (debugEnabled > 0) console.warn(`${AUTOMATED_POLYMORPHER_MODULE_NAME} | `, ...args);
 };
-export const error = (...args) => console.error(`${APCONSTS.MN} | `, ...args);
-export const timelog = (...args) => warn(`${APCONSTS.MN} | `, Date.now(), ...args);
+export const error = (...args) => console.error(`${AUTOMATED_POLYMORPHER_MODULE_NAME} | `, ...args);
+export const timelog = (...args) => warn(`${AUTOMATED_POLYMORPHER_MODULE_NAME} | `, Date.now(), ...args);
 
 export const i18n = (key) => {
   return getGame().i18n.localize(key);
@@ -46,7 +45,7 @@ export const setDebugLevel = (debugText: string) => {
 /* Initialize module					*/
 /* ------------------------------------ */
 Hooks.once('init', async () => {
-  console.log(`${APCONSTS.MN} | Initializing ${APCONSTS.MN}`);
+  console.log(`${AUTOMATED_POLYMORPHER_MODULE_NAME} | Initializing ${AUTOMATED_POLYMORPHER_MODULE_NAME}`);
 
   // Register custom module settings
   registerSettings();
@@ -78,12 +77,16 @@ Hooks.once('setup', function () {
 Hooks.once('ready', () => {
   // Do anything once the module is ready
   if (!getGame().modules.get('sequencer')?.active && getGame().user?.isGM) {
-    ui.notifications?.error(`The '${APCONSTS.MN}' module requires to install and activate the 'sequencer' module.`);
+    ui.notifications?.error(
+      `The '${AUTOMATED_POLYMORPHER_MODULE_NAME}' module requires to install and activate the 'sequencer' module.`,
+    );
     return;
   }
   if (getGame().system.id != 'dnd5e') {
     if (!getGame().modules.get('warpgate')?.active && getGame().user?.isGM) {
-      ui.notifications?.error(`The '${APCONSTS.MN}' module requires to install and activate the 'warpgate' module.`);
+      ui.notifications?.error(
+        `The '${AUTOMATED_POLYMORPHER_MODULE_NAME}' module requires to install and activate the 'warpgate' module.`,
+      );
       return;
     }
   }

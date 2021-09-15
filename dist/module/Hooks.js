@@ -1,25 +1,25 @@
 import { warn, i18n, log } from "../automated-polymorpher.js";
-import { APCONSTS } from "./config.js";
 import { PolymorpherManager } from "./polymorphermanager.js";
-import { getGame } from "./settings.js";
+import { AUTOMATED_POLYMORPHER_MODULE_NAME, getGame } from "./settings.js";
+import { ANIMATIONS } from "./animations.js";
 // let automatedpolymorphers: SystemCreatures;
 export const readyHooks = async () => {
     // setup all the hooks
-    APCONSTS.animationFunctions = mergeObject(APCONSTS.animationFunctions, getGame().settings?.get(APCONSTS.MN, 'customanimations'));
-    log('Automated Evocations: Animation Functions Loaded - ', APCONSTS.animationFunctions);
-    const sortedAnims = Object.keys(APCONSTS.animationFunctions).sort();
+    ANIMATIONS.animationFunctions = mergeObject(ANIMATIONS.animationFunctions, getGame().settings?.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customanimations'));
+    log('Automated Evocations: Animation Functions Loaded - ', ANIMATIONS.animationFunctions);
+    const sortedAnims = Object.keys(ANIMATIONS.animationFunctions).sort();
     for (const k of sortedAnims) {
-        const group = APCONSTS.animationFunctions[k].group || 'z-none';
-        APCONSTS.animations[group] = APCONSTS.animations[group] || [];
-        APCONSTS.animations[group].push({
-            name: APCONSTS.animationFunctions[k]?.name || i18n(`AP.animations.${k}`),
+        const group = ANIMATIONS.animationFunctions[k].group || 'z-none';
+        ANIMATIONS.animations[group] = ANIMATIONS.animations[group] || [];
+        ANIMATIONS.animations[group].push({
+            name: ANIMATIONS.animationFunctions[k]?.name || i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.animations.${k}`),
             key: k,
         });
     }
-    APCONSTS.animations = Object.keys(APCONSTS.animations)
+    ANIMATIONS.animations = Object.keys(ANIMATIONS.animations)
         .sort()
         .reduce((obj, key) => {
-        obj[key] = APCONSTS.animations[key];
+        obj[key] = ANIMATIONS.animations[key];
         return obj;
     }, {});
     //new PolymorpherManager().render(true)
@@ -35,16 +35,16 @@ export const readyHooks = async () => {
   
     automatedpolymorphers[getGame().system.id] = mergeObject(
       automatedpolymorphers[getGame().system.id],
-      <any>getGame().settings.get(APCONSTS.MN, 'customautospells'),
+      <any>getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customautospells'),
     );
     */
     Hooks.on('getActorSheetHeaderButtons', (app, buttons) => {
-        if (getGame().settings.get(APCONSTS.MN, 'hidebutton'))
+        if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton'))
             return;
         buttons.unshift({
             icon: 'fas fa-users',
             class: 'open-pm',
-            label: i18n('AP.actorSheetBtn'),
+            label: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.actorSheetBtn`),
             onclick: function openCM(event) {
                 const appId = event.currentTarget.offsetParent.dataset.appid;
                 //@ts-ignore
@@ -55,7 +55,7 @@ export const readyHooks = async () => {
     });
     /*
     Hooks.on('createChatMessage', async (chatMessage) => {
-      if (chatMessage.data.user !== getGame().user?.id || !getGame().settings.get(APCONSTS.MN, 'enableautomations')) {
+      if (chatMessage.data.user !== getGame().user?.id || !getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'enableautomations')) {
         return;
       }
       const spellName: string =

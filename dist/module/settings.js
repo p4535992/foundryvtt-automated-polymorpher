@@ -1,7 +1,5 @@
 import { i18n } from "../automated-polymorpher.js";
-import { APCONSTS } from "./config.js";
-// import ImagePicker from "./libs/ImagePicker";
-// import SoundPicker from "./libs/SoundPicker";
+export const AUTOMATED_POLYMORPHER_MODULE_NAME = 'automated-polymorpher';
 /**
  * Because typescript doesn't know when in the lifecycle of foundry your code runs, we have to assume that the
  * canvas is potentially not yet initialized, so it's typed as declare let canvas: Canvas | {ready: false}.
@@ -33,7 +31,7 @@ export function getGame() {
     return game;
 }
 export const registerSettings = function () {
-    getGame().settings.register(APCONSTS.MN, 'polymorphers', {
+    getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'polymorphers', {
         name: '',
         hint: '',
         scope: 'client',
@@ -41,7 +39,7 @@ export const registerSettings = function () {
         type: Array,
         default: [],
     });
-    // getGame().settings.register(APCONSTS.MN, 'customautospells', {
+    // getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customautospells', {
     //   name: '',
     //   hint: '',
     //   scope: 'world',
@@ -49,7 +47,7 @@ export const registerSettings = function () {
     //   type: Object,
     //   default: {},
     // });
-    getGame().settings.register(APCONSTS.MN, 'customanimations', {
+    getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customanimations', {
         name: '',
         hint: '',
         scope: 'world',
@@ -57,41 +55,41 @@ export const registerSettings = function () {
         type: Object,
         default: {},
     });
-    getGame().settings.register(APCONSTS.MN, 'autoclose', {
-        name: i18n(`AP.settings.autoclose.title`),
-        hint: i18n(`AP.settings.autoclose.hint`),
+    getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose', {
+        name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.autoclose.title`),
+        hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.autoclose.hint`),
         scope: 'world',
         config: true,
         type: Boolean,
         default: false,
     });
-    getGame().settings.register(APCONSTS.MN, 'enableautomations', {
-        name: i18n(`AP.settings.enableautomations.title`),
-        hint: i18n(`AP.settings.enableautomations.hint`),
+    getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'enableautomations', {
+        name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.enableautomations.title`),
+        hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.enableautomations.hint`),
         scope: 'world',
         config: true,
         type: Boolean,
         default: true,
     });
-    getGame().settings.register(APCONSTS.MN, 'storeonactor', {
-        name: i18n(`AP.settings.storeonactor.title`),
-        hint: i18n(`AP.settings.storeonactor.hint`),
+    getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'storeonactor', {
+        name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.storeonactor.title`),
+        hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.storeonactor.hint`),
         scope: 'world',
         config: true,
         type: Boolean,
         default: false,
     });
-    getGame().settings.register(APCONSTS.MN, 'hidebutton', {
-        name: i18n(`AP.settings.hidebutton.title`),
-        hint: i18n(`AP.settings.hidebutton.hint`),
+    getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton', {
+        name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.hidebutton.title`),
+        hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.hidebutton.hint`),
         scope: 'world',
         config: true,
         type: Boolean,
         default: false,
     });
-    getGame().settings.register(APCONSTS.MN, 'restrictOwned', {
-        name: i18n(`AP.settings.restrictOwned.title`),
-        hint: i18n(`AP.settings.restrictOwned.hint`),
+    getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOwned', {
+        name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOwned.title`),
+        hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOwned.hint`),
         scope: 'world',
         config: true,
         type: Boolean,
