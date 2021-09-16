@@ -247,6 +247,16 @@ export class PolymorpherManager extends FormApplication {
           // duplicates: duplicates,
           assignedActor: this.actor || getGame().user?.character || _token?.actor,
         });
+
+      // log("Automated Polymorpher", {
+      //   assignedActor: this.caster || getGame().user?.character || _token?.actor,
+      //   spellLevel: this.spellLevel || 0,
+      //   duplicates: duplicates,
+      //   warpgateData: customTokenData || {},
+      //   summon: actor,
+      //  tokenData: tokenData,
+      //  posData: posData,
+      // })
       //@ts-ignore
       warpgate.mutate(posData.document, customTokenData || {}, {}, {});
 
