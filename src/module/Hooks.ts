@@ -52,9 +52,7 @@ export const readyHooks = async () => {
       class: 'open-pm',
       label: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.actorSheetBtn`),
       onclick: function openCM(event) {
-        const appId = event.currentTarget.offsetParent.dataset.appid;
-        //@ts-ignore
-        const actor = ui.windows[appId].object;
+        const actor = app.object;
         new PolymorpherManager(actor).render(true);
       },
     });
