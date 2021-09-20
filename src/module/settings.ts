@@ -91,9 +91,9 @@ export const registerSettings = function () {
     type: Boolean,
     default: false,
   });
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOwned', {
-    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOwned.title`),
-    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOwned.hint`),
+  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOnlyGM', {
+    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOnlyGM.title`),
+    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOnlyGM.hint`),
     scope: 'world',
     config: true,
     type: Boolean,

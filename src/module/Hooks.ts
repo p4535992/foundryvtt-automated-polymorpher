@@ -47,6 +47,12 @@ export const readyHooks = async () => {
   */
   Hooks.on('getActorSheetHeaderButtons', (app, buttons) => {
     if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton')) return;
+
+    const restrictedOnlyGM = getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOnlyGM');
+    if (restrictedOnlyGM && !getGame().user?.isGM) {
+      return;
+    }
+
     buttons.unshift({
       icon: 'fas fa-users',
       class: 'open-pm',
