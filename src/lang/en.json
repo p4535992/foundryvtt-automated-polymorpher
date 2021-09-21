@@ -53,8 +53,8 @@
         "hint": "Restrict the polymorpher list to only show owned polymorphers actors."
       },
       "restrictOnlyGM": {
-        "title": "Only GM can see Polymorhper button",
-        "hint": "Restrict the polymorpher list to only show to GM."
+        "title": "Only GM can see Polymorpher button",
+        "hint": "Restrict the polymorpher list to GMs only"
       }
     }
   }
