@@ -96,7 +96,7 @@ export class PolymorpherManager extends FormApplication {
     // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
     const tokenData = <TokenData>await actor.getTokenData();
     const posData =
-      <Token>getCanvas().tokens?.placeables.find((t: Token) => t.actor?.id === this.actor.id) || undefined;
+      <Token>getCanvas().tokens?.placeables.find((t: Token) => t.id === this.actor?.token?.id) || undefined;
     // Get the target actor
     const sourceActor = actor;
     // if (data.pack) {
@@ -155,8 +155,11 @@ export class PolymorpherManager extends FormApplication {
                   sourceActor,
                   rememberOptions(html),
                 );
-                if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) this.close();
-                else this.maximize();
+                if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) {
+                  this.close();
+                } else {
+                  this.maximize();
+                }
               },
             },
             wildshape: {
@@ -185,8 +188,11 @@ export class PolymorpherManager extends FormApplication {
                     transformTokens: rememberOptions(html).transformTokens,
                   },
                 );
-                if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) this.close();
-                else this.maximize();
+                if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) {
+                  this.close();
+                } else {
+                  this.maximize();
+                }
               },
             },
             polymorph: {
@@ -211,8 +217,11 @@ export class PolymorpherManager extends FormApplication {
                   },
                 );
 
-                if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) this.close();
-                else this.maximize();
+                if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) {
+                  this.close();
+                } else {
+                  this.maximize();
+                }
               },
             },
             cancel: {
@@ -228,7 +237,9 @@ export class PolymorpherManager extends FormApplication {
         },
       ).render(true);
     } else {
+      // ===========================================
       // If system is not dnd5e we can use warpgate
+      // ===========================================
       if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
         //@ts-ignore
         getGame().macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);

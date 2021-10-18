@@ -37,13 +37,13 @@ This module uses the [sequencer](https://github.com/fantasycalendar/FoundryVTT-S
 
 This module uses the [warpgate](https://github.com/trioderegion/warpgate) library. It is a optional dependency and it is recommended for the best experience and compatibility with other modules.
 
-**NOTE: you need this only if the system is not DnD5e, not tested**
+**NOTE: you need the warpgate module only if the system is not DnD5e, not tested**
 
 ### advanced-macros
 
 This module uses the [advanced-macros](https://github.com/League-of-Foundry-Developers/fvtt-advanced-macros) library. It is a optional dependency and it is recommended for the best experience and compatibility with other modules.
 
-**NOTE: you need this only for the custom macro feature, i don't suggest it is much easier to create the actors and set them up, but it's up to you**
+**NOTE: you need this only for the custom macro feature, i don't suggest it is much easier to create the actors and set them up, with the drag and drop but it's up to you**
 
 ## Features 
 

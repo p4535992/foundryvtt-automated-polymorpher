@@ -54,10 +54,10 @@ export const readyHooks = async () => {
     }
 
     buttons.unshift({
-      icon: 'fas fa-users',
+      icon: 'fas fa-eye',
       class: 'open-pm',
-      label: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.actorSheetBtn`),
-      onclick: function openCM(event) {
+      label: '', //i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.actorSheetBtn`),
+      onclick: function openPM(event) {
         const actor = app.object;
         new PolymorpherManager(actor).render(true);
       },
