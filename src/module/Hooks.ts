@@ -54,7 +54,7 @@ export const readyHooks = async () => {
     }
 
     buttons.unshift({
-      icon: 'fas fa-eye',
+      icon: 'fas fa-wind',
       class: 'open-pm',
       label: '', //i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.actorSheetBtn`),
       onclick: function openPM(event) {
