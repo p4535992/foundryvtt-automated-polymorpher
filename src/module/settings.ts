@@ -107,4 +107,12 @@ export const registerSettings = function () {
     type: Boolean,
     default: false,
   });
+  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'removeLabelSheetHeader', {
+    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.removeLabelSheetHeader.title`),
+    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.removeLabelSheetHeader.hint`),
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: true,
+  });
 };

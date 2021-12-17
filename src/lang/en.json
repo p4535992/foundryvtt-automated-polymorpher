@@ -55,6 +55,10 @@
       "restrictOnlyGM": {
         "title": "Only GM can see Polymorpher button",
         "hint": "Restrict the polymorpher list to GMs only"
+      },
+      "removeLabelSheetHeader": {
+        "title": "Remove label from sheet header button",
+        "hint": "Remove label from sheet header button useful for small monitor, tablet"
       }
     }
   }

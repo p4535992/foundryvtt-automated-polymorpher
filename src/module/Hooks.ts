@@ -48,6 +48,7 @@ export const readyHooks = async () => {
   Hooks.on('getActorSheetHeaderButtons', (app, buttons) => {
     if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton')) return;
 
+    const removeLabelSheetHeader = getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'removeLabelSheetHeader');
     const restrictedOnlyGM = getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOnlyGM');
     if (restrictedOnlyGM && !getGame().user?.isGM) {
       return;
@@ -56,7 +57,7 @@ export const readyHooks = async () => {
     buttons.unshift({
       icon: 'fas fa-wind',
       class: 'open-pm',
-      label: '', //i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.actorSheetBtn`),
+      label: removeLabelSheetHeader ? '' : i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.actorSheetBtn`),
       onclick: function openPM(event) {
         const actor = app.object;
         new PolymorpherManager(actor).render(true);
