@@ -96,7 +96,7 @@ Macro name: `AP_Polymorpher_Macro(XXX)`
 
 ```js
 return {
-  item: {
+  Item: {
     "Clenched Fist": {
       "data.attackBonus": args[0].assignedActor?.data.data.attributes.spelldc-8+args[0].assignedActor?.data.data.bonuses.msak.attack,
       "data.damage.parts":[[`${((args[0].spellLevel || 5)-5)*2+4}d8`,"force"]]

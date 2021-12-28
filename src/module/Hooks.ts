@@ -65,45 +65,29 @@ export const readyHooks = async () => {
     });
   });
   /*
-  Hooks.on('createChatMessage', async (chatMessage) => {
-    if (chatMessage.data.user !== getGame().user?.id || !getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'enableautomations')) {
-      return;
-    }
-    const spellName: string =
+  Hooks.on("createChatMessage", async (chatMessage) => {
+    if(game.system.id != "dnd5e")return;
+    if (chatMessage.data.user !== game.user.id || !game.settings.get(AECONSTS.MN, "enableautomations")) return;
+    let spellName =
       chatMessage.data.flavor ||
-      getCanvas()
-        .tokens?.get(chatMessage?.data?.speaker?.token)
-        ?.actor?.items?.get(chatMessage?.data?.flags?.dnd5e?.roll?.itemId)?.data?.name;
-    const system = automatedpolymorphers[getGame().system.id];
-    if (!system) {
-      return;
-    }
-
-    const creaturesCollection = system[spellName];
-
-    if (creaturesCollection) {
+      canvas.tokens.get(chatMessage?.data?.speaker?.token)?.actor?.items?.get(chatMessage?.data?.flags?.dnd5e?.roll?.itemId)?.data?.name;
+    let system = game.automatedevocations[game.system.id];
+    if (!system) return;
+    if (system[spellName]) {
       //attempt to get spell level
       let spellLevel;
-      //@ts-ignore
-      const midiLevel =
-        //@ts-ignore
-        typeof MidiQOL !== 'undefined' && chatMessage.data.flags['midi-qol']
-          ? //@ts-ignore
-            MidiQOL.Workflow.getWorkflow(chatMessage.data.flags['midi-qol'].workflowId)?.itemLevel
-          : undefined;
-      const brLevel = chatMessage.data.flags?.betterrolls5e?.params?.slotLevel;
-      const coreLevel = $(chatMessage.data.content)?.data('spell-level');
+      const midiLevel = typeof MidiQOL !== "undefined" && chatMessage.data.flags["midi-qol"] ? MidiQOL.Workflow.getWorkflow(chatMessage.data.flags["midi-qol"].workflowId)?.itemLevel : undefined;
+      const brLevel = chatMessage.data.flags?.betterrolls5e?.params?.slotLevel
+      const coreLevel = $(chatMessage.data.content)?.data("spell-level")
       spellLevel = midiLevel || brLevel || coreLevel || 0;
       spellLevel = parseInt(spellLevel);
-      const summonData: any[] = [];
-      const data = { level: spellLevel };
-      const creatures: Creature[] =
-        typeof creaturesCollection === 'function' ? creaturesCollection(data) : system[spellName];
-      for (const creature of creatures) {
-        if (creature.level && spellLevel && creature.level >= spellLevel) {
+      let summonData = [];
+      const data = {level:spellLevel}
+      const creatures = typeof system[spellName] === "function" ? system[spellName](data) : system[spellName];
+      for (let creature of creatures) {
+        if (creature.level && spellLevel && creature.level >= spellLevel)
           continue;
-        }
-        const actor = getGame().actors?.getName(creature.creature);
+        let actor = game.actors.getName(creature.creature);
         if (actor) {
           summonData.push({
             id: actor.id,
@@ -112,11 +96,36 @@ export const readyHooks = async () => {
           });
         }
       }
-      new SimplePolymorpherManager(
-        summonData,
-        spellLevel,
-        getCanvas().tokens?.get(chatMessage?.data?.speaker?.token)?.actor,
-      ).render(true);
+      new SimpleCompanionManager(summonData,spellLevel,canvas.tokens.get(chatMessage?.data?.speaker?.token)?.actor).render(true);
+    }
+  });
+
+  Hooks.on("createChatMessage", async (chatMessage) => {
+    if(game.system.id != "pf2e")return;
+    if (chatMessage.data.user !== game.user.id || !game.settings.get(AECONSTS.MN, "enableautomations")) return;
+    const item = await fromUuid(chatMessage.data.flags.pf2e.origin.uuid)
+    const spellName = item.data.name;
+    let system = game.automatedevocations[game.system.id];
+    if (!system) return;
+    if (system[spellName]) {
+      let summonData = [];
+      const spellLevel = $(chatMessage.data.content)?.data("spell-lvl")
+      const data = {level:item, spellLevel:spellLevel}
+    //const data = {level:item}
+      const creatures = typeof system[spellName] === "function" ? system[spellName](data) : system[spellName];
+      for (let creature of creatures) {
+        if (creature.level && spellLevel && creature.level >= spellLevel)
+          continue;
+        let actor = game.actors.getName(creature.creature);
+        if (actor) {
+          summonData.push({
+            id: actor.id,
+            number: creature.number,
+            animation: creature.animation,
+          });
+        }
+      }
+      new SimpleCompanionManager(summonData,spellLevel,canvas.tokens.get(chatMessage?.data?.speaker?.token)?.actor).render(true);
     }
   });
   */
