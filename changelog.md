@@ -1,3 +1,7 @@
+## 1.0.9
+
+- Update typescript
+
 ## 1.0.8
 
 - Add [CHANGELOGS & CONFLICTS](https://github.com/theripper93/libChangelogs) hooks for better management of the conflicts
