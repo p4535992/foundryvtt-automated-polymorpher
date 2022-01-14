@@ -23,7 +23,6 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 
 ## Known issue/Limitation
 
-
 ## Installation
 
 It's always easiest to install modules from the in game add-on browser.

@@ -1,8 +1,9 @@
 import { Creature, SystemCreatures } from './automatedPolymorpherModels';
 import { warn, error, debug, i18n, i18nFormat, log } from '../automated-polymorpher';
 import { PolymorpherManager, SimplePolymorpherManager } from './polymorphermanager';
-import { AUTOMATED_POLYMORPHER_MODULE_NAME, getCanvas, getGame } from './settings';
+import { AUTOMATED_POLYMORPHER_MODULE_NAME } from './settings';
 import { ANIMATIONS } from './animations';
+import { canvas, game } from './settings';
 
 // let automatedpolymorphers: SystemCreatures;
 
@@ -11,7 +12,7 @@ export const readyHooks = async () => {
 
   ANIMATIONS.animationFunctions = mergeObject(
     ANIMATIONS.animationFunctions,
-    <any>getGame().settings?.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customanimations'),
+    <any>game.settings?.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customanimations'),
   );
   log('Automated Evocations: Animation Functions Loaded - ', ANIMATIONS.animationFunctions);
   const sortedAnims = Object.keys(ANIMATIONS.animationFunctions).sort();
@@ -34,23 +35,23 @@ export const readyHooks = async () => {
   if (!automatedpolymorphers) {
     automatedpolymorphers = {};
   }
-  if (getGame().system.id == 'dnd5e') {
+  if (game.system.id == 'dnd5e') {
     automatedpolymorphers['dnd5e'] = {
       // TODO PREPARE SOME PRESET
     };
   }
 
-  automatedpolymorphers[getGame().system.id] = mergeObject(
-    automatedpolymorphers[getGame().system.id],
-    <any>getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customautospells'),
+  automatedpolymorphers[game.system.id] = mergeObject(
+    automatedpolymorphers[game.system.id],
+    <any>game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customautospells'),
   );
   */
   Hooks.on('getActorSheetHeaderButtons', (app, buttons) => {
-    if (getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton')) return;
+    if (game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton')) return;
 
-    const removeLabelSheetHeader = getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'removeLabelSheetHeader');
-    const restrictedOnlyGM = getGame().settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOnlyGM');
-    if (restrictedOnlyGM && !getGame().user?.isGM) {
+    const removeLabelSheetHeader = game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'removeLabelSheetHeader');
+    const restrictedOnlyGM = game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOnlyGM');
+    if (restrictedOnlyGM && !game.user?.isGM) {
       return;
     }
 

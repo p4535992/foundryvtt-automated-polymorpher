@@ -12,9 +12,10 @@
 // Import JavaScript modules
 
 // Import TypeScript modules
-import { AUTOMATED_POLYMORPHER_MODULE_NAME, getGame, registerSettings } from './module/settings';
+import { AUTOMATED_POLYMORPHER_MODULE_NAME, registerSettings } from './module/settings';
 import { preloadTemplates } from './module/preloadTemplates';
 import { initHooks, readyHooks, setupHooks } from './module/Hooks';
+import { canvas, game } from './module/settings';
 
 export let debugEnabled = 0;
 // 0 = none, warnings = 1, debug = 2, all = 3
@@ -29,10 +30,10 @@ export const error = (...args) => console.error(`${AUTOMATED_POLYMORPHER_MODULE_
 export const timelog = (...args) => warn(`${AUTOMATED_POLYMORPHER_MODULE_NAME} | `, Date.now(), ...args);
 
 export const i18n = (key) => {
-  return getGame().i18n.localize(key);
+  return game.i18n.localize(key);
 };
 export const i18nFormat = (key, data = {}) => {
-  return getGame().i18n.format(key, data);
+  return game.i18n.format(key, data);
 };
 
 export const setDebugLevel = (debugText: string) => {
@@ -76,14 +77,14 @@ Hooks.once('setup', function () {
 /* ------------------------------------ */
 Hooks.once('ready', () => {
   // Do anything once the module is ready
-  if (!getGame().modules.get('sequencer')?.active && getGame().user?.isGM) {
+  if (!game.modules.get('sequencer')?.active && game.user?.isGM) {
     ui.notifications?.error(
       `The '${AUTOMATED_POLYMORPHER_MODULE_NAME}' module requires to install and activate the 'sequencer' module.`,
     );
     return;
   }
-  if (getGame().system.id != 'dnd5e') {
-    if (!getGame().modules.get('warpgate')?.active && getGame().user?.isGM) {
+  if (game.system.id != 'dnd5e') {
+    if (!game.modules.get('warpgate')?.active && game.user?.isGM) {
       ui.notifications?.error(
         `The '${AUTOMATED_POLYMORPHER_MODULE_NAME}' module requires to install and activate the 'warpgate' module.`,
       );
@@ -97,9 +98,5 @@ Hooks.once('ready', () => {
 
 Hooks.once('libChangelogsReady', function () {
   //@ts-ignore
-  libChangelogs.register(
-    AUTOMATED_POLYMORPHER_MODULE_NAME,
-    '- Add [CHANGELOGS & CONFLICTS](https://github.com/theripper93/libChangelogs) hooks for better management of the conflicts',
-    'minor',
-  );
+  libChangelogs.register(AUTOMATED_POLYMORPHER_MODULE_NAME, '- Some bug fix', 'minor');
 });
