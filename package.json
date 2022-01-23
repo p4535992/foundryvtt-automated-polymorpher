@@ -3,7 +3,7 @@
   "name": "automated-polymorpher",
   "title": "",
   "description": "A user interface to manage polymorpher with summoning animations and automated summoning for spells",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "scripts": {
     "package": "gulp package",
     "build": "gulp build && gulp link",
@@ -44,7 +44,7 @@
     "gulp-typescript": "^6.0.0-alpha.1",
     "json-stringify-pretty-compact": "^2.0.0",
     "prettier": "^2.5.1",
-    "sass": "^1.45.0",
+    "sass": "^1.49.0",
     "yargs": "^15.4.1"
   },
   "lint-staged": {
@@ -52,6 +52,6 @@
     "*.(json|scss)": "prettier --write"
   },
   "dependencies": {
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.5"
   }
 }

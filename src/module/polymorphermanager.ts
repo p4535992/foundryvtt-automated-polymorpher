@@ -96,7 +96,19 @@ export class PolymorpherManager extends FormApplication {
     const actor = <Actor>game.actors?.get(aId);
     // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
     const tokenData = <TokenData>await actor.getTokenData();
-    const posData = <Token>canvas.tokens?.placeables.find((t: Token) => t.id === this.actor?.token?.id) || undefined;
+    //@ts-ignore
+    // const posData = await warpgate.crosshairs.show({
+    //   size: Math.max(tokenData.width,tokenData.height)*tokenData.scale,
+    //   icon: `modules/${AUTOMATED_POLYMORPHER_MODULE_NAME}/assets/black-hole-bolas.webp`,
+    //   label: "",
+    // });
+    // if (posData.cancelled) {
+    //   this.maximize();
+    //   return;
+    // }
+    const posData = <Token>canvas.tokens?.placeables.find((t: Token) => {
+        return t.actor?.id === this.actor.id;
+      }) || undefined;
     // Get the target actor
     const sourceActor = actor;
     // if (data.pack) {

@@ -41,9 +41,7 @@ This module uses the [sequencer](https://github.com/fantasycalendar/FoundryVTT-S
 
 ### warpgate
 
-This module uses the [warpgate](https://github.com/trioderegion/warpgate) library. It is a optional dependency and it is recommended for the best experience and compatibility with other modules.
-
-**NOTE: you need the warpgate module only if the system is not DnD5e, not tested**
+This module uses the [warpgate](https://github.com/trioderegion/warpgate) library. It is a mandatory dependency and it is recommended for the best experience and compatibility with other modules.
 
 ### advanced-macros
 

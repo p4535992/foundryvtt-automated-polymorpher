@@ -1,3 +1,7 @@
+## 1.0.10
+
+- Some bug fix
+
 ## 1.0.9
 
 - Update typescript

@@ -38,7 +38,7 @@ function getGame(): Game {
 }
 
 export const registerSettings = function () {
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'polymorphers', {
+  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'polymorphers', {
     name: '',
     hint: '',
     scope: 'client',
@@ -46,7 +46,7 @@ export const registerSettings = function () {
     type: Array,
     default: [],
   });
-  // getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customautospells', {
+  // game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customautospells', {
   //   name: '',
   //   hint: '',
   //   scope: 'world',
@@ -54,7 +54,7 @@ export const registerSettings = function () {
   //   type: Object,
   //   default: {},
   // });
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customanimations', {
+  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customanimations', {
     name: '',
     hint: '',
     scope: 'world',
@@ -62,7 +62,7 @@ export const registerSettings = function () {
     type: Object,
     default: {},
   });
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose', {
+  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose', {
     name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.autoclose.title`),
     hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.autoclose.hint`),
     scope: 'world',
@@ -70,7 +70,7 @@ export const registerSettings = function () {
     type: Boolean,
     default: false,
   });
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'enableautomations', {
+  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'enableautomations', {
     name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.enableautomations.title`),
     hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.enableautomations.hint`),
     scope: 'world',
@@ -78,7 +78,7 @@ export const registerSettings = function () {
     type: Boolean,
     default: true,
   });
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'storeonactor', {
+  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'storeonactor', {
     name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.storeonactor.title`),
     hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.storeonactor.hint`),
     scope: 'world',
@@ -86,7 +86,7 @@ export const registerSettings = function () {
     type: Boolean,
     default: false,
   });
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton', {
+  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton', {
     name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.hidebutton.title`),
     hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.hidebutton.hint`),
     scope: 'world',
@@ -94,7 +94,7 @@ export const registerSettings = function () {
     type: Boolean,
     default: false,
   });
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOwned', {
+  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOwned', {
     name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOwned.title`),
     hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOwned.hint`),
     scope: 'world',
@@ -102,7 +102,7 @@ export const registerSettings = function () {
     type: Boolean,
     default: false,
   });
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOnlyGM', {
+  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOnlyGM', {
     name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOnlyGM.title`),
     hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOnlyGM.hint`),
     scope: 'world',
@@ -110,7 +110,7 @@ export const registerSettings = function () {
     type: Boolean,
     default: false,
   });
-  getGame().settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'removeLabelSheetHeader', {
+  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'removeLabelSheetHeader', {
     name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.removeLabelSheetHeader.title`),
     hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.removeLabelSheetHeader.hint`),
     scope: 'world',
