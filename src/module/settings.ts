@@ -84,7 +84,7 @@ export const registerSettings = function () {
     scope: 'world',
     config: true,
     type: Boolean,
-    default: false,
+    default: true,
   });
   game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton', {
     name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.hidebutton.title`),
@@ -111,8 +111,8 @@ export const registerSettings = function () {
     default: false,
   });
   game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'removeLabelSheetHeader', {
-    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.removeLabelSheetHeader.title`),
-    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.removeLabelSheetHeader.hint`),
+    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.removeLabelSheetHeader.title`),
+    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.removeLabelSheetHeader.hint`),
     scope: 'world',
     config: true,
     type: Boolean,
