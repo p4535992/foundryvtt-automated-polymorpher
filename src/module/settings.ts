@@ -1,9 +1,8 @@
-import { i18n } from '../automated-polymorpher';
+import CONSTANTS from './constants';
+import { i18n } from './lib/lib';
 
 export const game = getGame();
 export const canvas = getCanvas();
-
-export const AUTOMATED_POLYMORPHER_MODULE_NAME = 'automated-polymorpher';
 
 /**
  * Because typescript doesn't know when in the lifecycle of foundry your code runs, we have to assume that the
@@ -38,7 +37,7 @@ function getGame(): Game {
 }
 
 export const registerSettings = function () {
-  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'polymorphers', {
+  game.settings.register(CONSTANTS.MODULE_NAME, 'polymorphers', {
     name: '',
     hint: '',
     scope: 'client',
@@ -46,7 +45,7 @@ export const registerSettings = function () {
     type: Array,
     default: [],
   });
-  // game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customautospells', {
+  // game.settings.register(CONSTANTS.MODULE_NAME, 'customautospells', {
   //   name: '',
   //   hint: '',
   //   scope: 'world',
@@ -54,7 +53,7 @@ export const registerSettings = function () {
   //   type: Object,
   //   default: {},
   // });
-  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'customanimations', {
+  game.settings.register(CONSTANTS.MODULE_NAME, 'customanimations', {
     name: '',
     hint: '',
     scope: 'world',
@@ -62,57 +61,57 @@ export const registerSettings = function () {
     type: Object,
     default: {},
   });
-  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose', {
-    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.autoclose.title`),
-    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.autoclose.hint`),
+  game.settings.register(CONSTANTS.MODULE_NAME, 'autoclose', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.autoclose.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.autoclose.hint`),
     scope: 'world',
     config: true,
     type: Boolean,
     default: false,
   });
-  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'enableautomations', {
-    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.enableautomations.title`),
-    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.enableautomations.hint`),
+  game.settings.register(CONSTANTS.MODULE_NAME, 'enableautomations', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.enableautomations.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.enableautomations.hint`),
     scope: 'world',
     config: true,
     type: Boolean,
     default: true,
   });
-  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'storeonactor', {
-    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.storeonactor.title`),
-    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.storeonactor.hint`),
+  game.settings.register(CONSTANTS.MODULE_NAME, 'storeonactor', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.hint`),
     scope: 'world',
     config: true,
     type: Boolean,
     default: true,
   });
-  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'hidebutton', {
-    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.hidebutton.title`),
-    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.hidebutton.hint`),
+  game.settings.register(CONSTANTS.MODULE_NAME, 'hidebutton', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hidebutton.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hidebutton.hint`),
     scope: 'world',
     config: true,
     type: Boolean,
     default: false,
   });
-  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOwned', {
-    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOwned.title`),
-    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOwned.hint`),
+  game.settings.register(CONSTANTS.MODULE_NAME, 'restrictOwned', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.restrictOwned.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.restrictOwned.hint`),
     scope: 'world',
     config: true,
     type: Boolean,
     default: false,
   });
-  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOnlyGM', {
-    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOnlyGM.title`),
-    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.restrictOnlyGM.hint`),
+  game.settings.register(CONSTANTS.MODULE_NAME, 'restrictOnlyGM', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.restrictOnlyGM.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.restrictOnlyGM.hint`),
     scope: 'world',
     config: true,
     type: Boolean,
     default: false,
   });
-  game.settings.register(AUTOMATED_POLYMORPHER_MODULE_NAME, 'removeLabelSheetHeader', {
-    name: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.removeLabelSheetHeader.title`),
-    hint: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.settings.removeLabelSheetHeader.hint`),
+  game.settings.register(CONSTANTS.MODULE_NAME, 'removeLabelSheetHeader', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.removeLabelSheetHeader.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.removeLabelSheetHeader.hint`),
     scope: 'world',
     config: true,
     type: Boolean,

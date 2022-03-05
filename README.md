@@ -21,6 +21,8 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 
 ## NOTE: If you are a javascript developer and not a typescript developer, you can just use the javascript files under the dist folder
 
+### If you want to buy me a coffee [![alt-text](https://img.shields.io/badge/-Patreon-%23ff424d?style=for-the-badge)](https://www.patreon.com/p4535992)
+
 ## Known issue/Limitation
 
 ## Installation

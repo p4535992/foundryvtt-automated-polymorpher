@@ -1,8 +1,9 @@
 import { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
-import { i18n } from '../automated-polymorpher';
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
-import { AUTOMATED_POLYMORPHER_MODULE_NAME } from './settings';
+import CONSTANTS from './constants';
+import { i18n } from './lib/lib';
+
 import { canvas, game } from './settings';
 
 export class PolymorpherManager extends FormApplication {
@@ -22,9 +23,9 @@ export class PolymorpherManager extends FormApplication {
   static get defaultOptions() {
     return {
       ...super.defaultOptions,
-      title: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.dialogs.polymorpherManager.title`),
+      title: i18n(`${CONSTANTS.MODULE_NAME}.dialogs.polymorpherManager.title`),
       id: 'polymorpherManager',
-      template: `modules/${AUTOMATED_POLYMORPHER_MODULE_NAME}/templates/polymorphermanager.hbs`,
+      template: `modules/${CONSTANTS.MODULE_NAME}/templates/polymorphermanager.hbs`,
       resizable: true,
       width: 300,
       height: window.innerHeight > 400 ? 400 : window.innerHeight - 100,
@@ -99,7 +100,7 @@ export class PolymorpherManager extends FormApplication {
     //@ts-ignore
     // const posData = await warpgate.crosshairs.show({
     //   size: Math.max(tokenData.width,tokenData.height)*tokenData.scale,
-    //   icon: `modules/${AUTOMATED_POLYMORPHER_MODULE_NAME}/assets/black-hole-bolas.webp`,
+    //   icon: `modules/${CONSTANTS.MODULE_NAME}/assets/black-hole-bolas.webp`,
     //   label: "",
     // });
     // if (posData.cancelled) {
@@ -166,7 +167,7 @@ export class PolymorpherManager extends FormApplication {
                   sourceActor,
                   rememberOptions(html),
                 );
-                if (game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) {
+                if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                   this.close();
                 } else {
                   this.maximize();
@@ -199,7 +200,7 @@ export class PolymorpherManager extends FormApplication {
                     transformTokens: rememberOptions(html).transformTokens,
                   },
                 );
-                if (game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) {
+                if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                   this.close();
                 } else {
                   this.maximize();
@@ -228,7 +229,7 @@ export class PolymorpherManager extends FormApplication {
                   },
                 );
 
-                if (game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) {
+                if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                   this.close();
                 } else {
                   this.maximize();
@@ -277,18 +278,19 @@ export class PolymorpherManager extends FormApplication {
       //  tokenData: tokenData,
       //  posData: posData,
       // })
+      //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
       //@ts-ignore
-      warpgate.mutate(posData.document, customTokenData || {}, {}, {});
+      await warpgate.mutate(posData.document, customTokenData || {}, {}, {});
 
-      if (game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'autoclose')) this.close();
+      if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) this.close();
       else this.maximize();
     }
   }
 
   async _onRemovePolymorpher(event) {
     Dialog.confirm({
-      title: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.dialogs.polymorpherManager.confirm.title`),
-      content: i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.dialogs.polymorpherManager.confirm.content`),
+      title: i18n(`${CONSTANTS.MODULE_NAME}.dialogs.polymorpherManager.confirm.title`),
+      content: i18n(`${CONSTANTS.MODULE_NAME}.dialogs.polymorpherManager.confirm.content`),
       yes: () => {
         event.currentTarget.parentElement.remove();
         this.saveData();
@@ -311,10 +313,10 @@ export class PolymorpherManager extends FormApplication {
   async loadPolymorphers() {
     const data: any =
       this.actor &&
-      (<boolean>this.actor.getFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
-        game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
-        ? this.actor.getFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
-        : game.user?.getFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.POLYMORPHERS);
+      (<boolean>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+        game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
+        ? this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
+        : game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS);
     if (data) {
       for (const polymorpher of data) {
         this.element.find('#polymorpher-list').append(this.generateLi(polymorpher));
@@ -325,7 +327,7 @@ export class PolymorpherManager extends FormApplication {
   generateLi(data) {
     const actor = game.actors?.get(data.id) || game.actors?.getName(data.id);
     if (!actor) return '';
-    const restricted = game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, 'restrictOwned');
+    const restricted = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOwned');
     if (restricted && !actor.isOwner) return '';
     const $li = $(`
 	<li id="polymorpher" class="polymorpher-item" data-aid="${actor.id}" data-elid="${randomID()}" draggable="true">
@@ -347,10 +349,8 @@ export class PolymorpherManager extends FormApplication {
   getAnimations(anim) {
     let animList = '';
     for (const [group, animations] of Object.entries(ANIMATIONS.animations)) {
-      const localGroup = i18n(`${AUTOMATED_POLYMORPHER_MODULE_NAME}.groups.${group}`);
-      animList += `<optgroup label="${
-        localGroup == `${AUTOMATED_POLYMORPHER_MODULE_NAME}.groups.${group}` ? group : localGroup
-      }">`;
+      const localGroup = i18n(`${CONSTANTS.MODULE_NAME}.groups.${group}`);
+      animList += `<optgroup label="${localGroup == `${CONSTANTS.MODULE_NAME}.groups.${group}` ? group : localGroup}">`;
       for (const a of <any[]>animations) {
         animList += `<option value="${a.key}" ${a.key == anim ? 'selected' : ''}>${a.name}</option>`;
       }
@@ -372,10 +372,10 @@ export class PolymorpherManager extends FormApplication {
       });
     }
     this.actor &&
-    (this.actor.getFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
-      game.settings.get(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
-      ? this.actor.setFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data)
-      : game.user?.setFlag(AUTOMATED_POLYMORPHER_MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data);
+    (this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+      game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
+      ? this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data)
+      : game.user?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data);
   }
 
   //@ts-ignore

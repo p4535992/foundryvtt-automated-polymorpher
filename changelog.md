@@ -1,3 +1,12 @@
+## 1.0.12
+
+- Some bug fix
+- Update typescript
+
+## 1.0.11
+
+- Some bug fix
+
 ## 1.0.10
 
 - Some bug fix
