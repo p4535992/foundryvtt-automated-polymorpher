@@ -45,7 +45,7 @@ This module uses the [sequencer](https://github.com/fantasycalendar/FoundryVTT-S
 
 This module uses the [warpgate](https://github.com/trioderegion/warpgate) library. It is a mandatory dependency and it is recommended for the best experience and compatibility with other modules.
 
-### advanced-macros
+### advanced-macros (optional)
 
 This module uses the [advanced-macros](https://github.com/League-of-Foundry-Developers/fvtt-advanced-macros) library. It is a optional dependency and it is recommended for the best experience and compatibility with other modules.
 
@@ -74,40 +74,7 @@ Then you interact with the standard panel of the Polymorph (if the system is dnd
 
 By default polymorphers are stored per user (so each actor will have the same summon list). If you want a particular actor to have it's own summon list you can use the included macro to switch the actor from global storage to local (on the actor). Simply place a linked actor on the scene, select it and run the macro. Using the other macro to switch it to global again will not wipe the saved polymorphers so setting it to local at a later date will restore the previous list.
 
-For more advanced users you can set the flag with the following command : `actor.setFlag(APCONSTS.MN,"isLocal", false)` (set true\false to enable disable local storage)
-
-## Custom Macros (requires the Advanced Macro Module and a game system is not Dnd5e)
-
-You can assign custom macros to specific actors
-
-1. Create a macro with this exact name `AP_Polymorpher_Macro(ActorName)` eg. `AP_Polymorpher_Macro(Bat)`, this will get fired any time a creature with that name is summoned
-2. Add code for the custom data, in the context of the macro args[0] contains the following data: 
-
-`polymorpherActor`: the actor that's getting summoned
-
-`assignedActor`: the actor assigned to the player doing the summoning (this will be the selected token actor if no assigned actor is found, this is always the case for GMs)
-
-The macro must return the custom data.
-
-Example (XXX auto scaling)
-
-Macro name: `AP_Polymorpher_Macro(XXX)`
-
-```js
-return {
-  Item: {
-    "Clenched Fist": {
-      "data.attackBonus": args[0].assignedActor?.data.data.attributes.spelldc-8+args[0].assignedActor?.data.data.bonuses.msak.attack,
-      "data.damage.parts":[[`${((args[0].spellLevel || 5)-5)*2+4}d8`,"force"]]
-    },
-    "Grasping Hand":{
-      "data.damage.parts":[[`${((args[0].spellLevel || 5)-5)*2+4}d6 + ${args[0].assignedActor?.data.data.abilities[args[0].assignedActor?.data.data.attributes.spellcasting]?.mod || ""}`,"bludgeoning"]]
-    }
-  }
-}
-```
-
-Every time an actor named `XXX` is summoned, the custom data will be applied
+For more advanced users you can set the flag with the following command : `actor.setFlag('automated-polymorpher','isLocal', false)` (set true\false to enable disable local storage)
 
 # Build
 

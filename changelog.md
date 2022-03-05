@@ -1,3 +1,7 @@
+## 1.0.13
+
+- Remove macro custom management, make this module more basic
+
 ## 1.0.12
 
 - Some bug fix

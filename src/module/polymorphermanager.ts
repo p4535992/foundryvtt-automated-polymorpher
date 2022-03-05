@@ -261,6 +261,7 @@ export class PolymorpherManager extends FormApplication {
       await this.wait(ANIMATIONS.animationFunctions[animation].time);
 
       //get custom data macro
+      /* DO NOT NEED THESE
       const customTokenData = await game.macros?.getName(`AP_Polymorpher_Macro(${actor.data.name})`)?.execute({
         //@ts-ignore
         polymorpherActor: actor,
@@ -268,7 +269,7 @@ export class PolymorpherManager extends FormApplication {
         // duplicates: duplicates,
         assignedActor: this.actor || game.user?.character || _token?.actor,
       });
-
+      */
       // log("Automated Polymorpher", {
       //   assignedActor: this.caster || game.user?.character || _token?.actor,
       //   spellLevel: this.spellLevel || 0,
