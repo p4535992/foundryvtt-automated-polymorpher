@@ -21,6 +21,8 @@ If you want to support more modules of this kind, I invite you to go and support
 
 Should work with all system supported from the [warpgate](https://github.com/trioderegion/warpgate) module "mutate" function, but for now the module is only used and tested with the Dnd5e system and the polymorph mechanism.
 
+![gif](./wiki/feature_automated_polymorhper.gif)
+
 ## NOTE: If you are a javascript developer and not a typescript developer, you can just use the javascript files under the dist folder
 
 ## Known issue/Limitation

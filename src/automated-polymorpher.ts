@@ -74,5 +74,5 @@ Hooks.once('ready', () => {
 
 Hooks.once('libChangelogsReady', function () {
   //@ts-ignore
-  libChangelogs.register(CONSTANTS.MODULE_NAME, '- Some bug fix', 'minor');
+  libChangelogs.register(CONSTANTS.MODULE_NAME, '- Official first release', 'minor');
 });
