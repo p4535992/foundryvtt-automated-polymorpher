@@ -1,3 +1,7 @@
+## 1.0.15
+
+- add japanese localization, author: のらせす (@BrotherSharper)
+
 ## 1.0.14
 
 - Official first release
