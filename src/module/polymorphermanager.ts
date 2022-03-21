@@ -86,14 +86,14 @@ export class PolymorpherManager extends FormApplication {
       // || data?.type !== 'Actor'){
       return;
     }
-    this.element.find('#polymorpher-list').append(this.generateLi(
-      {
+    this.element.find('#polymorpher-list').append(
+      this.generateLi({
         id: data.id,
         animation: '',
         number: 0,
-        defaultsummontype: ''
-      }
-    ));
+        defaultsummontype: '',
+      }),
+    );
     this.saveData();
   }
 
@@ -102,8 +102,11 @@ export class PolymorpherManager extends FormApplication {
     const animation = <string>$(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
     const aId = event.currentTarget.dataset.aid;
     const actor = <Actor>game.actors?.get(aId);
-    if(!actor){
-      warn(`The actor you try to polimorphing not exists anymore, please set up again the actor on the polymorpher manager`, true);
+    if (!actor) {
+      warn(
+        `The actor you try to polimorphing not exists anymore, please set up again the actor on the polymorpher manager`,
+        true,
+      );
       return;
     }
     // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
@@ -133,7 +136,7 @@ export class PolymorpherManager extends FormApplication {
 
     if (game.system.id === 'dnd5e') {
       const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
-      if (!canPolymorph){
+      if (!canPolymorph) {
         warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
         return false;
       }
@@ -294,9 +297,14 @@ export class PolymorpherManager extends FormApplication {
       // })
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
       //@ts-ignore
-      await warpgate.mutate(posData.document, customTokenData || {}, {}, {
-        name: posData.document.actor?.id // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
-      });
+      await warpgate.mutate(
+        posData.document,
+        customTokenData || {},
+        {},
+        {
+          name: posData.document.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+        },
+      );
 
       if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) this.close();
       else this.maximize();
@@ -340,7 +348,7 @@ export class PolymorpherManager extends FormApplication {
     }
   }
 
-  generateLi(data:PolymorpherData) {
+  generateLi(data: PolymorpherData) {
     const actor = game.actors?.get(data.id) || game.actors?.getName(data.id);
     if (!actor) return '';
     const restricted = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOwned');
@@ -378,10 +386,9 @@ export class PolymorpherManager extends FormApplication {
     return animList;
   }
 
-
-  getDefaultSummonTypes(defaultsummontype:string) {
+  getDefaultSummonTypes(defaultsummontype: string) {
     let animList = '';
-    const typesArray = ['', "DND5E.PolymorphWildShape", "DND5E.Polymorph"];
+    const typesArray = ['', 'DND5E.PolymorphWildShape', 'DND5E.Polymorph'];
     for (const [group, types] of Object.entries(typesArray)) {
       const localGroup = i18n(`${CONSTANTS.MODULE_NAME}.groups.${group}`);
       animList += `<optgroup label="${localGroup == `${CONSTANTS.MODULE_NAME}.groups.${group}` ? group : localGroup}">`;
@@ -424,13 +431,16 @@ export class PolymorpherManager extends FormApplication {
     // DO NOTHING
   }
 
-  async fastSummonPolymorpher(polymorpherData:PolymorpherData) {
+  async fastSummonPolymorpher(polymorpherData: PolymorpherData) {
     this.minimize();
 
     const actor = <Actor>game.actors?.get(polymorpherData.id);
     const animation = polymorpherData.animation;
-    if(!actor){
-      warn(`The actor you try to polymorphism not exists anymore, please set up again the actor on the polymorpher manager`, true);
+    if (!actor) {
+      warn(
+        `The actor you try to polymorphism not exists anymore, please set up again the actor on the polymorpher manager`,
+        true,
+      );
       return;
     }
     const tokenData = <TokenData>await actor.getTokenData();
@@ -443,7 +453,7 @@ export class PolymorpherManager extends FormApplication {
 
     if (game.system.id === 'dnd5e') {
       const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
-      if (!canPolymorph){
+      if (!canPolymorph) {
         warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
         return false;
       }
@@ -458,7 +468,7 @@ export class PolymorpherManager extends FormApplication {
       //   return settings;
       // };
 
-      if(polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings'){
+      if (polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings') {
         if (posData) {
           if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
             //@ts-ignore
@@ -486,10 +496,10 @@ export class PolymorpherManager extends FormApplication {
             keepItems: false,
             keepBio: false,
             keepVision: true,
-            transformTokens: true
-          }
+            transformTokens: true,
+          },
         );
-      } else if(polymorpherData.defaultsummontype === 'DND5E.PolymorphWildShape'){
+      } else if (polymorpherData.defaultsummontype === 'DND5E.PolymorphWildShape') {
         if (posData) {
           if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
             //@ts-ignore
@@ -512,7 +522,7 @@ export class PolymorpherManager extends FormApplication {
             transformTokens: true,
           },
         );
-      }else if(polymorpherData.defaultsummontype === 'DND5E.Polymorph'){
+      } else if (polymorpherData.defaultsummontype === 'DND5E.Polymorph') {
         if (posData) {
           if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
             //@ts-ignore
@@ -539,8 +549,8 @@ export class PolymorpherManager extends FormApplication {
             keepItems: false,
             keepBio: false,
             keepVision: true,
-            transformTokens: true
-          }
+            transformTokens: true,
+          },
         );
       }
     } else {
@@ -557,9 +567,14 @@ export class PolymorpherManager extends FormApplication {
 
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
       //@ts-ignore
-      await warpgate.mutate(posData.document, customTokenData || {}, {}, {
-        name: posData.document.actor?.id // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
-      });
+      await warpgate.mutate(
+        posData.document,
+        customTokenData || {},
+        {},
+        {
+          name: posData.document.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+        },
+      );
     }
   }
 }

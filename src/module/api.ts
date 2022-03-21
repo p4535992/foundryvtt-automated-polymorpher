@@ -5,7 +5,6 @@ import { PolymorpherManager } from './polymorphermanager';
 import { canvas, game } from './settings';
 
 const API = {
-
   async invokePolymorpherManagerArr(...inAttributes: any[]) {
     if (!Array.isArray(inAttributes)) {
       throw error('invokePolymorpherManager | inAttributes must be of type array');
@@ -15,38 +14,37 @@ const API = {
     return result;
   },
 
-  async invokePolymorpherManager(sourceToken:Token, removePolymorpher, random = false){
+  async invokePolymorpherManager(sourceToken: Token, removePolymorpher, random = false) {
     const actor = <Actor>sourceToken.document.actor;
-    if(removePolymorpher){
+    if (removePolymorpher) {
       // Do something with left click
       if (game.system.id === 'dnd5e') {
         //@ts-ignore
         actor?.revertOriginalForm();
-      }else{
+      } else {
         //@ts-ignore
-        warpgate.revert(sourceToken.document, mutationName = actor.id);
+        warpgate.revert(sourceToken.document, (mutationName = actor.id));
       }
-    }else{
-      if(random){
+    } else {
+      if (random) {
         const listPolymorphers: PolymorpherData[] =
           this.actor &&
           (<boolean>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
             game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
             ? <PolymorpherData[]>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
-            :  <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+            : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
 
-        if(listPolymorphers?.length === 1){
+        if (listPolymorphers?.length === 1) {
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0]);
-        }else{
-          const randomIndex = Math.floor(Math.random() *listPolymorphers.length);
+        } else {
+          const randomIndex = Math.floor(Math.random() * listPolymorphers.length);
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[randomIndex]);
         }
-      }else{
+      } else {
         new PolymorpherManager(actor).render(true);
       }
     }
   },
-
 };
 
 export default API;

@@ -1,5 +1,4 @@
-import CONSTANTS from "./constants";
-
+import CONSTANTS from './constants';
 
 export const preloadTemplates = async function () {
   const templatePaths = [

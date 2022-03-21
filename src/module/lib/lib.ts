@@ -119,10 +119,10 @@ export function isStringEquals(stringToCheck1: string, stringToCheck2: string, s
 export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
   // if only one token is selected
   if (canvas.tokens?.controlled.length == 1) {
-    const sourceToken = <Token>canvas.tokens?.placeables.find((t:Token) => {
+    const sourceToken = <Token>canvas.tokens?.placeables.find((t: Token) => {
       return t.id === hudToken._id;
     });
-    if(!sourceToken || !sourceToken.isOwner){
+    if (!sourceToken || !sourceToken.isOwner) {
       return;
     }
 
@@ -133,18 +133,18 @@ export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
   }
 }
 
-function addToPolymorphButton(html, sourceToken:Token) {
-  if(!sourceToken || !sourceToken.isOwner){
+function addToPolymorphButton(html, sourceToken: Token) {
+  if (!sourceToken || !sourceToken.isOwner) {
     return;
   }
 
-  const isPolymorphed = sourceToken.document.actor?.getFlag("dnd5e", "isPolymorphed");
+  const isPolymorphed = sourceToken.document.actor?.getFlag('dnd5e', 'isPolymorphed');
   let button = buildButton(html, `Transform ${sourceToken.name}`);
-  if(isPolymorphed){
+  if (isPolymorphed) {
     button = addSlash(button);
   }
 
-  const random = <boolean>game.settings.get(CONSTANTS.MODULE_NAME,'hudAvoidPanelChoice') ?? false;
+  const random = <boolean>game.settings.get(CONSTANTS.MODULE_NAME, 'hudAvoidPanelChoice') ?? false;
 
   button.find('i').on('click', async (ev) => {
     API.invokePolymorpherManager(sourceToken, false, random);
@@ -170,72 +170,70 @@ function addToPolymorphButton(html, sourceToken:Token) {
 //   });
 // }
 
-  function buildButton(html, tooltip) {
-    const iconClass = 'fas fa-wind';
-    const button = $(
-      `<div class="control-icon ${CONSTANTS.MODULE_NAME}" title="${tooltip}"><i class="${iconClass}"></i></div>`,
-    );
-    const settingHudColClass = game.settings.get(CONSTANTS.MODULE_NAME, 'hudColumn');
-    const settingHudTopBottomClass = game.settings.get(CONSTANTS.MODULE_NAME, 'hudTopBottom');
-    const col = html.find(settingHudColClass);
-    if (settingHudTopBottomClass === 'top') {
-      col.prepend(button);
-    } else {
-      col.append(button);
-    }
-    return button;
+function buildButton(html, tooltip) {
+  const iconClass = 'fas fa-wind';
+  const button = $(
+    `<div class="control-icon ${CONSTANTS.MODULE_NAME}" title="${tooltip}"><i class="${iconClass}"></i></div>`,
+  );
+  const settingHudColClass = game.settings.get(CONSTANTS.MODULE_NAME, 'hudColumn');
+  const settingHudTopBottomClass = game.settings.get(CONSTANTS.MODULE_NAME, 'hudTopBottom');
+  const col = html.find(settingHudColClass);
+  if (settingHudTopBottomClass === 'top') {
+    col.prepend(button);
+  } else {
+    col.append(button);
   }
+  return button;
+}
 
-  // /**
-  //  * Adds the hud button to the HUD HTML
-  //  * @param {object} html - The HTML
-  //  * @param {object} data - The data
-  //  * @param {boolean} hasSlash - If true, the slash will be placed over the icon
-  //  */
-  // async function addButton(html, data, hasSlash = false) {
-  //   const button = $(`<div class="control-icon ${CONSTANTS.MODULE_NAME}"><i class="fas ${SettingsForm.getIconClass()}"></i></div>`);
+// /**
+//  * Adds the hud button to the HUD HTML
+//  * @param {object} html - The HTML
+//  * @param {object} data - The data
+//  * @param {boolean} hasSlash - If true, the slash will be placed over the icon
+//  */
+// async function addButton(html, data, hasSlash = false) {
+//   const button = $(`<div class="control-icon ${CONSTANTS.MODULE_NAME}"><i class="fas ${SettingsForm.getIconClass()}"></i></div>`);
 
-  //   if (hasSlash) {
-  //     this.addSlash(button);
-  //   }
+//   if (hasSlash) {
+//     this.addSlash(button);
+//   }
 
-  //   const col = html.find(SettingsForm.getHudColumnClass());
-  //   if (SettingsForm.getHudTopBottomClass() == 'top') {
-  //     col.prepend(button);
-  //   } else {
-  //     col.append(button);
-  //   }
+//   const col = html.find(SettingsForm.getHudColumnClass());
+//   if (SettingsForm.getHudTopBottomClass() == 'top') {
+//     col.prepend(button);
+//   } else {
+//     col.append(button);
+//   }
 
-  //   button.find('i').on('click', async (ev) => {
-  //     // do something
-  //     if (hasSlash) {
-  //       removeSlash(button);
-  //     } else {
-  //       addSlash(button);
-  //     }
-  //   });
-  // }
+//   button.find('i').on('click', async (ev) => {
+//     // do something
+//     if (hasSlash) {
+//       removeSlash(button);
+//     } else {
+//       addSlash(button);
+//     }
+//   });
+// }
 
-  /**
-   * Adds a slash icon on top of the icon to signify is active
-   * @param {Object} button - The HUD button to add a slash on top of
-   */
-   function addSlash(button) {
-    const slash = $(`<i class="fas fa-slash" style="position: absolute; color: tomato"></i>`);
-    button.addClass('fa-stack');
-    button.find('i').addClass('fa-stack-1x');
-    slash.addClass('fa-stack-1x');
-    button.append(slash);
-    return button;
-  }
+/**
+ * Adds a slash icon on top of the icon to signify is active
+ * @param {Object} button - The HUD button to add a slash on top of
+ */
+function addSlash(button) {
+  const slash = $(`<i class="fas fa-slash" style="position: absolute; color: tomato"></i>`);
+  button.addClass('fa-stack');
+  button.find('i').addClass('fa-stack-1x');
+  slash.addClass('fa-stack-1x');
+  button.append(slash);
+  return button;
+}
 
-  /**
-   * Removes the slash icon from the button to signify that it is no longer active
-   * @param {Object} button - The button
-   */
-  function removeSlash(button) {
-    const slash = button.find('i')[1];
-    slash.remove();
-  }
-
-
+/**
+ * Removes the slash icon from the button to signify that it is no longer active
+ * @param {Object} button - The button
+ */
+function removeSlash(button) {
+  const slash = button.find('i')[1];
+  slash.remove();
+}

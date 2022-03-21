@@ -34,5 +34,5 @@ export class PolymorpherData {
   id: string;
   animation: string;
   number: number;
-  defaultsummontype:string;
+  defaultsummontype: string;
 }
