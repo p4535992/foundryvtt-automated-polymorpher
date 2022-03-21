@@ -1,3 +1,4 @@
+import API from '../api';
 import { PolymorpherFlags } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
 import { PolymorpherManager } from '../polymorphermanager';
@@ -125,18 +126,8 @@ export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
       return;
     }
 
-    if (game.system.id === 'dnd5e') {
-      addToRevertPolymorphButton(html, sourceToken);
-    }
+    //addToRevertPolymorphButton(html, sourceToken);
     addToPolymorphButton(html, sourceToken);
-
-    //const isPolymorphed = sourceToken.document.actor?.getFlag("dnd5e", "isPolymorphed");
-    // if the selected token is a mount
-    //if (isPolymorphed) {
-    //  addToRevertPolymorphButton(html, sourceToken);
-    //}else{
-    //  addToPolymorphButton(html, sourceToken);
-    //}
   } else {
     // Do not show anything
   }
@@ -147,34 +138,37 @@ function addToPolymorphButton(html, sourceToken:Token) {
     return;
   }
 
-  const button = buildButton(html, `Transform ${sourceToken.name}`);
+  const isPolymorphed = sourceToken.document.actor?.getFlag("dnd5e", "isPolymorphed");
+  let button = buildButton(html, `Transform ${sourceToken.name}`);
+  if(isPolymorphed){
+    button = addSlash(button);
+  }
+
+  const random = <boolean>game.settings.get(CONSTANTS.MODULE_NAME,'hudAvoidPanelChoice') ?? false;
 
   button.find('i').on('click', async (ev) => {
-    // Do something with left click
-    const actor = <Actor>sourceToken.document.actor;
-    new PolymorpherManager(actor).render(true);
+    API.invokePolymorpherManager(sourceToken, false, random);
   });
   button.find('i').on('contextmenu', async (ev) => {
     // Do somethign with right click
+    API.invokePolymorpherManager(sourceToken, true, random);
   });
 }
 
-function addToRevertPolymorphButton(html, sourceToken:Token) {
-  if(!sourceToken || !sourceToken.isOwner){
-    return;
-  }
-  let button = buildButton(html, `Revert transform ${sourceToken.name}`);
-  button = addSlash(button);
+// function addToRevertPolymorphButton(html, sourceToken:Token) {
+//   if(!sourceToken || !sourceToken.isOwner){
+//     return;
+//   }
+//   let button = buildButton(html, `Revert transform ${sourceToken.name}`);
+//   button = addSlash(button);
 
-  button.find('i').on('click', async (ev) => {
-    // Do something with left click
-    //@ts-ignore
-    sourceToken.document.actor?.revertOriginalForm();
-  });
-  button.find('i').on('contextmenu', async (ev) => {
-    // Do something with right click
-  });
-}
+//   button.find('i').on('click', async (ev) => {
+//     API.invokePolymorpherManager(sourceToken,true);
+//   });
+//   button.find('i').on('contextmenu', async (ev) => {
+//     // Do something with right click
+//   });
+// }
 
   function buildButton(html, tooltip) {
     const iconClass = 'fas fa-wind';
@@ -193,13 +187,13 @@ function addToRevertPolymorphButton(html, sourceToken:Token) {
   }
 
   // /**
-  //  * Adds the mount button to the HUD HTML
+  //  * Adds the hud button to the HUD HTML
   //  * @param {object} html - The HTML
   //  * @param {object} data - The data
   //  * @param {boolean} hasSlash - If true, the slash will be placed over the icon
   //  */
   // async function addButton(html, data, hasSlash = false) {
-  //   const button = $(`<div class="control-icon mount-up"><i class="fas ${SettingsForm.getIconClass()}"></i></div>`);
+  //   const button = $(`<div class="control-icon ${CONSTANTS.MODULE_NAME}"><i class="fas ${SettingsForm.getIconClass()}"></i></div>`);
 
   //   if (hasSlash) {
   //     this.addSlash(button);
@@ -213,7 +207,7 @@ function addToRevertPolymorphButton(html, sourceToken:Token) {
   //   }
 
   //   button.find('i').on('click', async (ev) => {
-  //     await MountManager.mountUpHud(data);
+  //     // do something
   //     if (hasSlash) {
   //       removeSlash(button);
   //     } else {
@@ -223,7 +217,7 @@ function addToRevertPolymorphButton(html, sourceToken:Token) {
   // }
 
   /**
-   * Adds a slash icon on top of the horse icon to signify "dismount"
+   * Adds a slash icon on top of the icon to signify is active
    * @param {Object} button - The HUD button to add a slash on top of
    */
    function addSlash(button) {
@@ -236,10 +230,12 @@ function addToRevertPolymorphButton(html, sourceToken:Token) {
   }
 
   /**
-   * Removes the slash icon from the button to signify that it is no longer a mount
-   * @param {Object} button - The mount up button
+   * Removes the slash icon from the button to signify that it is no longer active
+   * @param {Object} button - The button
    */
   function removeSlash(button) {
     const slash = button.find('i')[1];
     slash.remove();
   }
+
+

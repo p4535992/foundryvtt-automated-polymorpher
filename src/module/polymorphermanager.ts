@@ -86,7 +86,14 @@ export class PolymorpherManager extends FormApplication {
       // || data?.type !== 'Actor'){
       return;
     }
-    this.element.find('#polymorpher-list').append(this.generateLi({ id: data.id }));
+    this.element.find('#polymorpher-list').append(this.generateLi(
+      {
+        id: data.id,
+        animation: '',
+        number: 0,
+        defaultsummontype: ''
+      }
+    ));
     this.saveData();
   }
 
@@ -96,7 +103,8 @@ export class PolymorpherManager extends FormApplication {
     const aId = event.currentTarget.dataset.aid;
     const actor = <Actor>game.actors?.get(aId);
     if(!actor){
-      warn(`The actor with id '${aId}' not exists anymore, please set up again the actor on the polymorpher manager`, true);
+      warn(`The actor you try to polimorphing not exists anymore, please set up again the actor on the polymorpher manager`, true);
+      return;
     }
     // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
     const tokenData = <TokenData>await actor.getTokenData();
@@ -125,7 +133,10 @@ export class PolymorpherManager extends FormApplication {
 
     if (game.system.id === 'dnd5e') {
       const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
-      if (!canPolymorph) return false;
+      if (!canPolymorph){
+        warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
+        return false;
+      }
 
       // Define a function to record polymorph settings for future use
       const rememberOptions = (html) => {
@@ -283,7 +294,9 @@ export class PolymorpherManager extends FormApplication {
       // })
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
       //@ts-ignore
-      await warpgate.mutate(posData.document, customTokenData || {}, {}, {});
+      await warpgate.mutate(posData.document, customTokenData || {}, {}, {
+        name: posData.document.actor?.id // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+      });
 
       if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) this.close();
       else this.maximize();
@@ -314,12 +327,12 @@ export class PolymorpherManager extends FormApplication {
   }
 
   async loadPolymorphers() {
-    const data: any =
+    const data: PolymorpherData[] =
       this.actor &&
       (<boolean>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
         game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
-        ? this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
-        : game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS);
+        ? <PolymorpherData[]>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
+        : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
     if (data) {
       for (const polymorpher of data) {
         this.element.find('#polymorpher-list').append(this.generateLi(polymorpher));
@@ -327,7 +340,7 @@ export class PolymorpherManager extends FormApplication {
     }
   }
 
-  generateLi(data) {
+  generateLi(data:PolymorpherData) {
     const actor = game.actors?.get(data.id) || game.actors?.getName(data.id);
     if (!actor) return '';
     const restricted = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOwned');
@@ -342,6 +355,9 @@ export class PolymorpherManager extends FormApplication {
     	<select class="anim-dropdown">
         	${this.getAnimations(data.animation)}
     	</select>
+        <select id="automated-polymorpher.defaultSummonType" class="defaultSummonType" name="defaultSummonType" data-dtype="String" is="ms-dropdown-ap">
+            ${this.getDefaultSummonTypes(data.defaultsummontype)}
+        </select>
 		<i id="remove-polymorpher" class="fas fa-trash"></i>
 	</li>
 	`);
@@ -361,6 +377,22 @@ export class PolymorpherManager extends FormApplication {
     }
     return animList;
   }
+
+
+  getDefaultSummonTypes(defaultsummontype:string) {
+    let animList = '';
+    const typesArray = ['', "DND5E.PolymorphWildShape", "DND5E.Polymorph"];
+    for (const [group, types] of Object.entries(typesArray)) {
+      const localGroup = i18n(`${CONSTANTS.MODULE_NAME}.groups.${group}`);
+      animList += `<optgroup label="${localGroup == `${CONSTANTS.MODULE_NAME}.groups.${group}` ? group : localGroup}">`;
+      for (const a of types) {
+        animList += `<option value="${a}" ${a === defaultsummontype ? 'selected' : ''}>${i18n(a)}</option>`;
+      }
+      animList += '</optgroup>';
+    }
+    return animList;
+  }
+
   async wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
@@ -372,6 +404,7 @@ export class PolymorpherManager extends FormApplication {
         id: <string>polymorpher.dataset.aid,
         animation: <string>$(polymorpher).find('.anim-dropdown').val(),
         number: <number>$(polymorpher).find('#polymorpher-number-val').val(),
+        defaultsummontype: <string>$(polymorpher).find('.defaultSummonType').val(),
       });
     }
     this.actor &&
@@ -389,6 +422,145 @@ export class PolymorpherManager extends FormApplication {
 
   _updateObject(event): any {
     // DO NOTHING
+  }
+
+  async fastSummonPolymorpher(polymorpherData:PolymorpherData) {
+    this.minimize();
+
+    const actor = <Actor>game.actors?.get(polymorpherData.id);
+    const animation = polymorpherData.animation;
+    if(!actor){
+      warn(`The actor you try to polymorphism not exists anymore, please set up again the actor on the polymorpher manager`, true);
+      return;
+    }
+    const tokenData = <TokenData>await actor.getTokenData();
+    const posData = <Token>canvas.tokens?.placeables.find((t: Token) => {
+        return t.actor?.id === this.actor.id;
+      }) || undefined;
+    // Get the target actor
+    const sourceActor = actor;
+    if (!sourceActor) return;
+
+    if (game.system.id === 'dnd5e') {
+      const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
+      if (!canPolymorph){
+        warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
+        return false;
+      }
+      // // Define a function to record polymorph settings for future use
+      // const rememberOptions = (html) => {
+      //   const options = {};
+      //   html.find('input').each((i, el) => {
+      //     options[el.name] = el.checked;
+      //   });
+      //   const settings = mergeObject(<any>game.settings.get('dnd5e', 'polymorphSettings') || {}, options);
+      //   game.settings.set('dnd5e', 'polymorphSettings', settings);
+      //   return settings;
+      // };
+
+      if(polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings'){
+        if (posData) {
+          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+            //@ts-ignore
+            game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+          } else {
+            ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+          }
+          await this.wait(ANIMATIONS.animationFunctions[animation].time);
+        }
+        //@ts-ignore
+        await this.actor.transformInto(
+          // await this._transformIntoCustom(
+          sourceActor,
+          // rememberOptions(html),
+          {
+            keepPhysical: false,
+            keepMental: false,
+            keepSaves: false,
+            keepSkills: false,
+            mergeSaves: false,
+            mergeSkills: false,
+            keepClass: false,
+            keepFeats: false,
+            keepSpells: false,
+            keepItems: false,
+            keepBio: false,
+            keepVision: true,
+            transformTokens: true
+          }
+        );
+      } else if(polymorpherData.defaultsummontype === 'DND5E.PolymorphWildShape'){
+        if (posData) {
+          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+            //@ts-ignore
+            game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+          } else {
+            ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+          }
+          await this.wait(ANIMATIONS.animationFunctions[animation].time);
+        }
+        //@ts-ignore
+        await this.actor.transformInto(
+          // await this._transformIntoCustom(
+          sourceActor,
+          {
+            keepBio: true,
+            keepClass: true,
+            keepMental: true,
+            mergeSaves: true,
+            mergeSkills: true,
+            transformTokens: true,
+          },
+        );
+      }else if(polymorpherData.defaultsummontype === 'DND5E.Polymorph'){
+        if (posData) {
+          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+            //@ts-ignore
+            game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+          } else {
+            ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+          }
+          await this.wait(ANIMATIONS.animationFunctions[animation].time);
+        }
+        //@ts-ignore
+        await this.actor.transformInto(
+          // await this._transformIntoCustom(
+          sourceActor,
+          {
+            keepPhysical: false,
+            keepMental: false,
+            keepSaves: false,
+            keepSkills: false,
+            mergeSaves: false,
+            mergeSkills: false,
+            keepClass: false,
+            keepFeats: false,
+            keepSpells: false,
+            keepItems: false,
+            keepBio: false,
+            keepVision: true,
+            transformTokens: true
+          }
+        );
+      }
+    } else {
+      // ===========================================
+      // If system is not dnd5e we can use warpgate
+      // ===========================================
+      if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+        //@ts-ignore
+        game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+      } else {
+        ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+      }
+      await this.wait(ANIMATIONS.animationFunctions[animation].time);
+
+      //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
+      //@ts-ignore
+      await warpgate.mutate(posData.document, customTokenData || {}, {}, {
+        name: posData.document.actor?.id // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+      });
+    }
   }
 }
 

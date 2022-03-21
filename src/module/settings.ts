@@ -149,4 +149,13 @@ export const registerSettings = function () {
       1: 'Bottom',
     },
   });
+
+  game.settings.register(CONSTANTS.MODULE_NAME, 'hudAvoidPanelChoice', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudAvoidPanelChoice.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudAvoidPanelChoice.hint`),
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: false,
+  });
 };

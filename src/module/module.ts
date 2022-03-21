@@ -6,9 +6,11 @@ import { canvas, game } from './settings';
 import CONSTANTS from './constants';
 import API from './api';
 import { ModuleData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/packages.mjs';
+import { registerSocket } from './socket';
 
 export const initHooks = () => {
   warn('Init Hooks processing');
+  Hooks.once('socketlib.ready', registerSocket);
 };
 
 export const setupHooks = () => {

@@ -6,7 +6,8 @@
         "confirm": {
           "title": "Delete Polymorpher",
           "content": "<p>Are you sure you want to delete this polymorpher?</p>"
-        }
+        },
+        "defaultSummonType": "Default summon type"
       }
     },
     "actorSheetBtn": "Polymorphers",
@@ -67,6 +68,10 @@
       "hudTopBottom": {
         "title": "HUD Top/Bottom",
         "hint": "Where to place the button in the column"
+      },
+      "hudAvoidPanelChoice": {
+        "title": "HUD avoid the rendering of the polymorpher manager when there is only one choice",
+        "hint": "Only from the HUD interface when click on the button if only one entity is been set for the current actor, the rendering of the polymorpher manager is skipped for avoid two click, can be really useful in some use case"
       }
     }
   }

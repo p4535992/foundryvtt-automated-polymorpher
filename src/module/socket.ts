@@ -36,12 +36,12 @@ export function registerSocket() {
    */
   automatedPolymorpherSocket.register(SOCKET_HANDLERS.CALL_HOOK, (hook, ...args) => callHook(hook, ...args));
 
-  // /**
-  //  * Conditional Visibility sockets
-  //  */
-  // automatedPolymorpherSocket.register(SOCKET_HANDLERS.ON_RENDER_TOKEN_CONFIG, (...args) =>
-  //   API._onRenderTokenConfig(...args),
-  // );
+  /**
+   * Automated Polymorpher sockets
+   */
+  automatedPolymorpherSocket.register('invokePolymorpherManagerArr', (...args) =>
+    API.invokePolymorpherManagerArr(...args),
+  );
 
   /**
    * UI sockets
