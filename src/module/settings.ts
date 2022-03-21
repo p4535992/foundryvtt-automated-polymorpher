@@ -124,13 +124,11 @@ export const registerSettings = function () {
     hint: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudColumn.hint`),
     scope: 'world',
     config: true,
-    // type: String,
-    // default: 'Left',
-    type: Number,
-    default: 0,
-    choices: {
-      0: 'Left',
-      1: 'Right',
+    type: String,
+    default: 'Left',
+    choices: <any>{
+      Left: 'Left',
+      Right: 'Right',
     },
   });
 
@@ -140,13 +138,11 @@ export const registerSettings = function () {
     hint: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudTopBottom.hint`),
     scope: 'world',
     config: true,
-    // type: String,
-    // default: 'Top',
-    type: Number,
-    default: 0,
-    choices: {
-      0: 'Top',
-      1: 'Bottom',
+    type: String,
+    default: 'Top',
+    choices: <any>{
+      Top: 'Top',
+      Bottom: 'Bottom',
     },
   });
 

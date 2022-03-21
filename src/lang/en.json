@@ -70,8 +70,8 @@
         "hint": "Where to place the button in the column"
       },
       "hudAvoidPanelChoice": {
-        "title": "HUD avoid the rendering of the polymorpher manager when there is only one choice",
-        "hint": "Only from the HUD interface when click on the button if only one entity is been set for the current actor, the rendering of the polymorpher manager is skipped for avoid two click, can be really useful in some use case"
+        "title": "HUD avoid the rendering of the polymorpher manager for fast polymorph",
+        "hint": "Only from the HUD interface when click on the button all the entities with a 'default summon type' on the token header button, will let you avoid the rendering of the polymorpher manager, can be really useful for fast combat"
       }
     }
   }

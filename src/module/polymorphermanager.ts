@@ -27,7 +27,7 @@ export class PolymorpherManager extends FormApplication {
       id: 'polymorpherManager',
       template: `modules/${CONSTANTS.MODULE_NAME}/templates/polymorphermanager.hbs`,
       resizable: true,
-      width: 300,
+      width: 400,
       height: window.innerHeight > 400 ? 400 : window.innerHeight - 100,
       dragDrop: [{ dragSelector: null, dropSelector: null }],
     };
@@ -299,7 +299,7 @@ export class PolymorpherManager extends FormApplication {
       //@ts-ignore
       await warpgate.mutate(
         posData.document,
-        customTokenData || {},
+        {}, //customTokenData || {},
         {},
         {
           name: posData.document.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
@@ -364,7 +364,7 @@ export class PolymorpherManager extends FormApplication {
         	${this.getAnimations(data.animation)}
     	</select>
         <select id="automated-polymorpher.defaultSummonType" class="defaultSummonType" name="defaultSummonType" data-dtype="String" is="ms-dropdown-ap">
-            ${this.getDefaultSummonTypes(data.defaultsummontype)}
+            ${this.getDefaultSummonTypes(data.defaultsummontype, data)}
         </select>
 		<i id="remove-polymorpher" class="fas fa-trash"></i>
 	</li>
@@ -386,16 +386,11 @@ export class PolymorpherManager extends FormApplication {
     return animList;
   }
 
-  getDefaultSummonTypes(defaultsummontype: string) {
+  getDefaultSummonTypes(defaultsummontype: string, a: PolymorpherData) {
     let animList = '';
     const typesArray = ['', 'DND5E.PolymorphWildShape', 'DND5E.Polymorph'];
-    for (const [group, types] of Object.entries(typesArray)) {
-      const localGroup = i18n(`${CONSTANTS.MODULE_NAME}.groups.${group}`);
-      animList += `<optgroup label="${localGroup == `${CONSTANTS.MODULE_NAME}.groups.${group}` ? group : localGroup}">`;
-      for (const a of types) {
-        animList += `<option value="${a}" ${a === defaultsummontype ? 'selected' : ''}>${i18n(a)}</option>`;
-      }
-      animList += '</optgroup>';
+    for (const [index, type] of Object.entries(typesArray)) {
+      animList += `<option value="${type}" ${a.defaultsummontype === type ? 'selected' : ''}>${i18n(type)}</option>`;
     }
     return animList;
   }
@@ -569,7 +564,7 @@ export class PolymorpherManager extends FormApplication {
       //@ts-ignore
       await warpgate.mutate(
         posData.document,
-        customTokenData || {},
+        {}, // customTokenData || {},
         {},
         {
           name: posData.document.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.

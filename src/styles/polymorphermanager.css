@@ -128,7 +128,8 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.6);
 }
 
-.open-pm .fa-wind {
+.open-pm .fa-wind,
+.control-icon.automated-polymorpher .fa-wind {
   color: darkgoldenrod;
   text-shadow: 0 0 8px darkgoldenrod;
 }

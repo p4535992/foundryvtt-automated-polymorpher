@@ -28,10 +28,10 @@ const API = {
     } else {
       if (random) {
         const listPolymorphers: PolymorpherData[] =
-          this.actor &&
-          (<boolean>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+          sourceToken.actor &&
+          (<boolean>sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
             game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
-            ? <PolymorpherData[]>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
+            ? <PolymorpherData[]>sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
             : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
 
         if (listPolymorphers?.length === 1) {

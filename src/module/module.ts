@@ -14,9 +14,14 @@ export const initHooks = () => {
 };
 
 export const setupHooks = () => {
-  // DO NOTHING
+  if (!game[CONSTANTS.MODULE_NAME]) {
+    game[CONSTANTS.MODULE_NAME] = {};
+  }
+  if (!game[CONSTANTS.MODULE_NAME].API) {
+    game[CONSTANTS.MODULE_NAME].API = {};
+  }
   //@ts-ignore
-  game.modules.get(CONSTANTS.MODULE_NAME)?.api = API;
+  game[CONSTANTS.MODULE_NAME].API = API;
 };
 
 export const readyHooks = async () => {
@@ -80,6 +85,10 @@ export const readyHooks = async () => {
   });
 
   Hooks.on('renderTokenHUD', (app, html, data) => {
+    const restrictedOnlyGM = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOnlyGM');
+    if (restrictedOnlyGM && !game.user?.isGM) {
+      return;
+    }
     renderAutomatedPolymorpherHud(app, html, data);
   });
 };

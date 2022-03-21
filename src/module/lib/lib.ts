@@ -175,9 +175,12 @@ function buildButton(html, tooltip) {
   const button = $(
     `<div class="control-icon ${CONSTANTS.MODULE_NAME}" title="${tooltip}"><i class="${iconClass}"></i></div>`,
   );
-  const settingHudColClass = game.settings.get(CONSTANTS.MODULE_NAME, 'hudColumn');
-  const settingHudTopBottomClass = game.settings.get(CONSTANTS.MODULE_NAME, 'hudTopBottom');
-  const col = html.find(settingHudColClass);
+  const settingHudColClass = <string>game.settings.get(CONSTANTS.MODULE_NAME, 'hudColumn') ?? '.left';
+  const settingHudTopBottomClass = <string>game.settings.get(CONSTANTS.MODULE_NAME, 'hudTopBottom') ?? 'top';
+
+  const buttonPos = '.' + settingHudColClass.toLowerCase();
+
+  const col = html.find(buttonPos);
   if (settingHudTopBottomClass === 'top') {
     col.prepend(button);
   } else {
