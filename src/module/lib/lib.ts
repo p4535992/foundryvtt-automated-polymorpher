@@ -1,4 +1,6 @@
+import { PolymorpherFlags } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
+import { PolymorpherManager } from '../polymorphermanager';
 import { canvas, game } from '../settings';
 
 // =============================
@@ -105,3 +107,139 @@ export function isStringEquals(stringToCheck1: string, stringToCheck2: string, s
 }
 
 // =========================================================================================
+
+/**
+ * Called when a token is right clicked on to display the HUD.
+ * Adds a button with a icon, and adds a slash on top of it if it is already active.
+ * @param {Object} app - the application data
+ * @param {Object} html - the html data
+ * @param {Object} hudToken - The HUD Data
+ */
+export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
+  // if only one token is selected
+  if (canvas.tokens?.controlled.length == 1) {
+    const sourceToken = <Token>canvas.tokens?.placeables.find((t:Token) => {
+      return t.id === hudToken._id;
+    });
+    if(!sourceToken || !sourceToken.isOwner){
+      return;
+    }
+
+    if (game.system.id === 'dnd5e') {
+      addToRevertPolymorphButton(html, sourceToken);
+    }
+    addToPolymorphButton(html, sourceToken);
+
+    //const isPolymorphed = sourceToken.document.actor?.getFlag("dnd5e", "isPolymorphed");
+    // if the selected token is a mount
+    //if (isPolymorphed) {
+    //  addToRevertPolymorphButton(html, sourceToken);
+    //}else{
+    //  addToPolymorphButton(html, sourceToken);
+    //}
+  } else {
+    // Do not show anything
+  }
+}
+
+function addToPolymorphButton(html, sourceToken:Token) {
+  if(!sourceToken || !sourceToken.isOwner){
+    return;
+  }
+
+  const button = buildButton(html, `Transform ${sourceToken.name}`);
+
+  button.find('i').on('click', async (ev) => {
+    // Do something with left click
+    const actor = <Actor>sourceToken.document.actor;
+    new PolymorpherManager(actor).render(true);
+  });
+  button.find('i').on('contextmenu', async (ev) => {
+    // Do somethign with right click
+  });
+}
+
+function addToRevertPolymorphButton(html, sourceToken:Token) {
+  if(!sourceToken || !sourceToken.isOwner){
+    return;
+  }
+  let button = buildButton(html, `Revert transform ${sourceToken.name}`);
+  button = addSlash(button);
+
+  button.find('i').on('click', async (ev) => {
+    // Do something with left click
+    //@ts-ignore
+    sourceToken.document.actor?.revertOriginalForm();
+  });
+  button.find('i').on('contextmenu', async (ev) => {
+    // Do something with right click
+  });
+}
+
+  function buildButton(html, tooltip) {
+    const iconClass = 'fas fa-wind';
+    const button = $(
+      `<div class="control-icon ${CONSTANTS.MODULE_NAME}" title="${tooltip}"><i class="${iconClass}"></i></div>`,
+    );
+    const settingHudColClass = game.settings.get(CONSTANTS.MODULE_NAME, 'hudColumn');
+    const settingHudTopBottomClass = game.settings.get(CONSTANTS.MODULE_NAME, 'hudTopBottom');
+    const col = html.find(settingHudColClass);
+    if (settingHudTopBottomClass === 'top') {
+      col.prepend(button);
+    } else {
+      col.append(button);
+    }
+    return button;
+  }
+
+  // /**
+  //  * Adds the mount button to the HUD HTML
+  //  * @param {object} html - The HTML
+  //  * @param {object} data - The data
+  //  * @param {boolean} hasSlash - If true, the slash will be placed over the icon
+  //  */
+  // async function addButton(html, data, hasSlash = false) {
+  //   const button = $(`<div class="control-icon mount-up"><i class="fas ${SettingsForm.getIconClass()}"></i></div>`);
+
+  //   if (hasSlash) {
+  //     this.addSlash(button);
+  //   }
+
+  //   const col = html.find(SettingsForm.getHudColumnClass());
+  //   if (SettingsForm.getHudTopBottomClass() == 'top') {
+  //     col.prepend(button);
+  //   } else {
+  //     col.append(button);
+  //   }
+
+  //   button.find('i').on('click', async (ev) => {
+  //     await MountManager.mountUpHud(data);
+  //     if (hasSlash) {
+  //       removeSlash(button);
+  //     } else {
+  //       addSlash(button);
+  //     }
+  //   });
+  // }
+
+  /**
+   * Adds a slash icon on top of the horse icon to signify "dismount"
+   * @param {Object} button - The HUD button to add a slash on top of
+   */
+   function addSlash(button) {
+    const slash = $(`<i class="fas fa-slash" style="position: absolute; color: tomato"></i>`);
+    button.addClass('fa-stack');
+    button.find('i').addClass('fa-stack-1x');
+    slash.addClass('fa-stack-1x');
+    button.append(slash);
+    return button;
+  }
+
+  /**
+   * Removes the slash icon from the button to signify that it is no longer a mount
+   * @param {Object} button - The mount up button
+   */
+  function removeSlash(button) {
+    const slash = button.find('i')[1];
+    slash.remove();
+  }

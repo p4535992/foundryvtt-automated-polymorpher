@@ -59,6 +59,14 @@
       "removeLabelSheetHeader": {
         "title": "Remove label from sheet header button",
         "hint": "Remove label from sheet header button useful for small monitor, tablet"
+      },
+      "hudColumn": {
+        "title": "HUD Column",
+        "hint": "Which HUD column to place the button in"
+      },
+      "hudTopBottom": {
+        "title": "HUD Top/Bottom",
+        "hint": "Where to place the button in the column"
       }
     }
   }

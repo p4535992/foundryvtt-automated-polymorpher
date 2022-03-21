@@ -1,9 +1,11 @@
 import { Creature, SystemCreatures } from './automatedPolymorpherModels';
-import { warn, error, debug, i18n, i18nFormat, log } from './lib/lib';
+import { warn, error, debug, i18n, i18nFormat, log, renderAutomatedPolymorpherHud } from './lib/lib';
 import { PolymorpherManager, SimplePolymorpherManager } from './polymorphermanager';
 import { ANIMATIONS } from './animations';
 import { canvas, game } from './settings';
 import CONSTANTS from './constants';
+import API from './api';
+import { ModuleData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/packages.mjs';
 
 export const initHooks = () => {
   warn('Init Hooks processing');
@@ -11,6 +13,8 @@ export const initHooks = () => {
 
 export const setupHooks = () => {
   // DO NOTHING
+  //@ts-ignore
+  game.modules.get(CONSTANTS.MODULE_NAME)?.api = API;
 };
 
 export const readyHooks = async () => {
@@ -52,6 +56,7 @@ export const readyHooks = async () => {
     <any>game.settings.get(CONSTANTS.MODULE_NAME, 'customautospells'),
   );
   */
+
   Hooks.on('getActorSheetHeaderButtons', (app, buttons) => {
     if (game.settings.get(CONSTANTS.MODULE_NAME, 'hidebutton')) return;
 
@@ -70,5 +75,9 @@ export const readyHooks = async () => {
         new PolymorpherManager(actor).render(true);
       },
     });
+  });
+
+  Hooks.on('renderTokenHUD', (app, html, data) => {
+    renderAutomatedPolymorpherHud(app, html, data);
   });
 };

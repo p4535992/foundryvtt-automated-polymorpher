@@ -123,7 +123,7 @@ export class PolymorpherManager extends FormApplication {
     // }
     if (!sourceActor) return;
 
-    if (game.system.id == 'dnd5e') {
+    if (game.system.id === 'dnd5e') {
       const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
       if (!canPolymorph) return false;
 
@@ -231,7 +231,6 @@ export class PolymorpherManager extends FormApplication {
                     transformTokens: rememberOptions(html).transformTokens,
                   },
                 );
-
                 if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                   this.close();
                 } else {

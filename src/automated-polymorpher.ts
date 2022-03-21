@@ -74,5 +74,5 @@ Hooks.once('ready', () => {
 
 Hooks.once('libChangelogsReady', function () {
   //@ts-ignore
-  libChangelogs.register(CONSTANTS.MODULE_NAME, '- add japanese localization, author: のらせす (@BrotherSharper)', 'minor');
+  libChangelogs.register(CONSTANTS.MODULE_NAME, `- Add hud control and some setting`, 'minor');
 });

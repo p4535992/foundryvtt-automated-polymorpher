@@ -117,4 +117,36 @@ export const registerSettings = function () {
     type: Boolean,
     default: true,
   });
+
+  /** Which column should the button be placed on */
+  game.settings.register(CONSTANTS.MODULE_NAME, 'hudColumn', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudColumn.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudColumn.hint`),
+    scope: 'world',
+    config: true,
+    // type: String,
+    // default: 'Left',
+    type: Number,
+    default: 0,
+    choices: {
+      0: 'Left',
+      1: 'Right',
+    },
+  });
+
+  /** Whether the button should be placed on the top or bottom of the column */
+  game.settings.register(CONSTANTS.MODULE_NAME, 'hudTopBottom', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudTopBottom.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudTopBottom.hint`),
+    scope: 'world',
+    config: true,
+    // type: String,
+    // default: 'Top',
+    type: Number,
+    default: 0,
+    choices: {
+      0: 'Top',
+      1: 'Bottom',
+    },
+  });
 };
