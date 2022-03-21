@@ -32,6 +32,7 @@ export enum PolymorpherFlags {
 
 export class PolymorpherData {
   id: string;
+  name:string;
   animation: string;
   number: number;
   defaultsummontype: string;

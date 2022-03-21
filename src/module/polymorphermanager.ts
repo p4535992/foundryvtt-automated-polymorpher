@@ -89,6 +89,7 @@ export class PolymorpherManager extends FormApplication {
     this.element.find('#polymorpher-list').append(
       this.generateLi({
         id: data.id,
+        name: data.name,
         animation: '',
         number: 0,
         defaultsummontype: '',
@@ -101,6 +102,7 @@ export class PolymorpherManager extends FormApplication {
     this.minimize();
     const animation = <string>$(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
     const aId = event.currentTarget.dataset.aid;
+    const aName = event.currentTarget.dataset.aname;
     const actor = <Actor>game.actors?.get(aId);
     if (!actor) {
       warn(
@@ -354,10 +356,10 @@ export class PolymorpherManager extends FormApplication {
     const restricted = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOwned');
     if (restricted && !actor.isOwner) return '';
     const $li = $(`
-	<li id="polymorpher" class="polymorpher-item" data-aid="${actor.id}" data-elid="${randomID()}" draggable="true">
+	<li id="polymorpher" class="polymorpher-item" data-aid="${actor.id}" data-aname="${actor.name}" data-elid="${randomID()}" draggable="true">
 		<div class="summon-btn">
 			<img class="actor-image" src="${actor.data.img}" alt="">
-			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actor.id}"></div>
+			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actor.id}" data-aname="${actor.name}"></div>
 		</div>
     	<span class="actor-name">${actor.data.name}</span>
     	<select class="anim-dropdown">
@@ -404,6 +406,7 @@ export class PolymorpherManager extends FormApplication {
     for (const polymorpher of this.element.find('.polymorpher-item')) {
       data.push({
         id: <string>polymorpher.dataset.aid,
+        name: <string>polymorpher.dataset.aname,
         animation: <string>$(polymorpher).find('.anim-dropdown').val(),
         number: <number>$(polymorpher).find('#polymorpher-number-val').val(),
         defaultsummontype: <string>$(polymorpher).find('.defaultSummonType').val(),
@@ -547,6 +550,8 @@ export class PolymorpherManager extends FormApplication {
             transformTokens: true,
           },
         );
+      } else {
+        warn(`You check the settings ${i18n(`${CONSTANTS.MODULE_NAME}.settings.hudAvoidPanelChoice.title`)} but no default summon type is setted for any polymorphing actor`, true);
       }
     } else {
       // ===========================================
