@@ -2,7 +2,7 @@ import { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/f
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
-import { i18n } from './lib/lib';
+import { i18n, warn } from './lib/lib';
 
 import { canvas, game } from './settings';
 
@@ -95,6 +95,9 @@ export class PolymorpherManager extends FormApplication {
     const animation = <string>$(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
     const aId = event.currentTarget.dataset.aid;
     const actor = <Actor>game.actors?.get(aId);
+    if(!actor){
+      warn(`The actor with id '${aId}' not exists anymore, please set up again the actor on the polymorpher manager`, true);
+    }
     // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
     const tokenData = <TokenData>await actor.getTokenData();
     //@ts-ignore
