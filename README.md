@@ -24,6 +24,8 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 ![gif](./wiki/feature_automated_polymorhper.gif)
 ![hud](./wiki/feature_hud_1.gif)
 
+## NOTE this module work very well with this other module [Automated Evocations (Variant Fork)](https://github.com/p4535992/automated-evocations-variant)
+
 ## NOTE: If you are a javascript developer and not a typescript developer, you can just use the javascript files under the dist folder
 
 ## Known issue/Limitation
