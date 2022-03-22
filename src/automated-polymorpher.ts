@@ -122,6 +122,7 @@ Hooks.once('libChangelogsReady', function () {
   - Add hud control
   - add some new setting
   - Add a fast polymorphing mechanism for make the comabt more fluid
+  - Add socketLib, API, new feature
   `,
     'minor',
   );

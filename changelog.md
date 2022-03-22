@@ -1,3 +1,10 @@
+## 1.0.16
+
+- Add hud control
+- add some new setting
+- Add a fast polymorphing mechanism for make the comabt more fluid
+- Add socketLib, API, new feature
+
 ## 1.0.15
 
 - add japanese localization, author: のらせす (@BrotherSharper)

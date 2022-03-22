@@ -83,6 +83,8 @@ export const readyHooks = async () => {
     if (restrictedOnlyGM && !game.user?.isGM) {
       return;
     }
-    renderAutomatedPolymorpherHud(app, html, data);
+    if (game.settings.get(CONSTANTS.MODULE_NAME, 'hudEnable')) {
+      renderAutomatedPolymorpherHud(app, html, data);
+    }
   });
 };

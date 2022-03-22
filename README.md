@@ -22,6 +22,7 @@ If you want to support more modules of this kind, I invite you to go and support
 Should work with all system supported from the [warpgate](https://github.com/trioderegion/warpgate) module "mutate" function, but for now the module is only used and tested with the Dnd5e system and the polymorph mechanism.
 
 ![gif](./wiki/feature_automated_polymorhper.gif)
+![hud](./wiki/feature_hud_1.gif)
 
 ## NOTE: If you are a javascript developer and not a typescript developer, you can just use the javascript files under the dist folder
 
@@ -60,6 +61,8 @@ This module uses the [advanced-macros](https://github.com/League-of-Foundry-Deve
 
 ## Token configuration panel
 
+![gif](./wiki/feature_automated_polymorhper.gif)
+
 Open any character sheet, in the header of the window you will see the polymorphers button
 
 ![image](./wiki/Image1.png)
@@ -85,7 +88,20 @@ For more advanced users you can set the flag with the following command : `actor
 
 ## Token HUD fast click
 
+An interface in the hud layer now allows you to speed up the transformations during a fight in a very intuitive way to manage the transformations there are three modes, at the level of the individual actor:
 
+- Random: the next transformation is randomly taken from the list of transformations associated with the actor
+- Ordered: the next transformation is taken according to the order of the list of transformations associated with the actor
+- No random, No orderder: the standard method shows the configuration panel that you would have by clicking on the header sheet button
+
+the actions on the hud button are of two types left click and right click. 
+
+- Left click activates the transformation event
+- Right click reverts the transformation and returns to the original shape.
+
+![hud](./wiki/feature_hud_1.gif)
+
+**NOTE: you can't have both ordered and random**
 
 # API
 

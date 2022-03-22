@@ -119,15 +119,15 @@ export function isStringEquals(stringToCheck1: string, stringToCheck2: string, s
 export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
   // if only one token is selected
   // if (canvas.tokens?.controlled.length == 1) {
-    const sourceToken = <Token>canvas.tokens?.placeables.find((t: Token) => {
-      return t.id === hudToken._id;
-    });
-    if (!sourceToken || !sourceToken.isOwner) {
-      return;
-    }
+  const sourceToken = <Token>canvas.tokens?.placeables.find((t: Token) => {
+    return t.id === hudToken._id;
+  });
+  if (!sourceToken || !sourceToken.isOwner) {
+    return;
+  }
 
-    //addToRevertPolymorphButton(html, sourceToken);
-    addToPolymorphButton(html, sourceToken);
+  //addToRevertPolymorphButton(html, sourceToken);
+  addToPolymorphButton(html, sourceToken);
   // } else {
   //   // Do not show anything
   // }
@@ -151,15 +151,16 @@ function addToPolymorphButton(html, sourceToken: Token) {
   }
 
   const random = <boolean>sourceToken.document.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
-  const ordered = <boolean>sourceToken.document.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
+  const ordered =
+    <boolean>sourceToken.document.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
 
   button.find('i').on('click', async (ev) => {
-    for(const targetToken of <Token[]>canvas.tokens?.controlled){
+    for (const targetToken of <Token[]>canvas.tokens?.controlled) {
       API.invokePolymorpherManager(targetToken.id, false, ordered, random);
     }
   });
   button.find('i').on('contextmenu', async (ev) => {
-    for(const targetToken of <Token[]>canvas.tokens?.controlled){
+    for (const targetToken of <Token[]>canvas.tokens?.controlled) {
       // Do somethign with right click
       API.invokePolymorpherManager(targetToken.id, true, ordered, random);
     }

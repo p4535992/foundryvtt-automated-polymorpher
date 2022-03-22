@@ -27,7 +27,7 @@ const API = {
     removePolymorpher = false,
     ordered = false,
     random = false,
-    animationExternal: { sequence: undefined, timeToWait: 0 } | undefined = undefined,
+    animationExternal: { sequence: undefined; timeToWait: 0 } | undefined = undefined,
   ): Promise<void> {
     const sourceToken = canvas.tokens?.placeables.find((t: Token) => {
       return t.id === sourceTokenId;
@@ -62,9 +62,9 @@ const API = {
 
     let lastElement = '';
     const matches = <any[]>sourceToken.name.match(/(?<=\().+?(?=\))/g);
-    if(matches && matches.length > 0){
+    if (matches && matches.length > 0) {
       lastElement = matches[matches.length - 1];
-    }else{
+    } else {
       lastElement = sourceToken.name;
     }
 
@@ -74,11 +74,10 @@ const API = {
       }) || undefined;
 
     if (removePolymorpher) {
-
       const polyData = listPolymorphers.find((a) => {
         return lastElement.toLowerCase().includes(a.name.toLowerCase());
       });
-      
+
       const animation = polyData?.animation;
 
       const polyDataIndex = listPolymorphers.findIndex((a) => {
@@ -120,7 +119,7 @@ const API = {
             return lastElement.toLowerCase().includes(a.name.toLowerCase());
           });
           let randomIndex = 0;
-          while(randomIndex === polyDataIndex) {
+          while (randomIndex === polyDataIndex) {
             randomIndex = Math.floor(Math.random() * listPolymorphers.length);
           }
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[randomIndex], animationExternal);
@@ -128,7 +127,7 @@ const API = {
       } else if (isOrdered) {
         const polyDataIndex = listPolymorphers.findIndex((a) => {
           return lastElement.toLowerCase().includes(a.name.toLowerCase());
-        });       
+        });
         const nextIndex = polyDataIndex + 1;
         if (listPolymorphers?.length - 1 < nextIndex) {
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0], animationExternal);
