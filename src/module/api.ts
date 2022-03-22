@@ -12,53 +12,64 @@ const API = {
       throw error('invokePolymorpherManager | inAttributes must be of type array');
     }
     const [sourceToken, removePolymorpher, ordered, random, animationExternal] = inAttributes;
-    const result = await (this as typeof API).invokePolymorpherManager(sourceToken, removePolymorpher, ordered, random, animationExternal);
+    const result = await (this as typeof API).invokePolymorpherManager(
+      sourceToken,
+      removePolymorpher,
+      ordered,
+      random,
+      animationExternal,
+    );
     return result;
   },
 
-  async invokePolymorpherManager(sourceTokenId: string, removePolymorpher = false, ordered = false, random = false,
+  async invokePolymorpherManager(
+    sourceTokenId: string,
+    removePolymorpher = false,
+    ordered = false,
+    random = false,
     //@ts-ignore
-    animationExternal:{ sequence:Sequence, timeToWait:number }|undefined = undefined):Promise<void> {
-    const sourceToken = canvas.tokens?.placeables.find((t:Token) =>{
+    animationExternal: { sequence: Sequence; timeToWait: number } | undefined = undefined,
+  ): Promise<void> {
+    const sourceToken = canvas.tokens?.placeables.find((t: Token) => {
       return t.id === sourceTokenId;
-    })
-    if(!sourceToken){
+    });
+    if (!sourceToken) {
       warn(`No token founded on canvas with id '${sourceTokenId}'`, true);
       return;
     }
     const actor = sourceToken.actor || <Actor>sourceToken.document.actor;
-    if(sourceTokenId){
+    if (sourceTokenId) {
       warn(`No actor founded on canvas with token '${sourceTokenId}'`, true);
       return;
     }
 
     const listPolymorphers: PolymorpherData[] =
-    // actor &&
-    // (<boolean>ctor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
-    //   game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
-    //   ? <PolymorpherData[]>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
-    //   : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
-    <PolymorpherData[]>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+      // actor &&
+      // (<boolean>ctor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+      //   game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
+      //   ? <PolymorpherData[]>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
+      //   : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+      <PolymorpherData[]>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
 
     let isOrdered = ordered;
     let isRandom = random;
 
-    if(!ordered && actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED)){
+    if (!ordered && actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED)) {
       isOrdered = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
     }
-    if(!random && actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM)){
+    if (!random && actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM)) {
       isRandom = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
     }
 
     const matches = <any[]>sourceToken.name.match(/(?<=\().+?(?=\))/g);
     const lastElement = matches[matches.length - 1];
-    const polyData = listPolymorphers.find((a) =>{
+    const polyData = listPolymorphers.find((a) => {
       return lastElement.toLowerCase().includes(a.name.toLowerCase());
     });
 
     const animation = polyData?.animation;
 
-    const polyDataIndex = listPolymorphers.findIndex((a) =>{
+    const polyDataIndex = listPolymorphers.findIndex((a) => {
       return lastElement.toLowerCase().includes(a.name.toLowerCase());
     });
 
@@ -68,11 +79,10 @@ const API = {
       }) || undefined;
 
     if (removePolymorpher) {
-      if(animationExternal){
+      if (animationExternal) {
         await animationExternal.sequence.play();
         await wait(animationExternal.timeToWait);
-      }
-      else if(animation){
+      } else if (animation) {
         if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
           //@ts-ignore
           game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
@@ -91,7 +101,7 @@ const API = {
         warpgate.revert(sourceToken.document, (mutationName = actor.id));
       }
     } else {
-      if(isRandom && isOrdered){
+      if (isRandom && isOrdered) {
         warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
         return;
       }
@@ -102,15 +112,14 @@ const API = {
           const randomIndex = Math.floor(Math.random() * listPolymorphers.length);
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[randomIndex], animationExternal);
         }
-      } else if(isOrdered){
+      } else if (isOrdered) {
         const nextIndex = polyDataIndex + 1;
         if (listPolymorphers?.length - 1 < nextIndex) {
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0], animationExternal);
         } else {
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[nextIndex], animationExternal);
         }
-      }
-      else {
+      } else {
         new PolymorpherManager(actor).render(true);
       }
     }

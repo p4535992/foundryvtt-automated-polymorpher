@@ -65,18 +65,18 @@ export function getApi(): typeof API {
  * Initialization helper, to set Socket.
  * @param socket to set to game module.
  */
- export function setSocket(socket: any): void {
+export function setSocket(socket: any): void {
   const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
   data.socket = socket;
 }
 
 /*
-* Returns the set socket.
-* @returns Socket from games module.
-*/
+ * Returns the set socket.
+ * @returns Socket from games module.
+ */
 export function getSocket() {
- const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
- return data.socket;
+  const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
+  return data.socket;
 }
 
 export const registerSettings = function () {
@@ -197,5 +197,4 @@ export const registerSettings = function () {
       Bottom: 'Bottom',
     },
   });
-
 };

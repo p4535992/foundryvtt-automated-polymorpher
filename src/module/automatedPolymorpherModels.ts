@@ -29,12 +29,12 @@ export enum PolymorpherFlags {
   STORE_ON_ACTOR = 'storeonactor',
   POLYMORPHERS = 'polymorphers',
   RANDOM = 'random',
-  ORDERED = 'ordered'
+  ORDERED = 'ordered',
 }
 
 export class PolymorpherData {
   id: string;
-  name:string;
+  name: string;
   animation: string;
   number: number;
   defaultsummontype: string;
