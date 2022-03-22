@@ -2,7 +2,7 @@ import { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/f
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
-import { error, wait } from './lib/lib';
+import { error, wait, warn } from './lib/lib';
 import { PolymorpherManager } from './polymorphermanager';
 import { canvas, game } from './settings';
 
@@ -11,34 +11,68 @@ const API = {
     if (!Array.isArray(inAttributes)) {
       throw error('invokePolymorpherManager | inAttributes must be of type array');
     }
-    const [sourceToken, removePolymorpher, random] = inAttributes;
-    const result = await this.invokePolymorpherManager(sourceToken, removePolymorpher, random);
+    const [sourceToken, removePolymorpher, ordered, random, animationExternal] = inAttributes;
+    const result = await (this as typeof API).invokePolymorpherManager(sourceToken, removePolymorpher, ordered, random, animationExternal);
     return result;
   },
 
-  async invokePolymorpherManager(sourceToken: Token, removePolymorpher, random = false) {
-    const actor = <Actor>sourceToken.document.actor;
+  async invokePolymorpherManager(sourceTokenId: string, removePolymorpher = false, ordered = false, random = false,
+    //@ts-ignore
+    animationExternal:{ sequence:Sequence, timeToWait:number }|undefined = undefined):Promise<void> {
+    const sourceToken = canvas.tokens?.placeables.find((t:Token) =>{
+      return t.id === sourceTokenId;
+    })
+    if(!sourceToken){
+      warn(`No token founded on canvas with id '${sourceTokenId}'`, true);
+      return;
+    }
+    const actor = sourceToken.actor || <Actor>sourceToken.document.actor;
+    if(sourceTokenId){
+      warn(`No actor founded on canvas with token '${sourceTokenId}'`, true);
+      return;
+    }
 
     const listPolymorphers: PolymorpherData[] =
-    sourceToken.actor &&
-    (<boolean>sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
-      game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
-      ? <PolymorpherData[]>sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
-      : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+    // actor &&
+    // (<boolean>ctor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+    //   game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
+    //   ? <PolymorpherData[]>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
+    //   : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+    <PolymorpherData[]>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+
+    let isOrdered = ordered;
+    let isRandom = random;
+
+    if(!ordered && actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED)){
+      isOrdered = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
+    }
+    if(!random && actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM)){
+      isRandom = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
+    }
+
+    const matches = <any[]>sourceToken.name.match(/(?<=\().+?(?=\))/g);
+    const lastElement = matches[matches.length - 1];
+    const polyData = listPolymorphers.find((a) =>{
+      return lastElement.toLowerCase().includes(a.name.toLowerCase());
+    });
+
+    const animation = polyData?.animation;
+
+    const polyDataIndex = listPolymorphers.findIndex((a) =>{
+      return lastElement.toLowerCase().includes(a.name.toLowerCase());
+    });
+
+    const tokenData = <TokenData>await actor.getTokenData();
+    const posData = <Token>canvas.tokens?.placeables.find((t: Token) => {
+        return t.actor?.id === actor.id;
+      }) || undefined;
 
     if (removePolymorpher) {
-      const matches = <any[]>sourceToken.name.match(/(?<=\().+?(?=\))/g);
-      const lastElement = matches[matches.length - 1];
-      const animation = listPolymorphers.find((a) =>{
-        return lastElement.toLowerCase().includes(a.name.toLowerCase()); 
-      })?.animation;
-
-      const tokenData = <TokenData>await actor.getTokenData();
-      const posData = <Token>canvas.tokens?.placeables.find((t: Token) => {
-          return t.actor?.id === actor.id;
-        }) || undefined;
-
-      if(animation){
+      if(animationExternal){
+        await animationExternal.sequence.play();
+        await wait(animationExternal.timeToWait);
+      }
+      else if(animation){
         if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
           //@ts-ignore
           game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
@@ -57,14 +91,26 @@ const API = {
         warpgate.revert(sourceToken.document, (mutationName = actor.id));
       }
     } else {
-      if (random) {
+      if(isRandom && isOrdered){
+        warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
+        return;
+      }
+      if (isRandom) {
         if (listPolymorphers?.length === 1) {
-          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0]);
+          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0], animationExternal);
         } else {
           const randomIndex = Math.floor(Math.random() * listPolymorphers.length);
-          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[randomIndex]);
+          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[randomIndex], animationExternal);
         }
-      } else {
+      } else if(isOrdered){
+        const nextIndex = polyDataIndex + 1;
+        if (listPolymorphers?.length - 1 < nextIndex) {
+          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0], animationExternal);
+        } else {
+          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[nextIndex], animationExternal);
+        }
+      }
+      else {
         new PolymorpherManager(actor).render(true);
       }
     }

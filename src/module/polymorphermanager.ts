@@ -2,7 +2,7 @@ import { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/f
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
-import { i18n, warn } from './lib/lib';
+import { i18n, wait, warn } from './lib/lib';
 
 import { canvas, game } from './settings';
 
@@ -12,7 +12,7 @@ export class PolymorpherManager extends FormApplication {
   // spellLevel: number | undefined;
   actor: Actor;
 
-  constructor(actor: Actor, summonData?: any[]) {
+  constructor(actor: Actor, summonData?: PolymorpherData[]) {
     super({});
     // this.caster = actor;
     this.summons = summonData;
@@ -338,11 +338,12 @@ export class PolymorpherManager extends FormApplication {
 
   async loadPolymorphers() {
     const data: PolymorpherData[] =
-      this.actor &&
-      (<boolean>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
-        game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
-        ? <PolymorpherData[]>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
-        : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+      // this.actor &&
+      // (<boolean>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+      //   game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
+      //   ? <PolymorpherData[]>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
+      //   : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+      <PolymorpherData[]>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
     if (data) {
       for (const polymorpher of data) {
         this.element.find('#polymorpher-list').append(this.generateLi(polymorpher));
@@ -412,11 +413,24 @@ export class PolymorpherManager extends FormApplication {
         defaultsummontype: <string>$(polymorpher).find('.defaultSummonType').val(),
       });
     }
-    this.actor &&
-    (this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
-      game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
-      ? this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data)
-      : game.user?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data);
+
+    const isOrdered = <string>this.element.parent().find('.polymorpher-ordered').val() === 'true' ?? false;
+    const isRandom = <string>this.element.parent().find('.polymorpher-random').val() === 'true' ?? false;
+
+    if(isRandom && isOrdered){
+      warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
+    }
+
+    // this.actor &&
+    // (this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+    //   game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
+    //   ? this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data)
+    //   : game.user?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data);
+    this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, data);
+
+    this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM, isRandom);
+    this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED, isOrdered);
+
   }
 
   //@ts-ignore
@@ -429,7 +443,8 @@ export class PolymorpherManager extends FormApplication {
     // DO NOTHING
   }
 
-  async fastSummonPolymorpher(polymorpherData: PolymorpherData) {
+  //@ts-ignore
+  async fastSummonPolymorpher(polymorpherData: PolymorpherData, animationExternal = { sequence:Sequence, timeToWait:number }) {
     this.minimize();
 
     const actor = <Actor>game.actors?.get(polymorpherData.id);
@@ -468,13 +483,19 @@ export class PolymorpherManager extends FormApplication {
 
       if (polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings') {
         if (posData) {
-          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-            //@ts-ignore
-            game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-          } else {
-            ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+          if(animationExternal){
+            await animationExternal.sequence.play();
+            await wait(animationExternal.timeToWait);
           }
-          await this.wait(ANIMATIONS.animationFunctions[animation].time);
+          else if(animation){
+            if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+              //@ts-ignore
+              game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+            } else {
+              ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+            }
+            await this.wait(ANIMATIONS.animationFunctions[animation].time);
+          }
         }
         //@ts-ignore
         await this.actor.transformInto(
@@ -499,13 +520,19 @@ export class PolymorpherManager extends FormApplication {
         );
       } else if (polymorpherData.defaultsummontype === 'DND5E.PolymorphWildShape') {
         if (posData) {
-          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-            //@ts-ignore
-            game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-          } else {
-            ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+          if(animationExternal){
+            await animationExternal.sequence.play();
+            await wait(animationExternal.timeToWait);
           }
-          await this.wait(ANIMATIONS.animationFunctions[animation].time);
+            else if(animation){
+            if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+              //@ts-ignore
+              game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+            } else {
+              ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+            }
+            await this.wait(ANIMATIONS.animationFunctions[animation].time);
+          }
         }
         //@ts-ignore
         await this.actor.transformInto(
@@ -522,13 +549,19 @@ export class PolymorpherManager extends FormApplication {
         );
       } else if (polymorpherData.defaultsummontype === 'DND5E.Polymorph') {
         if (posData) {
-          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-            //@ts-ignore
-            game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-          } else {
-            ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+          if(animationExternal){
+            await animationExternal.sequence.play();
+            await wait(animationExternal.timeToWait);
           }
-          await this.wait(ANIMATIONS.animationFunctions[animation].time);
+          else if(animation){
+            if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+              //@ts-ignore
+              game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+            } else {
+              ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+            }
+            await this.wait(ANIMATIONS.animationFunctions[animation].time);
+          }
         }
         //@ts-ignore
         await this.actor.transformInto(
@@ -551,20 +584,25 @@ export class PolymorpherManager extends FormApplication {
           },
         );
       } else {
-        warn(`You check the settings ${i18n(`${CONSTANTS.MODULE_NAME}.settings.hudAvoidPanelChoice.title`)} but no default summon type is setted for any polymorphing actor`, true);
+        warn(`No default summon type is setted for any polymorphing actor on the list associated to this actor ${actor.name}`, true);
       }
     } else {
       // ===========================================
       // If system is not dnd5e we can use warpgate
       // ===========================================
-      if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-        //@ts-ignore
-        game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
-      } else {
-        ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+      if(animationExternal){
+        await animationExternal.sequence.play();
+        await wait(animationExternal.timeToWait);
       }
-      await this.wait(ANIMATIONS.animationFunctions[animation].time);
-
+      else if(animation){
+        if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+          //@ts-ignore
+          game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+        } else {
+          ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+        }
+        await this.wait(ANIMATIONS.animationFunctions[animation].time);
+      }
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
       //@ts-ignore
       await warpgate.mutate(
@@ -584,7 +622,7 @@ export class SimplePolymorpherManager extends PolymorpherManager {
   // summons: any[];
   // spellLevel: number;
 
-  constructor(actor, summonData) {
+  constructor(actor:Actor, summonData) {
     super(actor, summonData);
     // this.caster = actor;
     // this.summons = summonData;

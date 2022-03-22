@@ -47,6 +47,9 @@ This module uses the [sequencer](https://github.com/fantasycalendar/FoundryVTT-S
 
 This module uses the [warpgate](https://github.com/trioderegion/warpgate) library. It is a mandatory dependency and it is recommended for the best experience and compatibility with other modules.
 
+### socketlib
+
+This module uses the [socketlib](https://github.com/manuelVo/foundryvtt-socketlib) library for wrapping core methods. It is a hard dependency and it is recommended for the best experience and compatibility with other modules.
 ### advanced-macros (optional)
 
 This module uses the [advanced-macros](https://github.com/League-of-Foundry-Developers/fvtt-advanced-macros) library. It is a optional dependency and it is recommended for the best experience and compatibility with other modules.
@@ -54,6 +57,8 @@ This module uses the [advanced-macros](https://github.com/League-of-Foundry-Deve
 **NOTE: you need this only for the custom macro feature, i don't suggest it is much easier to create the actors and set them up, with the drag and drop but it's up to you**
 
 ## Features 
+
+## Token configuration panel
 
 Open any character sheet, in the header of the window you will see the polymorphers button
 
@@ -76,7 +81,100 @@ Then you interact with the standard panel of the Polymorph (if the system is dnd
 
 By default polymorphers are stored per user (so each actor will have the same summon list). If you want a particular actor to have it's own summon list you can use the included macro to switch the actor from global storage to local (on the actor). Simply place a linked actor on the scene, select it and run the macro. Using the other macro to switch it to global again will not wipe the saved polymorphers so setting it to local at a later date will restore the previous list.
 
-For more advanced users you can set the flag with the following command : `actor.setFlag('automated-polymorpher','isLocal', false)` (set true\false to enable disable local storage)
+For more advanced users you can set the flag with the following command : `actor.setFlag('automated-polymorpher','storeonactor', false)` (set true\false to enable disable the store on actor)
+
+## Token HUD fast click
+
+
+
+# API
+
+###  async game.modules.get('automated-polymorpher').invokePolymorpherManager(sourceTokenId: string, removePolymorpher = false, ordered = false, random = false, animationExternal:{ sequence:Sequence, timeToWait:number }|undefined = undefined) ⇒ <code>Promise.&lt;void&gt;</code>
+
+Invoke the polymorpher manager feature from macro
+
+**Returns**: <code>Promise.&lt;void&gt;</code> - A empty promise
+
+| Param | Type | Description | Default |
+| --- | --- | --- | --- |
+| sourceTokenIdOrName | <code>string</code> | The id or the name of the token (not the actor) | <code>undefined</code> |
+| removePolymorpher | <code>boolean</code> | This action should revert the polymorpher if the current token is polymorphed | <code>false</code> |
+| ordered | <code>boolean</code> | The 'ordered' feature is enabled for this polymorphing | <code>false</code> |
+| random | <code>boolean</code> | The 'random' feature is enabled for this polymorphing | <code>0</code> |
+| animationExternal | <code>{ sequence:Sequence, timeToWait:number }</code> | Advanced: Use your personal sequence animation and the time needed to wait before the polymorph action, checkout the [Sequencer module](https://github.com/fantasycalendar/FoundryVTT-Sequencer) for more information  | <code>undefined</code> |
+
+**Examples**:
+
+`game.modules.get('automated-polymorpher').api.invokePolymorpherManager('Zruggig Widebrain')`
+
+`game.modules.get('automated-polymorpher').api.invokePolymorpherManager('Zruggig Widebrain', true)`
+
+`game.modules.get('automated-polymorpher').api.invokePolymorpherManager('Zruggig Widebrain', false, false)`
+
+`game.modules.get('automated-polymorpher').api.invokePolymorpherManager('Zruggig Widebrain', false, false, false)`
+
+```
+let sequence = new Sequence()
+    .effect()
+        .file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/electricity/electrivity_blast_CIRCLE.webm")
+        .atLocation(tokenD)
+        .scale(0.35)
+    .wait(1000)
+        .effect()
+        .file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/electricity/lightning_bolt_RECTANGLE_05.webm")
+        .atLocation(tokenD)
+        .reachTowards({
+            x: tokenD.center.x + canvas.grid.size*5,
+            y: tokenD.center.y
+        })
+    .wait(100)
+    .animation()
+        .on(tokenD)
+        .teleportTo({
+            x: tokenD.x + canvas.grid.size*5,
+            y: tokenD.y
+        })
+        .waitUntilFinished()
+    .effect()
+        .file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/electricity/electric_ball_CIRCLE_06.webm")
+        .atLocation(tokenD)
+        .scale(0.5)
+
+game.modules.get('automated-polymorpher').api.invokePolymorpherManager('Zruggig Widebrain', false, false, false, { sequence: sequence, timeToWait 1100})
+```
+
+## Integration with socketLib
+
+
+```
+let sequence = new Sequence()
+    .effect()
+        .file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/electricity/electrivity_blast_CIRCLE.webm")
+        .atLocation(tokenD)
+        .scale(0.35)
+    .wait(1000)
+        .effect()
+        .file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/electricity/lightning_bolt_RECTANGLE_05.webm")
+        .atLocation(tokenD)
+        .reachTowards({
+            x: tokenD.center.x + canvas.grid.size*5,
+            y: tokenD.center.y
+        })
+    .wait(100)
+    .animation()
+        .on(tokenD)
+        .teleportTo({
+            x: tokenD.x + canvas.grid.size*5,
+            y: tokenD.y
+        })
+        .waitUntilFinished()
+    .effect()
+        .file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/electricity/electric_ball_CIRCLE_06.webm")
+        .atLocation(tokenD)
+        .scale(0.5)
+
+game.modules.get('automated-polymorpher').socket.executeAsGM('invokePolymorpherManager',['Zruggig Widebrain', false, false, false, { sequence: sequence, timeToWait 1100}]);
+```
 
 # Build
 

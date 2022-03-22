@@ -144,14 +144,14 @@ function addToPolymorphButton(html, sourceToken: Token) {
     button = addSlash(button);
   }
 
-  const random = <boolean>game.settings.get(CONSTANTS.MODULE_NAME, 'hudAvoidPanelChoice') ?? false;
+  // const random = <boolean>game.settings.get(CONSTANTS.MODULE_NAME, 'hudAvoidPanelChoice') ?? false;
 
   button.find('i').on('click', async (ev) => {
-    API.invokePolymorpherManager(sourceToken, false, random);
+    API.invokePolymorpherManager(sourceToken.id);
   });
   button.find('i').on('contextmenu', async (ev) => {
     // Do somethign with right click
-    API.invokePolymorpherManager(sourceToken, true, random);
+    API.invokePolymorpherManager(sourceToken.id);
   });
 }
 

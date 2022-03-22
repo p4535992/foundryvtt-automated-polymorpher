@@ -1,5 +1,7 @@
+import API from './api';
 import CONSTANTS from './constants';
 import { i18n } from './lib/lib';
+import { registerSocket } from './socket';
 
 export const game = getGame();
 export const canvas = getCanvas();
@@ -34,6 +36,47 @@ function getGame(): Game {
     throw new Error('Game Is Not Initialized');
   }
   return game;
+}
+
+export interface AutomatedPolymorpherModuleData {
+  api: typeof API;
+  socket: any;
+}
+
+/**
+ * Initialization helper, to set API.
+ * @param api to set to game module.
+ */
+export function setApi(api: typeof API): void {
+  const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
+  data.api = api;
+}
+
+/**
+ * Returns the set API.
+ * @returns Api from games module.
+ */
+export function getApi(): typeof API {
+  const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
+  return data.api;
+}
+
+/**
+ * Initialization helper, to set Socket.
+ * @param socket to set to game module.
+ */
+ export function setSocket(socket: any): void {
+  const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
+  data.socket = socket;
+}
+
+/*
+* Returns the set socket.
+* @returns Socket from games module.
+*/
+export function getSocket() {
+ const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
+ return data.socket;
 }
 
 export const registerSettings = function () {
@@ -118,6 +161,15 @@ export const registerSettings = function () {
     default: true,
   });
 
+  game.settings.register(CONSTANTS.MODULE_NAME, 'hudEnable', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudEnable.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudEnable.hint`),
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: false,
+  });
+
   /** Which column should the button be placed on */
   game.settings.register(CONSTANTS.MODULE_NAME, 'hudColumn', {
     name: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudColumn.title`),
@@ -146,12 +198,4 @@ export const registerSettings = function () {
     },
   });
 
-  game.settings.register(CONSTANTS.MODULE_NAME, 'hudAvoidPanelChoice', {
-    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudAvoidPanelChoice.title`),
-    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudAvoidPanelChoice.hint`),
-    scope: 'world',
-    config: true,
-    type: Boolean,
-    default: false,
-  });
 };

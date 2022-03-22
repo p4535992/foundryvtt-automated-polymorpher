@@ -74,5 +74,9 @@ Hooks.once('ready', () => {
 
 Hooks.once('libChangelogsReady', function () {
   //@ts-ignore
-  libChangelogs.register(CONSTANTS.MODULE_NAME, `- Add hud control and some setting`, 'minor');
+  libChangelogs.register(CONSTANTS.MODULE_NAME, `
+  - Add hud control
+  - add some new setting
+  - Add a fast polymorphing mechanism for make the comabt more fluid
+  `, 'minor');
 });

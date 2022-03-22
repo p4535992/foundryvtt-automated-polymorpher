@@ -7,7 +7,9 @@
           "title": "Delete Polymorpher",
           "content": "<p>Are you sure you want to delete this polymorpher?</p>"
         },
-        "defaultSummonType": "Default summon type"
+        "defaultSummonType": "Default summon type",
+        "random": "Random",
+        "ordered": "Ordered"
       }
     },
     "actorSheetBtn": "Polymorphers",
@@ -69,9 +71,9 @@
         "title": "HUD Top/Bottom",
         "hint": "Where to place the button in the column"
       },
-      "hudAvoidPanelChoice": {
-        "title": "HUD avoid the rendering of the polymorpher manager for fast polymorph",
-        "hint": "Only from the HUD interface when click on the button all the entities with a 'default summon type' on the token header button, will let you avoid the rendering of the polymorpher manager, can be really useful for fast combat"
+      "hudEnable": {
+        "title": "Enable token HUD feature",
+        "hint": "Avoid the rendering of the polymorpher manager for fast polymorphing when click on the hud button. All the entities with a 'default summon type' setted on the token/actor configuration, will let you avoid the rendering of the polymorpher manager, can be really useful for fast combat, there two options 'random' and 'ordered' you can't enable both."
       }
     }
   }

@@ -2,7 +2,7 @@ import { Creature, SystemCreatures } from './automatedPolymorpherModels';
 import { warn, error, debug, i18n, i18nFormat, log, renderAutomatedPolymorpherHud } from './lib/lib';
 import { PolymorpherManager, SimplePolymorpherManager } from './polymorphermanager';
 import { ANIMATIONS } from './animations';
-import { canvas, game } from './settings';
+import { canvas, game, setApi, setSocket } from './settings';
 import CONSTANTS from './constants';
 import API from './api';
 import { ModuleData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/packages.mjs';
@@ -14,14 +14,7 @@ export const initHooks = () => {
 };
 
 export const setupHooks = () => {
-  if (!game[CONSTANTS.MODULE_NAME]) {
-    game[CONSTANTS.MODULE_NAME] = {};
-  }
-  if (!game[CONSTANTS.MODULE_NAME].API) {
-    game[CONSTANTS.MODULE_NAME].API = {};
-  }
-  //@ts-ignore
-  game[CONSTANTS.MODULE_NAME].API = API;
+  setApi(API);
 };
 
 export const readyHooks = async () => {

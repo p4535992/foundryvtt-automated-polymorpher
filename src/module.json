@@ -64,6 +64,9 @@
     },
     {
       "name": "warpgate"
+    },
+    {
+      "name": "socketlib"
     }
   ]
 }

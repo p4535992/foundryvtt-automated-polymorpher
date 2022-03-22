@@ -25,9 +25,11 @@ export class Creature {
 // type FunctionCreature = ReturnType<typeof createCreature>
 
 export enum PolymorpherFlags {
-  IS_LOCAL = 'isLocal',
+  // IS_LOCAL = 'isLocal',
   STORE_ON_ACTOR = 'storeonactor',
   POLYMORPHERS = 'polymorphers',
+  RANDOM = 'random',
+  ORDERED = 'ordered'
 }
 
 export class PolymorpherData {

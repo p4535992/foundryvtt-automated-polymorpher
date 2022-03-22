@@ -1,6 +1,7 @@
 import CONSTANTS from './constants';
 import API from './api';
 import { debug } from './lib/lib';
+import { setSocket } from './settings';
 
 export const SOCKET_HANDLERS = {
   /**
@@ -57,6 +58,7 @@ export function registerSocket() {
 
   // Basic
 
+  setSocket(automatedPolymorpherSocket);
   return automatedPolymorpherSocket;
 }
 
