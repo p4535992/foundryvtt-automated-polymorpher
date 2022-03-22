@@ -2,10 +2,11 @@
     <div class="form-group">
         <label>{{localize "automated-polymorpher.dialogs.random"}}</label>
         <input
-            id="polymorpher-ordered"
-            class="polymorpher-ordered"
+            id="polymorpher-random"
+            class="polymorpher-random"
             type="checkbox"
-            value="true"
+            value="{{random}}"
+            {{#if random}}checked{{/if}}
             onclick="$(this).attr('value', this.checked ? true : false)"
         />
         <label>{{localize "automated-polymorpher.dialogs.ordered"}}</label>
@@ -13,7 +14,8 @@
             id="polymorpher-ordered"
             class="polymorpher-ordered"
             type="checkbox"
-            value="false"
+            value="{{ordered}}"
+            {{#if ordered}}checked{{/if}}
             onclick="$(this).attr('value', this.checked ? true : false)"
         />
     </div>

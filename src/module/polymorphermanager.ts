@@ -34,7 +34,10 @@ export class PolymorpherManager extends FormApplication {
   }
 
   getData(): any {
-    return {};
+    const data = <any>super.getData();
+    data.random = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
+    data.ordered = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
+    return data;
   }
 
   async activateListeners(html) {
@@ -444,10 +447,9 @@ export class PolymorpherManager extends FormApplication {
     // DO NOTHING
   }
 
-  //@ts-ignore
   async fastSummonPolymorpher(
     polymorpherData: PolymorpherData,
-    animationExternal = { sequence: Sequence, timeToWait: number },
+    animationExternal = { sequence: undefined, timeToWait: 0 },
   ) {
     this.minimize();
 
@@ -487,7 +489,8 @@ export class PolymorpherManager extends FormApplication {
 
       if (polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings') {
         if (posData) {
-          if (animationExternal) {
+          if (animationExternal && animationExternal.sequence) {
+            //@ts-ignore
             await animationExternal.sequence.play();
             await wait(animationExternal.timeToWait);
           } else if (animation) {
@@ -523,7 +526,8 @@ export class PolymorpherManager extends FormApplication {
         );
       } else if (polymorpherData.defaultsummontype === 'DND5E.PolymorphWildShape') {
         if (posData) {
-          if (animationExternal) {
+          if (animationExternal && animationExternal.sequence) {
+            //@ts-ignore
             await animationExternal.sequence.play();
             await wait(animationExternal.timeToWait);
           } else if (animation) {
@@ -551,7 +555,8 @@ export class PolymorpherManager extends FormApplication {
         );
       } else if (polymorpherData.defaultsummontype === 'DND5E.Polymorph') {
         if (posData) {
-          if (animationExternal) {
+          if (animationExternal && animationExternal.sequence) {
+            //@ts-ignore
             await animationExternal.sequence.play();
             await wait(animationExternal.timeToWait);
           } else if (animation) {
@@ -594,7 +599,8 @@ export class PolymorpherManager extends FormApplication {
       // ===========================================
       // If system is not dnd5e we can use warpgate
       // ===========================================
-      if (animationExternal) {
+      if (animationExternal && animationExternal.sequence) {
+        //@ts-ignore
         await animationExternal.sequence.play();
         await wait(animationExternal.timeToWait);
       } else if (animation) {

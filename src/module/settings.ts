@@ -38,47 +38,6 @@ function getGame(): Game {
   return game;
 }
 
-export interface AutomatedPolymorpherModuleData {
-  api: typeof API;
-  socket: any;
-}
-
-/**
- * Initialization helper, to set API.
- * @param api to set to game module.
- */
-export function setApi(api: typeof API): void {
-  const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
-  data.api = api;
-}
-
-/**
- * Returns the set API.
- * @returns Api from games module.
- */
-export function getApi(): typeof API {
-  const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
-  return data.api;
-}
-
-/**
- * Initialization helper, to set Socket.
- * @param socket to set to game module.
- */
-export function setSocket(socket: any): void {
-  const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
-  data.socket = socket;
-}
-
-/*
- * Returns the set socket.
- * @returns Socket from games module.
- */
-export function getSocket() {
-  const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
-  return data.socket;
-}
-
 export const registerSettings = function () {
   game.settings.register(CONSTANTS.MODULE_NAME, 'polymorphers', {
     name: '',

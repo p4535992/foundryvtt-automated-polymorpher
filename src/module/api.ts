@@ -27,8 +27,7 @@ const API = {
     removePolymorpher = false,
     ordered = false,
     random = false,
-    //@ts-ignore
-    animationExternal: { sequence: Sequence; timeToWait: number } | undefined = undefined,
+    animationExternal: { sequence: undefined, timeToWait: 0 } | undefined = undefined,
   ): Promise<void> {
     const sourceToken = canvas.tokens?.placeables.find((t: Token) => {
       return t.id === sourceTokenId;
@@ -37,8 +36,8 @@ const API = {
       warn(`No token founded on canvas with id '${sourceTokenId}'`, true);
       return;
     }
-    const actor = sourceToken.actor || <Actor>sourceToken.document.actor;
-    if (sourceTokenId) {
+    const actor = <Actor>sourceToken.document.actor;
+    if (!actor) {
       warn(`No actor founded on canvas with token '${sourceTokenId}'`, true);
       return;
     }
@@ -61,17 +60,13 @@ const API = {
       isRandom = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
     }
 
+    let lastElement = '';
     const matches = <any[]>sourceToken.name.match(/(?<=\().+?(?=\))/g);
-    const lastElement = matches[matches.length - 1];
-    const polyData = listPolymorphers.find((a) => {
-      return lastElement.toLowerCase().includes(a.name.toLowerCase());
-    });
-
-    const animation = polyData?.animation;
-
-    const polyDataIndex = listPolymorphers.findIndex((a) => {
-      return lastElement.toLowerCase().includes(a.name.toLowerCase());
-    });
+    if(matches && matches.length > 0){
+      lastElement = matches[matches.length - 1];
+    }else{
+      lastElement = sourceToken.name;
+    }
 
     const tokenData = <TokenData>await actor.getTokenData();
     const posData = <Token>canvas.tokens?.placeables.find((t: Token) => {
@@ -79,7 +74,19 @@ const API = {
       }) || undefined;
 
     if (removePolymorpher) {
-      if (animationExternal) {
+
+      const polyData = listPolymorphers.find((a) => {
+        return lastElement.toLowerCase().includes(a.name.toLowerCase());
+      });
+      
+      const animation = polyData?.animation;
+
+      const polyDataIndex = listPolymorphers.findIndex((a) => {
+        return lastElement.toLowerCase().includes(a.name.toLowerCase());
+      });
+
+      if (animationExternal && animationExternal.sequence) {
+        //@ts-ignore
         await animationExternal.sequence.play();
         await wait(animationExternal.timeToWait);
       } else if (animation) {
@@ -109,10 +116,19 @@ const API = {
         if (listPolymorphers?.length === 1) {
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0], animationExternal);
         } else {
-          const randomIndex = Math.floor(Math.random() * listPolymorphers.length);
+          const polyDataIndex = listPolymorphers.findIndex((a) => {
+            return lastElement.toLowerCase().includes(a.name.toLowerCase());
+          });
+          let randomIndex = 0;
+          while(randomIndex === polyDataIndex) {
+            randomIndex = Math.floor(Math.random() * listPolymorphers.length);
+          }
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[randomIndex], animationExternal);
         }
       } else if (isOrdered) {
+        const polyDataIndex = listPolymorphers.findIndex((a) => {
+          return lastElement.toLowerCase().includes(a.name.toLowerCase());
+        });       
         const nextIndex = polyDataIndex + 1;
         if (listPolymorphers?.length - 1 < nextIndex) {
           new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0], animationExternal);

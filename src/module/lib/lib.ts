@@ -118,7 +118,7 @@ export function isStringEquals(stringToCheck1: string, stringToCheck2: string, s
  */
 export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
   // if only one token is selected
-  if (canvas.tokens?.controlled.length == 1) {
+  // if (canvas.tokens?.controlled.length == 1) {
     const sourceToken = <Token>canvas.tokens?.placeables.find((t: Token) => {
       return t.id === hudToken._id;
     });
@@ -128,9 +128,9 @@ export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
 
     //addToRevertPolymorphButton(html, sourceToken);
     addToPolymorphButton(html, sourceToken);
-  } else {
-    // Do not show anything
-  }
+  // } else {
+  //   // Do not show anything
+  // }
 }
 
 function addToPolymorphButton(html, sourceToken: Token) {
@@ -139,19 +139,30 @@ function addToPolymorphButton(html, sourceToken: Token) {
   }
 
   const isPolymorphed = sourceToken.document.actor?.getFlag('dnd5e', 'isPolymorphed');
-  let button = buildButton(html, `Transform ${sourceToken.name}`);
-  if (isPolymorphed) {
-    button = addSlash(button);
+  const button = buildButton(html, `Transform ${sourceToken.name}`);
+  // if (isPolymorphed) {
+  //   button = addSlash(button);
+  // }
+
+  const actor = <Actor>sourceToken.document.actor;
+  if (!actor) {
+    warn(`No actor founded on canvas with token '${sourceToken.id}'`, true);
+    return;
   }
 
-  // const random = <boolean>game.settings.get(CONSTANTS.MODULE_NAME, 'hudAvoidPanelChoice') ?? false;
+  const random = <boolean>sourceToken.document.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
+  const ordered = <boolean>sourceToken.document.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
 
   button.find('i').on('click', async (ev) => {
-    API.invokePolymorpherManager(sourceToken.id);
+    for(const targetToken of <Token[]>canvas.tokens?.controlled){
+      API.invokePolymorpherManager(targetToken.id, false, ordered, random);
+    }
   });
   button.find('i').on('contextmenu', async (ev) => {
-    // Do somethign with right click
-    API.invokePolymorpherManager(sourceToken.id);
+    for(const targetToken of <Token[]>canvas.tokens?.controlled){
+      // Do somethign with right click
+      API.invokePolymorpherManager(targetToken.id, true, ordered, random);
+    }
   });
 }
 

@@ -7,10 +7,10 @@
           "title": "Delete Polymorpher",
           "content": "<p>Are you sure you want to delete this polymorpher?</p>"
         },
-        "defaultSummonType": "Default summon type",
-        "random": "Random",
-        "ordered": "Ordered"
-      }
+        "defaultSummonType": "Default summon type"
+      },
+      "random": "Random",
+      "ordered": "Ordered"
     },
     "actorSheetBtn": "Polymorphers",
     "animations": {
