@@ -119,9 +119,7 @@ Hooks.once('libChangelogsReady', function () {
   libChangelogs.register(
     CONSTANTS.MODULE_NAME,
     `
-    - Add check for show the hud button only if at least a polymorphing actor is present on the current actor
-    - Converted the hud settings from 'world' to 'client'
-    - Set module settings 'hudEnable' default to true
+    - Bug fix on setting labels
   `,
     'minor',
   );

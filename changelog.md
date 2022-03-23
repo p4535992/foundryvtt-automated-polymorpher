@@ -1,3 +1,7 @@
+## 1.0.18
+
+- Bug fix on setting labels
+
 ## 1.0.17
 
 - Add check for show the hud button only if at least a polymorphing actor is present on the current actor

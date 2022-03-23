@@ -131,8 +131,8 @@ export const registerSettings = function () {
 
   /** Which column should the button be placed on */
   game.settings.register(CONSTANTS.MODULE_NAME, 'hudColumn', {
-    name: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudColumn.title`),
-    hint: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudColumn.hint`),
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudColumn.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudColumn.hint`),
     scope: 'client',
     config: true,
     type: String,
@@ -145,8 +145,8 @@ export const registerSettings = function () {
 
   /** Whether the button should be placed on the top or bottom of the column */
   game.settings.register(CONSTANTS.MODULE_NAME, 'hudTopBottom', {
-    name: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudTopBottom.title`),
-    hint: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudTopBottom.hint`),
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudTopBottom.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudTopBottom.hint`),
     scope: 'client',
     config: true,
     type: String,
