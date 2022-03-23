@@ -104,6 +104,7 @@ the actions on the hud button are of two types left click and right click.
 ![hud](./wiki/feature_hud_1.gif)
 
 **NOTE: you can't have both ordered and random**
+**NOTE: Remember you must own the token for see the HUD button**
 
 # API
 

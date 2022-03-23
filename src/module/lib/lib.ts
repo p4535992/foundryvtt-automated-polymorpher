@@ -1,3 +1,4 @@
+import { PolymorpherData } from '../automatedPolymorpherModels';
 import API from '../api';
 import { PolymorpherFlags } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
@@ -126,11 +127,27 @@ export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
     return;
   }
 
-  //addToRevertPolymorphButton(html, sourceToken);
-  addToPolymorphButton(html, sourceToken);
-  // } else {
-  //   // Do not show anything
-  // }
+  const actor = <Actor>sourceToken.document.actor;
+  if (!actor) {
+    warn(`No actor founded on canvas with token '${sourceToken.id}'`, true);
+    return;
+  }
+
+  const listPolymorphers: PolymorpherData[] =
+    // actor &&
+    // (<boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
+    //   game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
+    //   ? <PolymorpherData[]>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
+    //   : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+    <PolymorpherData[]>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+
+  if (listPolymorphers.length > 0) {
+    //addToRevertPolymorphButton(html, sourceToken);
+    addToPolymorphButton(html, sourceToken);
+    // } else {
+    //   // Do not show anything
+    // }
+  }
 }
 
 function addToPolymorphButton(html, sourceToken: Token) {
@@ -138,7 +155,7 @@ function addToPolymorphButton(html, sourceToken: Token) {
     return;
   }
 
-  const isPolymorphed = sourceToken.document.actor?.getFlag('dnd5e', 'isPolymorphed');
+  // const isPolymorphed = sourceToken.document.actor?.getFlag('dnd5e', 'isPolymorphed');
   const button = buildButton(html, `Transform ${sourceToken.name}`);
   // if (isPolymorphed) {
   //   button = addSlash(button);
@@ -150,9 +167,8 @@ function addToPolymorphButton(html, sourceToken: Token) {
     return;
   }
 
-  const random = <boolean>sourceToken.document.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
-  const ordered =
-    <boolean>sourceToken.document.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
+  const random = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
+  const ordered = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
 
   button.find('i').on('click', async (ev) => {
     for (const targetToken of <Token[]>canvas.tokens?.controlled) {
@@ -183,7 +199,7 @@ function addToPolymorphButton(html, sourceToken: Token) {
 // }
 
 function buildButton(html, tooltip) {
-  const iconClass = 'fas fa-wind';
+  const iconClass = 'fas fa-wind'; // TODO customize icon ???
   const button = $(
     `<div class="control-icon ${CONSTANTS.MODULE_NAME}" title="${tooltip}"><i class="${iconClass}"></i></div>`,
   );

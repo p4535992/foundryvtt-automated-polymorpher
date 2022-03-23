@@ -123,17 +123,17 @@ export const registerSettings = function () {
   game.settings.register(CONSTANTS.MODULE_NAME, 'hudEnable', {
     name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudEnable.title`),
     hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudEnable.hint`),
-    scope: 'world',
+    scope: 'client',
     config: true,
     type: Boolean,
-    default: false,
+    default: true,
   });
 
   /** Which column should the button be placed on */
   game.settings.register(CONSTANTS.MODULE_NAME, 'hudColumn', {
     name: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudColumn.title`),
     hint: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudColumn.hint`),
-    scope: 'world',
+    scope: 'client',
     config: true,
     type: String,
     default: 'Left',
@@ -147,7 +147,7 @@ export const registerSettings = function () {
   game.settings.register(CONSTANTS.MODULE_NAME, 'hudTopBottom', {
     name: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudTopBottom.title`),
     hint: i18n(`${CONSTANTS.MODULE_NAME}.setting.hudTopBottom.hint`),
-    scope: 'world',
+    scope: 'client',
     config: true,
     type: String,
     default: 'Top',

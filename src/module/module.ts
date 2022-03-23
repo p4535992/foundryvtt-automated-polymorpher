@@ -79,10 +79,10 @@ export const readyHooks = async () => {
   });
 
   Hooks.on('renderTokenHUD', (app, html, data) => {
-    const restrictedOnlyGM = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOnlyGM');
-    if (restrictedOnlyGM && !game.user?.isGM) {
-      return;
-    }
+    // const restrictedOnlyGM = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOnlyGM');
+    // if (restrictedOnlyGM && !game.user?.isGM) {
+    //   return;
+    // }
     if (game.settings.get(CONSTANTS.MODULE_NAME, 'hudEnable')) {
       renderAutomatedPolymorpherHud(app, html, data);
     }
