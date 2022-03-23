@@ -1,3 +1,7 @@
+## 1.0.19
+
+- Bug fix on socketLib
+
 ## 1.0.18
 
 - Bug fix on setting labels

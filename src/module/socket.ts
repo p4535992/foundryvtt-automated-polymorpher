@@ -40,7 +40,7 @@ export function registerSocket() {
   /**
    * Automated Polymorpher sockets
    */
-  automatedPolymorpherSocket.register('invokePolymorpherManagerArr', (...args) =>
+  automatedPolymorpherSocket.register('invokePolymorpherManager', (...args) =>
     API.invokePolymorpherManagerArr(...args),
   );
 
