@@ -15,9 +15,8 @@
 import { preloadTemplates } from './module/preloadTemplates';
 import { initHooks, readyHooks, setupHooks } from './module/module';
 import { registerSettings } from './module/settings';
-import { canvas, game } from './module/settings';
 import CONSTANTS from './module/constants';
-import API from './module/api';
+import type API from './module/api';
 
 /* ------------------------------------ */
 /* Initialize module					*/

@@ -1,10 +1,9 @@
-import { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
+import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
 import { error, wait, warn } from './lib/lib';
 import { PolymorpherManager } from './polymorphermanager';
-import { canvas, game } from './settings';
 
 const API = {
   async invokePolymorpherManagerArr(...inAttributes: any[]) {
@@ -113,7 +112,7 @@ const API = {
       }
       if (isRandom) {
         if (listPolymorphers?.length === 1) {
-          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0], animationExternal);
+          new PolymorpherManager(actor).fastSummonPolymorpher(<PolymorpherData>listPolymorphers[0], animationExternal);
         } else {
           const polyDataIndex = listPolymorphers.findIndex((a) => {
             return lastElement.toLowerCase().includes(a.name.toLowerCase());
@@ -122,7 +121,7 @@ const API = {
           while (randomIndex === polyDataIndex) {
             randomIndex = Math.floor(Math.random() * listPolymorphers.length);
           }
-          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[randomIndex], animationExternal);
+          new PolymorpherManager(actor).fastSummonPolymorpher(<PolymorpherData>listPolymorphers[randomIndex], animationExternal);
         }
       } else if (isOrdered) {
         const polyDataIndex = listPolymorphers.findIndex((a) => {
@@ -130,9 +129,9 @@ const API = {
         });
         const nextIndex = polyDataIndex + 1;
         if (listPolymorphers?.length - 1 < nextIndex) {
-          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[0], animationExternal);
+          new PolymorpherManager(actor).fastSummonPolymorpher(<PolymorpherData>listPolymorphers[0], animationExternal);
         } else {
-          new PolymorpherManager(actor).fastSummonPolymorpher(listPolymorphers[nextIndex], animationExternal);
+          new PolymorpherManager(actor).fastSummonPolymorpher(<PolymorpherData>listPolymorphers[nextIndex], animationExternal);
         }
       } else {
         new PolymorpherManager(actor).render(true);

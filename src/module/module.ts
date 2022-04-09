@@ -1,8 +1,6 @@
-import { Creature, SystemCreatures } from './automatedPolymorpherModels';
 import { warn, error, debug, i18n, i18nFormat, log, renderAutomatedPolymorpherHud } from './lib/lib';
 import { PolymorpherManager, SimplePolymorpherManager } from './polymorphermanager';
 import { ANIMATIONS } from './animations';
-import { canvas, game } from './settings';
 import CONSTANTS from './constants';
 import API from './api';
 import { ModuleData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/packages.mjs';

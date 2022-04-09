@@ -1,10 +1,8 @@
-import { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
+import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
 import { i18n, wait, warn } from './lib/lib';
-
-import { canvas, game } from './settings';
 
 export class PolymorpherManager extends FormApplication {
   // caster: Actor;

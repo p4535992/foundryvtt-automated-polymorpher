@@ -1,9 +1,8 @@
-import { PolymorpherData } from '../automatedPolymorpherModels';
+import type { PolymorpherData } from '../automatedPolymorpherModels';
 import API from '../api';
 import { PolymorpherFlags } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
 import { PolymorpherManager } from '../polymorphermanager';
-import { canvas, game } from '../settings';
 
 // =============================
 // Module Generic function
