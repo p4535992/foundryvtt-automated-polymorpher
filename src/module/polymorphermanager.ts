@@ -9,13 +9,15 @@ export class PolymorpherManager extends FormApplication {
   summons: any[] | undefined;
   // spellLevel: number | undefined;
   actor: Actor;
+  token: Token;
 
-  constructor(actor: Actor, summonData?: PolymorpherData[]) {
+  constructor(actor: Actor, token: Token, summonData?: PolymorpherData[]) {
     super({});
     // this.caster = actor;
     this.summons = summonData;
     // this.spellLevel = spellLevel;
     this.actor = actor;
+    this.token = token;
   }
 
   static get defaultOptions() {
@@ -104,8 +106,8 @@ export class PolymorpherManager extends FormApplication {
     const animation = <string>$(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
     const aId = event.currentTarget.dataset.aid;
     const aName = event.currentTarget.dataset.aname;
-    const actor = <Actor>game.actors?.get(aId);
-    if (!actor) {
+    const actorToTransform = <Actor>game.actors?.get(aId);
+    if (!actorToTransform) {
       warn(
         `The actor you try to polimorphing not exists anymore, please set up again the actor on the polymorpher manager`,
         true,
@@ -113,30 +115,34 @@ export class PolymorpherManager extends FormApplication {
       return;
     }
     // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
-    const tokenData = <TokenData>await actor.getTokenData();
+    const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
     //@ts-ignore
-    // const posData = await warpgate.crosshairs.show({
+    // const tokenFromTransform = await warpgate.crosshairs.show({
     //   size: Math.max(tokenData.width,tokenData.height)*tokenData.scale,
     //   icon: `modules/${CONSTANTS.MODULE_NAME}/assets/black-hole-bolas.webp`,
     //   label: "",
     // });
-    // if (posData.cancelled) {
+    // if (tokenFromTransform.cancelled) {
     //   this.maximize();
     //   return;
     // }
-    const posData = <Token>canvas.tokens?.placeables.find((t: Token) => {
+    let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
         return t.actor?.id === this.actor.id;
       }) || undefined;
+    if (this.token) {
+      tokenFromTransform = this.token;
+    }
     // Get the target actor
-    const sourceActor = actor;
+    const sourceActor = actorToTransform;
     // if (data.pack) {
     //   const pack = game.packs.find(p => p.collection === data.pack);
     //   sourceActor = await pack.getEntity(data.id);
     // } else {
     //   sourceActor = game.actors.get(data.id);
     // }
-    if (!sourceActor) return;
-
+    if (!sourceActor){
+      return;
+    }
     if (game.system.id === 'dnd5e') {
       const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
       if (!canPolymorph) {
@@ -172,12 +178,12 @@ export class PolymorpherManager extends FormApplication {
               icon: '<i class="fas fa-check"></i>',
               label: i18n('DND5E.PolymorphAcceptSettings'),
               callback: async (html) => {
-                if (posData) {
+                if (tokenFromTransform) {
                   if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                     //@ts-ignore
-                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenDataToTransform);
                   } else {
-                    ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+                    ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
@@ -198,12 +204,12 @@ export class PolymorpherManager extends FormApplication {
               icon: '<i class="fas fa-paw"></i>',
               label: i18n('DND5E.PolymorphWildShape'),
               callback: async (html) => {
-                if (posData) {
+                if (tokenFromTransform) {
                   if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                     //@ts-ignore
-                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenDataToTransform);
                   } else {
-                    ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+                    ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
@@ -231,12 +237,12 @@ export class PolymorpherManager extends FormApplication {
               icon: '<i class="fas fa-pastafarianism"></i>',
               label: i18n('DND5E.Polymorph'),
               callback: async (html) => {
-                if (posData) {
+                if (tokenFromTransform) {
                   if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                     //@ts-ignore
-                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenDataToTransform);
                   } else {
-                    ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+                    ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
@@ -273,9 +279,9 @@ export class PolymorpherManager extends FormApplication {
       // ===========================================
       if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
         //@ts-ignore
-        game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+        game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenDataToTransform);
       } else {
-        ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+        ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
       }
       await this.wait(ANIMATIONS.animationFunctions[animation].time);
 
@@ -298,14 +304,46 @@ export class PolymorpherManager extends FormApplication {
       //  tokenData: tokenData,
       //  posData: posData,
       // })
+
+      // Prepare flag for revert ???
+      let updatesForRevert:any= {};
+      if(!this.token.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)){
+        updatesForRevert = {
+          tokenData : this.token.data,
+          actorData: this.actor.data
+        }
+      }else{
+        updatesForRevert = this.token.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+      }
+      const updates = {
+        token : {
+          name: tokenDataToTransform.name, 
+          img: tokenDataToTransform.img,
+          scale: tokenDataToTransform.scale,
+          data: tokenDataToTransform,
+          actor: {
+            //   name: actorToTransform.name, 
+            //   data: actorToTransform.data
+            data:{
+              flags: {
+                'automated-polymorpher': {
+                  'updatesforrevert' : updatesForRevert
+                }
+              }
+            }
+          }
+        },
+      };
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
       //@ts-ignore
       await warpgate.mutate(
-        posData.document,
-        {}, //customTokenData || {},
+        tokenFromTransform.document,
+        updates, // tokenDataToTransform, //{}, //customTokenData || {},
         {},
         {
-          name: posData.document.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+          name: tokenFromTransform.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
         },
       );
 
@@ -331,9 +369,9 @@ export class PolymorpherManager extends FormApplication {
 
   async _onOpenSheet(event) {
     const actorId = event.currentTarget.parentElement.dataset.aid;
-    const actor = game.actors?.get(actorId);
-    if (actor) {
-      actor.sheet?.render(true);
+    const actorFromTransform = game.actors?.get(actorId);
+    if (actorFromTransform) {
+      actorFromTransform.sheet?.render(true);
     }
   }
 
@@ -353,19 +391,23 @@ export class PolymorpherManager extends FormApplication {
   }
 
   generateLi(data: PolymorpherData) {
-    const actor = game.actors?.get(data.id) || game.actors?.getName(data.id);
-    if (!actor) return '';
+    const actorToTransformLi = game.actors?.get(data.id) || game.actors?.getName(data.id);
+    if (!actorToTransformLi) {
+      return '';
+    }
     const restricted = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOwned');
-    if (restricted && !actor.isOwner) return '';
+    if (restricted && !actorToTransformLi.isOwner) return '';
     const $li = $(`
-	<li id="polymorpher" class="polymorpher-item" data-aid="${actor.id}" data-aname="${
-      actor.name
+	<li id="polymorpher" class="polymorpher-item" data-aid="${actorToTransformLi.id}" data-aname="${
+      actorToTransformLi.name
     }" data-elid="${randomID()}" draggable="true">
 		<div class="summon-btn">
-			<img class="actor-image" src="${actor.data.img}" alt="">
-			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actor.id}" data-aname="${actor.name}"></div>
+			<img class="actor-image" src="${actorToTransformLi.data.img}" alt="">
+			<div class="warpgate-btn" id="summon-polymorpher" data-aid="${actorToTransformLi.id}" data-aname="${
+      actorToTransformLi.name
+    }"></div>
 		</div>
-    	<span class="actor-name">${actor.data.name}</span>
+    	<span class="actor-name">${actorToTransformLi.data.name}</span>
     	<select class="anim-dropdown">
         	${this.getAnimations(data.animation)}
     	</select>
@@ -451,23 +493,28 @@ export class PolymorpherManager extends FormApplication {
   ) {
     this.minimize();
 
-    const actor = <Actor>game.actors?.get(polymorpherData.id);
+    const actorToTransform = <Actor>game.actors?.get(polymorpherData.id);
     const animation = polymorpherData.animation;
-    if (!actor) {
+    if (!actorToTransform) {
       warn(
         `The actor you try to polymorphism not exists anymore, please set up again the actor on the polymorpher manager`,
         true,
       );
       return;
     }
-    const tokenData = <TokenData>await actor.getTokenData();
-    const posData = <Token>canvas.tokens?.placeables.find((t: Token) => {
+    const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
+
+    let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
         return t.actor?.id === this.actor.id;
       }) || undefined;
+    if (this.token) {
+      tokenFromTransform = this.token;
+    }
     // Get the target actor
-    const sourceActor = actor;
-    if (!sourceActor) return;
-
+    const sourceActor = actorToTransform;
+    if (!sourceActor) {
+      return;
+    }
     if (game.system.id === 'dnd5e') {
       const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
       if (!canPolymorph) {
@@ -486,7 +533,7 @@ export class PolymorpherManager extends FormApplication {
       // };
 
       if (polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings') {
-        if (posData) {
+        if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
             //@ts-ignore
             await animationExternal.sequence.play();
@@ -494,9 +541,12 @@ export class PolymorpherManager extends FormApplication {
           } else if (animation) {
             if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
               //@ts-ignore
-              game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+              game.macros
+                ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                //@ts-ignore
+                ?.execute({tokenFromTransform, tokenDataToTransform});
             } else {
-              ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+              ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
             }
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
@@ -523,7 +573,7 @@ export class PolymorpherManager extends FormApplication {
           },
         );
       } else if (polymorpherData.defaultsummontype === 'DND5E.PolymorphWildShape') {
-        if (posData) {
+        if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
             //@ts-ignore
             await animationExternal.sequence.play();
@@ -531,9 +581,12 @@ export class PolymorpherManager extends FormApplication {
           } else if (animation) {
             if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
               //@ts-ignore
-              game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+              game.macros
+                ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                //@ts-ignore
+                ?.execute(tokenFromTransform, tokenDataToTransform);
             } else {
-              ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+              ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
             }
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
@@ -552,7 +605,7 @@ export class PolymorpherManager extends FormApplication {
           },
         );
       } else if (polymorpherData.defaultsummontype === 'DND5E.Polymorph') {
-        if (posData) {
+        if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
             //@ts-ignore
             await animationExternal.sequence.play();
@@ -560,9 +613,12 @@ export class PolymorpherManager extends FormApplication {
           } else if (animation) {
             if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
               //@ts-ignore
-              game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+              game.macros
+                ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                //@ts-ignore
+                ?.execute(tokenFromTransform, tokenDataToTransform);
             } else {
-              ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+              ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
             }
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
@@ -589,7 +645,7 @@ export class PolymorpherManager extends FormApplication {
         );
       } else {
         warn(
-          `No default summon type is setted for any polymorphing actor on the list associated to this actor ${actor.name}`,
+          `No default summon type is setted for any polymorphing actor on the list associated to this actor ${actorToTransform.name}`,
           true,
         );
       }
@@ -604,20 +660,55 @@ export class PolymorpherManager extends FormApplication {
       } else if (animation) {
         if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
           //@ts-ignore
-          game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+          game.macros
+            ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+            //@ts-ignore
+            ?.execute(tokenFromTransform, tokenDataToTransform);
         } else {
-          ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+          ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
         }
         await this.wait(ANIMATIONS.animationFunctions[animation].time);
       }
+
+      // Prepare flag for revert ???
+      let updatesForRevert:any= {};
+      if(!this.token.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)){
+        updatesForRevert = {
+          tokenData : this.token.data,
+          actorData: this.actor.data
+        }
+      }else{
+        updatesForRevert = this.token.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+      }
+      const updates = {
+        token : {
+          name: tokenDataToTransform.name, 
+          img: tokenDataToTransform.img,
+          scale: tokenDataToTransform.scale,
+          data: tokenDataToTransform,
+          actor: {
+            //   name: actorToTransform.name, 
+            //   data: actorToTransform.data
+            data:{
+              flags: {
+                'automated-polymorpher': {
+                  'updatesforrevert' : updatesForRevert
+                }
+              }
+            }
+          }
+        },
+      };
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
       //@ts-ignore
       await warpgate.mutate(
-        posData.document,
-        {}, // customTokenData || {},
+        tokenFromTransform.document,
+        updates, // tokenDataToTransform, // {}, // customTokenData || {},
         {},
         {
-          name: posData.document.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+          name: tokenFromTransform.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
         },
       );
     }
@@ -629,8 +720,8 @@ export class SimplePolymorpherManager extends PolymorpherManager {
   // summons: any[];
   // spellLevel: number;
 
-  constructor(actor: Actor, summonData) {
-    super(actor, summonData);
+  constructor(actor: Actor, token: Token, summonData) {
+    super(actor, token, summonData);
     // this.caster = actor;
     // this.summons = summonData;
     // this.spellLevel = spellLevel;

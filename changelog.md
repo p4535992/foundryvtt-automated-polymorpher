@@ -1,3 +1,8 @@
+## 1.0.20
+
+- Bug fix for case multitoke linked to the same actor, so now the animation is done on the correct token
+- Bug fix for apply warpgate mutate function on system not Dnd5e
+
 ## 1.0.19
 
 - Bug fix on socketLib

@@ -126,7 +126,7 @@ export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
     return;
   }
 
-  const actor = <Actor>sourceToken.document.actor;
+  const actor = <Actor>sourceToken.actor;
   if (!actor) {
     warn(`No actor founded on canvas with token '${sourceToken.id}'`, true);
     return;
@@ -154,13 +154,13 @@ function addToPolymorphButton(html, sourceToken: Token) {
     return;
   }
 
-  // const isPolymorphed = sourceToken.document.actor?.getFlag('dnd5e', 'isPolymorphed');
+  // const isPolymorphed = sourceToken.actor?.getFlag('dnd5e', 'isPolymorphed');
   const button = buildButton(html, `Transform ${sourceToken.name}`);
   // if (isPolymorphed) {
   //   button = addSlash(button);
   // }
 
-  const actor = <Actor>sourceToken.document.actor;
+  const actor = <Actor>sourceToken.actor;
   if (!actor) {
     warn(`No actor founded on canvas with token '${sourceToken.id}'`, true);
     return;

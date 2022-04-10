@@ -35,12 +35,11 @@ const API = {
       warn(`No token founded on canvas with id '${sourceTokenId}'`, true);
       return;
     }
-    const actor = <Actor>sourceToken.document.actor;
+    const actor = <Actor>sourceToken.actor;
     if (!actor) {
       warn(`No actor founded on canvas with token '${sourceTokenId}'`, true);
       return;
     }
-
     const listPolymorphers: PolymorpherData[] =
       // actor &&
       // (<boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
@@ -68,7 +67,7 @@ const API = {
     }
 
     const tokenData = <TokenData>await actor.getTokenData();
-    const posData = <Token>canvas.tokens?.placeables.find((t: Token) => {
+    const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
         return t.actor?.id === actor.id;
       }) || undefined;
 
@@ -90,9 +89,9 @@ const API = {
       } else if (animation) {
         if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
           //@ts-ignore
-          game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(posData, tokenData);
+          game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenData);
         } else {
-          ANIMATIONS.animationFunctions[animation].fn(posData, tokenData);
+          ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenData);
         }
         await wait(ANIMATIONS.animationFunctions[animation].time);
       }
@@ -102,8 +101,37 @@ const API = {
         //@ts-ignore
         actor?.revertOriginalForm();
       } else {
+        //const mutationName = <string>actor.id;
+        // TODO why this is not working???
         //@ts-ignore
-        warpgate.revert(sourceToken.document, (mutationName = actor.id));
+        //warpgate.revert(sourceToken.document, mutationName);
+        const updatesForRevert:any = sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.UPDATES_FOR_REVERT);
+        if(!updatesForRevert){
+          warn(`Can't revert this token without the flag '${PolymorpherFlags.UPDATES_FOR_REVERT}'`, true);
+          return;
+        }
+        await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.UPDATES_FOR_REVERT);
+        const tokenDataToTransform = updatesForRevert.tokenData;
+        const actorDataToTransform = updatesForRevert.actorData;
+        const updates = {
+          token : {
+            name: tokenDataToTransform.name, 
+            img: tokenDataToTransform.img,
+            scale: tokenDataToTransform.scale,
+            data: tokenDataToTransform,
+          },
+          actor: {
+            data: actorDataToTransform
+          }
+        };
+
+        //@ts-ignore
+        await warpgate.mutate(
+          sourceToken.document,
+          updates,
+          {},
+          {},
+        );
       }
     } else {
       if (isRandom && isOrdered) {
@@ -112,7 +140,10 @@ const API = {
       }
       if (isRandom) {
         if (listPolymorphers?.length === 1) {
-          new PolymorpherManager(actor).fastSummonPolymorpher(<PolymorpherData>listPolymorphers[0], animationExternal);
+          new PolymorpherManager(actor, sourceToken).fastSummonPolymorpher(
+            <PolymorpherData>listPolymorphers[0],
+            animationExternal,
+          );
         } else {
           const polyDataIndex = listPolymorphers.findIndex((a) => {
             return lastElement.toLowerCase().includes(a.name.toLowerCase());
@@ -121,7 +152,10 @@ const API = {
           while (randomIndex === polyDataIndex) {
             randomIndex = Math.floor(Math.random() * listPolymorphers.length);
           }
-          new PolymorpherManager(actor).fastSummonPolymorpher(<PolymorpherData>listPolymorphers[randomIndex], animationExternal);
+          new PolymorpherManager(actor, sourceToken).fastSummonPolymorpher(
+            <PolymorpherData>listPolymorphers[randomIndex],
+            animationExternal,
+          );
         }
       } else if (isOrdered) {
         const polyDataIndex = listPolymorphers.findIndex((a) => {
@@ -129,12 +163,18 @@ const API = {
         });
         const nextIndex = polyDataIndex + 1;
         if (listPolymorphers?.length - 1 < nextIndex) {
-          new PolymorpherManager(actor).fastSummonPolymorpher(<PolymorpherData>listPolymorphers[0], animationExternal);
+          new PolymorpherManager(actor, sourceToken).fastSummonPolymorpher(
+            <PolymorpherData>listPolymorphers[0],
+            animationExternal,
+          );
         } else {
-          new PolymorpherManager(actor).fastSummonPolymorpher(<PolymorpherData>listPolymorphers[nextIndex], animationExternal);
+          new PolymorpherManager(actor, sourceToken).fastSummonPolymorpher(
+            <PolymorpherData>listPolymorphers[nextIndex],
+            animationExternal,
+          );
         }
       } else {
-        new PolymorpherManager(actor).render(true);
+        new PolymorpherManager(actor, sourceToken).render(true);
       }
     }
   },

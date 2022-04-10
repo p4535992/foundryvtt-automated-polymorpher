@@ -3,7 +3,6 @@ import { PolymorpherManager, SimplePolymorpherManager } from './polymorphermanag
 import { ANIMATIONS } from './animations';
 import CONSTANTS from './constants';
 import API from './api';
-import { ModuleData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/packages.mjs';
 import { registerSocket } from './socket';
 import { setApi } from '../automated-polymorpher';
 
@@ -71,7 +70,8 @@ export const readyHooks = async () => {
       label: removeLabelSheetHeader ? '' : i18n(`${CONSTANTS.MODULE_NAME}.actorSheetBtn`),
       onclick: function openPM(event) {
         const actor = app.object;
-        new PolymorpherManager(actor).render(true);
+        const token = app.object.token;
+        new PolymorpherManager(actor, token).render(true);
       },
     });
   });
