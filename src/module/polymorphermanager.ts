@@ -140,7 +140,7 @@ export class PolymorpherManager extends FormApplication {
     // } else {
     //   sourceActor = game.actors.get(data.id);
     // }
-    if (!sourceActor){
+    if (!sourceActor) {
       return;
     }
     if (game.system.id === 'dnd5e') {
@@ -161,6 +161,18 @@ export class PolymorpherManager extends FormApplication {
         return settings;
       };
 
+      // Prepare flag for revert ???
+      let updatesForRevert: any = {};
+      if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
+        updatesForRevert = {
+          tokenData: this.token.data,
+          actorData: this.actor.data,
+        };
+      } else {
+        updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+      }
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+
       // Create and render the Dialog
       return new Dialog(
         {
@@ -180,8 +192,10 @@ export class PolymorpherManager extends FormApplication {
               callback: async (html) => {
                 if (tokenFromTransform) {
                   if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-                    //@ts-ignore
-                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenDataToTransform);
+                    game.macros
+                      ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                      //@ts-ignore
+                      ?.execute(tokenFromTransform, tokenDataToTransform);
                   } else {
                     ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                   }
@@ -206,8 +220,10 @@ export class PolymorpherManager extends FormApplication {
               callback: async (html) => {
                 if (tokenFromTransform) {
                   if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-                    //@ts-ignore
-                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenDataToTransform);
+                    game.macros
+                      ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                      //@ts-ignore
+                      ?.execute(tokenFromTransform, tokenDataToTransform);
                   } else {
                     ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                   }
@@ -239,8 +255,10 @@ export class PolymorpherManager extends FormApplication {
               callback: async (html) => {
                 if (tokenFromTransform) {
                   if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-                    //@ts-ignore
-                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenDataToTransform);
+                    game.macros
+                      ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                      //@ts-ignore
+                      ?.execute(tokenFromTransform, tokenDataToTransform);
                   } else {
                     ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                   }
@@ -278,8 +296,10 @@ export class PolymorpherManager extends FormApplication {
       // If system is not dnd5e we can use warpgate
       // ===========================================
       if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-        //@ts-ignore
-        game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenDataToTransform);
+        game.macros
+          ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+          //@ts-ignore
+          ?.execute(tokenFromTransform, tokenDataToTransform);
       } else {
         ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
       }
@@ -306,32 +326,32 @@ export class PolymorpherManager extends FormApplication {
       // })
 
       // Prepare flag for revert ???
-      let updatesForRevert:any= {};
-      if(!this.token.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)){
+      let updatesForRevert: any = {};
+      if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
         updatesForRevert = {
-          tokenData : this.token.data,
-          actorData: this.actor.data
-        }
-      }else{
-        updatesForRevert = this.token.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+          tokenData: this.token.data,
+          actorData: this.actor.data,
+        };
+      } else {
+        updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       }
       const updates = {
-        token : {
-          name: tokenDataToTransform.name, 
+        token: {
+          name: tokenDataToTransform.name,
           img: tokenDataToTransform.img,
           scale: tokenDataToTransform.scale,
           data: tokenDataToTransform,
           actor: {
-            //   name: actorToTransform.name, 
+            //   name: actorToTransform.name,
             //   data: actorToTransform.data
-            data:{
+            data: {
               flags: {
                 'automated-polymorpher': {
-                  'updatesforrevert' : updatesForRevert
-                }
-              }
-            }
-          }
+                  updatesforrevert: updatesForRevert,
+                },
+              },
+            },
+          },
         },
       };
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
@@ -395,6 +415,9 @@ export class PolymorpherManager extends FormApplication {
     if (!actorToTransformLi) {
       return '';
     }
+
+    const isDnd5e = game.system.id === 'dnd5e';
+
     const restricted = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOwned');
     if (restricted && !actorToTransformLi.isOwner) return '';
     const $li = $(`
@@ -411,9 +434,13 @@ export class PolymorpherManager extends FormApplication {
     	<select class="anim-dropdown">
         	${this.getAnimations(data.animation)}
     	</select>
-        <select id="automated-polymorpher.defaultSummonType" class="defaultSummonType" name="defaultSummonType" data-dtype="String" is="ms-dropdown-ap">
+      ${
+        isDnd5e
+          ? `<select id="automated-polymorpher.defaultSummonType" class="defaultSummonType" name="defaultSummonType" data-dtype="String" is="ms-dropdown-ap">
             ${this.getDefaultSummonTypes(data.defaultsummontype, data)}
-        </select>
+        </select>`
+          : ''
+      }
 		<i id="remove-polymorpher" class="fas fa-trash"></i>
 	</li>
 	`);
@@ -532,6 +559,18 @@ export class PolymorpherManager extends FormApplication {
       //   return settings;
       // };
 
+      // Prepare flag for revert ???
+      let updatesForRevert: any = {};
+      if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
+        updatesForRevert = {
+          tokenData: this.token.data,
+          actorData: this.actor.data,
+        };
+      } else {
+        updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+      }
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+
       if (polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings') {
         if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
@@ -544,7 +583,7 @@ export class PolymorpherManager extends FormApplication {
               game.macros
                 ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                 //@ts-ignore
-                ?.execute({tokenFromTransform, tokenDataToTransform});
+                ?.execute({ tokenFromTransform, tokenDataToTransform });
             } else {
               ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
             }
@@ -671,32 +710,32 @@ export class PolymorpherManager extends FormApplication {
       }
 
       // Prepare flag for revert ???
-      let updatesForRevert:any= {};
-      if(!this.token.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)){
+      let updatesForRevert: any = {};
+      if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
         updatesForRevert = {
-          tokenData : this.token.data,
-          actorData: this.actor.data
-        }
-      }else{
-        updatesForRevert = this.token.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+          tokenData: this.token.data,
+          actorData: this.actor.data,
+        };
+      } else {
+        updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       }
       const updates = {
-        token : {
-          name: tokenDataToTransform.name, 
+        token: {
+          name: tokenDataToTransform.name,
           img: tokenDataToTransform.img,
           scale: tokenDataToTransform.scale,
           data: tokenDataToTransform,
           actor: {
-            //   name: actorToTransform.name, 
+            //   name: actorToTransform.name,
             //   data: actorToTransform.data
-            data:{
+            data: {
               flags: {
                 'automated-polymorpher': {
-                  'updatesforrevert' : updatesForRevert
-                }
-              }
-            }
-          }
+                  updatesforrevert: updatesForRevert,
+                },
+              },
+            },
+          },
         },
       };
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);

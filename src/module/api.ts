@@ -58,29 +58,51 @@ const API = {
       isRandom = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
     }
 
+    // TODO find a better method than this
     let lastElement = '';
+    let specialCaseEndWith1 = false;
+    if(sourceToken.name.endsWith(')')){
+      specialCaseEndWith1 = true;
+    }
     const matches = <any[]>sourceToken.name.match(/(?<=\().+?(?=\))/g);
     if (matches && matches.length > 0) {
       lastElement = matches[matches.length - 1];
     } else {
       lastElement = sourceToken.name;
     }
+    if(specialCaseEndWith1){
+      lastElement = lastElement + ')';
+    }
 
-    const tokenData = <TokenData>await actor.getTokenData();
-    const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
+    let tokenData = <TokenData>await actor.getTokenData();
+    let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
         return t.actor?.id === actor.id;
       }) || undefined;
 
     if (removePolymorpher) {
+
+      const updatesForRevert: any = sourceToken.actor?.getFlag(
+        CONSTANTS.MODULE_NAME,
+        PolymorpherFlags.UPDATES_FOR_REVERT,
+      );
+      if (!updatesForRevert) {
+        warn(`Can't revert this token without the flag '${PolymorpherFlags.UPDATES_FOR_REVERT}'`, true);
+        return;
+      }
+      await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+
       const polyData = listPolymorphers.find((a) => {
+        return lastElement.toLowerCase().includes(a.name.toLowerCase());
+      });
+      const polyDataIndex = listPolymorphers.findIndex((a) => {
         return lastElement.toLowerCase().includes(a.name.toLowerCase());
       });
 
       const animation = polyData?.animation;
-
-      const polyDataIndex = listPolymorphers.findIndex((a) => {
-        return lastElement.toLowerCase().includes(a.name.toLowerCase());
-      });
+      tokenData = updatesForRevert.tokenData || tokenData;
+      tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
+        return t.id === tokenData._id;
+      }) || tokenData;
 
       if (animationExternal && animationExternal.sequence) {
         //@ts-ignore
@@ -105,33 +127,22 @@ const API = {
         // TODO why this is not working???
         //@ts-ignore
         //warpgate.revert(sourceToken.document, mutationName);
-        const updatesForRevert:any = sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.UPDATES_FOR_REVERT);
-        if(!updatesForRevert){
-          warn(`Can't revert this token without the flag '${PolymorpherFlags.UPDATES_FOR_REVERT}'`, true);
-          return;
-        }
-        await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.UPDATES_FOR_REVERT);
         const tokenDataToTransform = updatesForRevert.tokenData;
         const actorDataToTransform = updatesForRevert.actorData;
         const updates = {
-          token : {
-            name: tokenDataToTransform.name, 
+          token: {
+            name: tokenDataToTransform.name,
             img: tokenDataToTransform.img,
             scale: tokenDataToTransform.scale,
             data: tokenDataToTransform,
           },
           actor: {
-            data: actorDataToTransform
-          }
+            data: actorDataToTransform,
+          },
         };
 
         //@ts-ignore
-        await warpgate.mutate(
-          sourceToken.document,
-          updates,
-          {},
-          {},
-        );
+        await warpgate.mutate(sourceToken.document, updates, {}, {});
       }
     } else {
       if (isRandom && isOrdered) {

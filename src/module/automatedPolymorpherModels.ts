@@ -30,7 +30,7 @@ export enum PolymorpherFlags {
   POLYMORPHERS = 'polymorphers',
   RANDOM = 'random',
   ORDERED = 'ordered',
-  UPDATES_FOR_REVERT = 'updatesforrevert'
+  UPDATES_FOR_REVERT = 'updatesforrevert',
 }
 
 export class PolymorpherData {
