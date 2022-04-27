@@ -70,7 +70,7 @@ export const readyHooks = async () => {
       label: removeLabelSheetHeader ? '' : i18n(`${CONSTANTS.MODULE_NAME}.actorSheetBtn`),
       onclick: function openPM(event) {
         const actor = app.object;
-        const token = app.object.token;
+        const token = app.token;
         new PolymorpherManager(actor, token).render(true);
       },
     });
