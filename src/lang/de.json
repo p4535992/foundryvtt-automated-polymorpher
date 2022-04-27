@@ -5,9 +5,9 @@
           "title": "Verwandlungs Manager",
           "confirm": {
             "title": "Entferne Verwandlung",
-            "content": "<p>Bist du dir sicher, dass du diese Verwandlung l&ouml;schen m&ouml;chtest?</p>"
+            "content": "<p>Bist du dir sicher, dass du diese Verwandlung löschen möchtest?</p>"
           },
-          "defaultSummonType": "Standard Beschw&ouml;rungs Typ"
+          "defaultSummonType": "Standard Beschwörungs Typ"
         },
         "random": "Zufall",
         "ordered": "Sortiert"
@@ -26,7 +26,7 @@
         "music2": "Noten",
         "darkness": "Dunkelheit",
         "ice1": "Eis",
-        "magic2": "Beschw&ouml;rung",
+        "magic2": "Beschwörung",
         "lightning2": "Sturm"
       },
       "groups": {
@@ -37,45 +37,44 @@
       "settings": {
         "storeonactor": {
           "title": "Speicher Verwandlungen auf Akteur",
-          "hint": "Speichert die Verwandlungen standardtm&auml;&szlig;ig auf dem Akteur anstatt auf dem Benutzer."
+          "hint": "Speichert die Verwandlungen standardtmäßig auf dem Akteur anstatt auf dem Benutzer."
         },
         "enableautomations": {
           "title": "Aktiviere Automatisierungen",
           "hint": "Aktiviere das automatische Verwandlungssystem beim Wirken von Zaubern."
         },
         "autoclose": {
-          "title": "Automatisches Schlie&szlig;en",
-          "hint": "Schlie&szlig;e automatisch das Verwandlungsfenster nach der Beschw&ouml;rung."
+          "title": "Automatisches Schließen",
+          "hint": "Schließe automatisch das Verwandlungsfenster nach der Beschwörung."
         },
         "hidebutton": {
-          "title": "Verstecke Verwandlungs Schaltfl&auml;che",
-          "hint": "Verstecke die Verwandlungs Schaltfl&auml;che auf Charakterb&ouml;gen."
+          "title": "Verstecke Verwandlungs Schaltfläche",
+          "hint": "Verstecke die Verwandlungs Schaltfläche auf Charakterbögen."
         },
         "restrictOwned": {
           "title": "Nur Akteure in Besitz",
-          "hint": "Schr&auml;nke die Verwandlungsliste auf Akteure ein, bei denen der Benutzer der Besitzer ist."
+          "hint": "Schränke die Verwandlungsliste auf Akteure ein, bei denen der Benutzer der Besitzer ist."
         },
         "restrictOnlyGM": {
-          "title": "Nur der SL sieht die Verwandlungs Schaltfl&auml;che",
-          "hint": "Schr&auml;nke die Verwandlungsliste auf den Spielleiter ein"
+          "title": "Nur der SL sieht die Verwandlungs Schaltfläche",
+          "hint": "Schränke die Verwandlungsliste auf den Spielleiter ein"
         },
         "removeLabelSheetHeader": {
-          "title": "Entferne die Beschriftung der Titelleistenschaltfl&auml;che",
-          "hint": "Entferne die Beschriftung der Titelleistenschaltfl&auml;che, n&uuml;tzlich bei kleineren Monitoren oder Tablets."
+          "title": "Entferne die Beschriftung der Titelleistenschaltfläche",
+          "hint": "Entferne die Beschriftung der Titelleistenschaltfläche, nützlich bei kleineren Monitoren oder Tablets."
         },
         "hudColumn": {
           "title": "HUD Spalte",
-          "hint": "In welcher Spalte des HUDs soll die Schaltfl&auml;che platziert werden"
+          "hint": "In welcher Spalte des HUDs soll die Schaltfläche platziert werden"
         },
         "hudTopBottom": {
           "title": "HUD Oben/Unten",
-          "hint": "Wo in der Spalte soll die Schaltfl&auml;che angezeigt werden."
+          "hint": "Wo in der Spalte soll die Schaltfläche angezeigt werden."
         },
         "hudEnable": {
           "title": "Aktiviere Figur HUD Funktion",
-          "hint": "Vermeide das Rendern des Verwandlungs Managers f&uuml;r schnelle Verwandlungen, wenn du auf die HUD-Schaltfl&auml;che klickst. Alle Einheiten mit einem 'Standardbeschw&ouml;rungstyp', welcher in der Figur/Akteur-Konfiguration eingestellt ist, lassen dich das Rendern des Verwandlungs-Managers &uuml;berspringen, das kann f&uuml;r schnelle K&auml;mpfe sehr n&uuml;tzlich sein. Es gibt zwei Optionen 'Zufall' und 'Sortiert', die du einstellen kannst, du kannst nicht beides aktivieren.. Denke daran, dass du das Token besitzen musst, um die HUD-Schaltfl&auml;che zu sehen"
+          "hint": "Vermeide das Rendern des Verwandlungs Managers für schnelle Verwandlungen, wenn du auf die HUD-Schaltfläche klickst. Alle Einheiten mit einem 'Standardbeschwörungstyp', welcher in der Figur/Akteur-Konfiguration eingestellt ist, lassen dich das Rendern des Verwandlungs-Managers überspringen, das kann für schnelle Kämpfe sehr nützlich sein. Es gibt zwei Optionen 'Zufall' und 'Sortiert', die du einstellen kannst, du kannst nicht beides aktivieren.. Denke daran, dass du das Token besitzen musst, um die HUD-Schaltfläche zu sehen"
         }
       }
     }
-  }
-  
+  }  
