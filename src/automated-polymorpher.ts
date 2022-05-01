@@ -118,8 +118,9 @@ Hooks.once('libChangelogsReady', function () {
   libChangelogs.register(
     CONSTANTS.MODULE_NAME,
     `
-    - Bug fix on setting labels
-  `,
+    - Merge de.json file for language
+    - Bug fix: [Doesn't work in v9 latest](https://github.com/p4535992/foundryvtt-automated-polymorpher/issues/5)
+    `,
     'minor',
   );
 });
