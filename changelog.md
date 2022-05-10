@@ -1,3 +1,7 @@
+### 1.0.22
+
+- Little update hud position feature
+
 ### 1.0.21
 
 - Merge de.json file for langugae
