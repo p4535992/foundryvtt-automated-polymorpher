@@ -108,7 +108,7 @@ the actions on the hud button are of two types left click and right click.
 
 # API
 
-###  async game.modules.get('automated-polymorpher').invokePolymorpherManager(sourceTokenId: string, removePolymorpher = false, ordered = false, random = false, animationExternal:{ sequence:Sequence, timeToWait:number }|undefined = undefined) ⇒ <code>Promise.&lt;void&gt;</code>
+###  async game.modules.get('automated-polymorpher').api.invokePolymorpherManager(sourceTokenId: string, removePolymorpher = false, ordered = false, random = false, animationExternal:{ sequence:Sequence, timeToWait:number }|undefined = undefined) ⇒ <code>Promise.&lt;void&gt;</code>
 
 Invoke the polymorpher manager feature from macro
 
@@ -162,7 +162,7 @@ let sequence = new Sequence()
 game.modules.get('automated-polymorpher').api.invokePolymorpherManager('Zruggig Widebrain', false, false, false, { sequence: sequence, timeToWait 1100})
 ```
 
-## Integration with socketLib
+#### Integration with socketLib
 
 
 ```
@@ -194,6 +194,14 @@ let sequence = new Sequence()
 
 game.modules.get('automated-polymorpher').socket.executeAsGM('invokePolymorpherManager',['Zruggig Widebrain', false, false, false, { sequence: sequence, timeToWait 1100}]);
 ```
+
+### Macro to clean up flags on token and actor
+
+####  async game.modules.get('automated-polymorpher').api.cleanUpTokenSelected() ⇒ <code>Promise.&lt;void&gt;</code>
+
+**Examples**:
+
+`game.modules.get('automated-polymorpher').api.cleanUpTokenSelected()`
 
 # Build
 

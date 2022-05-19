@@ -355,7 +355,11 @@ export class PolymorpherManager extends FormApplication {
         },
       };
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
-
+      const arrayMutationNames:string[] = <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
+        || [];
+      const mutationNameOriginalToken = tokenFromTransform.id+randomID();
+      arrayMutationNames.push(mutationNameOriginalToken);
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
       //@ts-ignore
       await warpgate.mutate(
@@ -363,7 +367,7 @@ export class PolymorpherManager extends FormApplication {
         updates, // tokenDataToTransform, //{}, //customTokenData || {},
         {},
         {
-          name: tokenFromTransform.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+          name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
         },
       );
 
@@ -739,7 +743,11 @@ export class PolymorpherManager extends FormApplication {
         },
       };
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
-
+      const arrayMutationNames:string[] = <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
+        || [];
+      const mutationNameOriginalToken = tokenFromTransform.id+randomID();
+      arrayMutationNames.push(mutationNameOriginalToken);
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
       //@ts-ignore
       await warpgate.mutate(
@@ -747,7 +755,7 @@ export class PolymorpherManager extends FormApplication {
         updates, // tokenDataToTransform, // {}, // customTokenData || {},
         {},
         {
-          name: tokenFromTransform.actor?.id, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+          name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
         },
       );
     }

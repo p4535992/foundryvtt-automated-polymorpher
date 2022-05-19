@@ -2,7 +2,7 @@ import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
-import { error, wait, warn } from './lib/lib';
+import { error, info, wait, warn } from './lib/lib';
 import { PolymorpherManager } from './polymorphermanager';
 
 const API = {
@@ -86,9 +86,13 @@ const API = {
         PolymorpherFlags.UPDATES_FOR_REVERT,
       );
       if (!updatesForRevert) {
+        await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+        await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
         warn(`Can't revert this token without the flag '${PolymorpherFlags.UPDATES_FOR_REVERT}'`, true);
         return;
       }
+      const arrayMutationNames:string[] = <string[]>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+      await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
       await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
 
       const polyData = listPolymorphers.find((a) => {
@@ -123,10 +127,12 @@ const API = {
         //@ts-ignore
         actor?.revertOriginalForm();
       } else {
-        //const mutationName = <string>actor.id;
-        // TODO why this is not working???
-        //@ts-ignore
-        //warpgate.revert(sourceToken.document, mutationName);
+        for(const revertName of arrayMutationNames){
+          info(`Revert token ${sourceToken.name}`);
+          //@ts-ignore
+          await warpgate.revert(sourceToken.document, revertName);
+        }
+        /*
         const tokenDataToTransform = updatesForRevert.tokenData;
         const actorDataToTransform = updatesForRevert.actorData;
         const updates = {
@@ -143,6 +149,7 @@ const API = {
 
         //@ts-ignore
         await warpgate.mutate(sourceToken.document, updates, {}, {});
+        */
       }
     } else {
       if (isRandom && isOrdered) {
@@ -186,6 +193,44 @@ const API = {
         }
       } else {
         new PolymorpherManager(actor, sourceToken).render(true);
+      }
+    }
+  },
+
+  async cleanUpTokenSelected() {
+    const tokens = <Token[]>canvas.tokens?.controlled;
+    if (!tokens || tokens.length === 0) {
+      warn(`No tokens are selected`, true);
+      return;
+    }
+    for (const token of tokens) {
+      if (token && token.document) {
+        if (getProperty(token.document, `data.flags.${CONSTANTS.MODULE_NAME}`)) {
+          const p = getProperty(token.document, `data.flags.${CONSTANTS.MODULE_NAME}`);
+          for (const key in p) {
+            const senseOrConditionIdKey = key;
+            const senseOrConditionValue = <any>p[key];
+            await token.document.unsetFlag(CONSTANTS.MODULE_NAME, senseOrConditionIdKey);
+          }
+          info(`Cleaned up token '${token.name}'`, true);
+        }
+      } else {
+        warn(`No token found on the canvas for id '${token.id}'`, true);
+      }
+    }
+    for (const token of tokens) {
+      if (token && token.actor) {
+        if (getProperty(token.actor, `data.flags.${CONSTANTS.MODULE_NAME}`)) {
+          const p = getProperty(token.actor, `data.flags.${CONSTANTS.MODULE_NAME}`);
+          for (const key in p) {
+            const senseOrConditionIdKey = key;
+            const senseOrConditionValue = <any>p[key];
+            await token.actor.unsetFlag(CONSTANTS.MODULE_NAME, senseOrConditionIdKey);
+          }
+          info(`Cleaned up actor '${token.name}'`, true);
+        }
+      } else {
+        warn(`No token found on the canvas for id '${token.id}'`, true);
       }
     }
   },

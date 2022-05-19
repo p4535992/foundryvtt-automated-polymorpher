@@ -1,3 +1,5 @@
+### 1.0.23
+
 ### 1.0.22
 
 - Little update hud position feature
