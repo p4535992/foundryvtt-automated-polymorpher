@@ -73,5 +73,9 @@
     {
       "name": "socketlib"
     }
-  ]
+  ],
+  "flags": {
+    "manifestPlusVersion": "1.2.0",
+    "allowBugReporter": true
+  }
 }

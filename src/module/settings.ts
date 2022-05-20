@@ -121,8 +121,8 @@ export const registerSettings = function () {
   });
 
   game.settings.register(CONSTANTS.MODULE_NAME, 'hudColorButton', {
-    name: i18n(CONSTANTS.MODULE_NAME + '.settings.hudColorButton.title'),
-    hint: i18n(CONSTANTS.MODULE_NAME + '.settings.hudColorButton.hint'),
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudColorButton.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hudColorButton.hint`),
     scope: 'client',
     type: String,
     default: '#b8860b',
