@@ -355,9 +355,9 @@ export class PolymorpherManager extends FormApplication {
         },
       };
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
-      const arrayMutationNames:string[] = <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
-        || [];
-      const mutationNameOriginalToken = tokenFromTransform.id+randomID();
+      const arrayMutationNames: string[] =
+        <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
+      const mutationNameOriginalToken = tokenFromTransform.id + randomID();
       arrayMutationNames.push(mutationNameOriginalToken);
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
@@ -743,9 +743,9 @@ export class PolymorpherManager extends FormApplication {
         },
       };
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
-      const arrayMutationNames:string[] = <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
-        || [];
-      const mutationNameOriginalToken = tokenFromTransform.id+randomID();
+      const arrayMutationNames: string[] =
+        <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
+      const mutationNameOriginalToken = tokenFromTransform.id + randomID();
       arrayMutationNames.push(mutationNameOriginalToken);
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
       //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})

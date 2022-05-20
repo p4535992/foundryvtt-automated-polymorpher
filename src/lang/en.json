@@ -74,6 +74,10 @@
       "hudEnable": {
         "title": "Enable token HUD feature",
         "hint": "Avoid the rendering of the polymorpher manager for fast polymorphing when click on the hud button. All the entities with a 'default summon type' setted on the token/actor configuration, will let you avoid the rendering of the polymorpher manager, can be really useful for fast combat, there two options 'random' and 'ordered' you can't enable both. Remember you must own the token for see the HUD button"
+      },
+      "hudColorButton": {
+        "title": "HUD feature color button",
+        "hint": "Choose what color to use for the HUD button"
       }
     }
   }

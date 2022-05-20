@@ -31,7 +31,7 @@ export enum PolymorpherFlags {
   RANDOM = 'random',
   ORDERED = 'ordered',
   UPDATES_FOR_REVERT = 'updatesforrevert',
-  MUTATION_NAMES_FOR_REVERT = 'mutationNamesForRevert'
+  MUTATION_NAMES_FOR_REVERT = 'mutationNamesForRevert',
 }
 
 export class PolymorpherData {

@@ -1,4 +1,11 @@
+### 1.0.24
+
+- Add module setting for apply a custom color to the hud button
+- Tested with SWADE
+
 ### 1.0.23
+
+- Finay fixed the warpgate revert bug (not bug just me being stupid)
 
 ### 1.0.22
 

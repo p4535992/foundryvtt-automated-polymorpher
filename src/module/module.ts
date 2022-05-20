@@ -76,13 +76,45 @@ export const readyHooks = async () => {
     });
   });
 
-  Hooks.on('renderTokenHUD', (app, html, data) => {
+  Hooks.on(
+    'renderActorSheet',
+    async function (actorSheet: ActorSheet, htmlElement: JQuery<HTMLElement>, actorObject: any) {
+      const settingHudColorButton = <string>game.settings.get(CONSTANTS.MODULE_NAME, 'hudColorButton') ?? '#b8860b';
+      if (htmlElement.find('.open-pm')?.length > 0) {
+        (<HTMLElement>htmlElement.find('.open-pm .fa-wind')[0]).style.color = `${settingHudColorButton}`;
+        (<HTMLElement>htmlElement.find('.open-pm .fa-wind')[0]).style.textShadow = `0 0 8px ${settingHudColorButton}`;
+      }
+    },
+  );
+
+  Hooks.on('renderTokenHUD', (app, html: JQuery<HTMLElement>, data) => {
     // const restrictedOnlyGM = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOnlyGM');
     // if (restrictedOnlyGM && !game.user?.isGM) {
     //   return;
     // }
     if (game.settings.get(CONSTANTS.MODULE_NAME, 'hudEnable')) {
       renderAutomatedPolymorpherHud(app, html, data);
+
+      const settingHudColorButton = <string>game.settings.get(CONSTANTS.MODULE_NAME, 'hudColorButton') ?? '#b8860b';
+      if (html.find('.control-icon.automated-polymorpher .fa-wind')?.length > 0) {
+        (<HTMLElement>(
+          html.find('.control-icon.automated-polymorpher .fa-wind')[0]
+        )).style.color = `${settingHudColorButton}`;
+        (<HTMLElement>(
+          html.find('.control-icon.automated-polymorpher .fa-wind')[0]
+        )).style.textShadow = `0 0 8px ${settingHudColorButton}`;
+      }
     }
+  });
+
+  Hooks.on('renderSettingsConfig', (app, html, data) => {
+    // Add colour pickers to the Configure Game Settings: Module Settings menu
+    const nameHudColorButton = `${CONSTANTS.MODULE_NAME}.hudColorButton`;
+    const settingHudColorButton = <string>game.settings.get(CONSTANTS.MODULE_NAME, 'hudColorButton') ?? '#b8860b';
+    $('<input>')
+      .attr('type', 'color')
+      .attr('data-edit', nameHudColorButton)
+      .val(settingHudColorButton)
+      .insertAfter($(`input[name="${nameHudColorButton}"]`, html).addClass('color'));
   });
 };
