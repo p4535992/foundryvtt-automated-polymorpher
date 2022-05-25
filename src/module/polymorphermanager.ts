@@ -1,8 +1,9 @@
 import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
+import { info } from 'console';
 import { ANIMATIONS } from './animations';
-import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
+import { PolymorpherData, PolymorpherFlags, PolymorpherCompendiumData } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
-import { i18n, wait, warn } from './lib/lib';
+import { error, i18n, wait, warn } from './lib/lib';
 
 export class PolymorpherManager extends FormApplication {
   // caster: Actor;
@@ -37,10 +38,31 @@ export class PolymorpherManager extends FormApplication {
     const data = <any>super.getData();
     data.random = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
     data.ordered = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
+
+    // Retrieve compendiums with actor
+    const currentCompendium = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM) ?? '';
+    const compendiumsData:PolymorpherCompendiumData[] = [];
+    const compDataNone = <PolymorpherCompendiumData>{
+      id:'', // 'world.shapes-compendium'
+      name: 'None',
+      selected: currentCompendium ? false : true
+    }
+    compendiumsData.push(compDataNone);
+    for(const comp of game.packs.contents){
+      if(comp.metadata.type === 'Actor'){
+        const compData = <PolymorpherCompendiumData>{
+          id: comp.collection, // 'world.shapes-compendium'
+          name: comp.name,
+          selected: currentCompendium === comp.collection ? true : false
+        }
+        compendiumsData.push(compData);
+      }
+    }
+    data.compendiums = compendiumsData;
     return data;
   }
 
-  async activateListeners(html) {
+  async activateListeners(html:JQuery<HTMLElement>) {
     html
       .find('#polymorpher-list')
       .before(
@@ -52,10 +74,10 @@ export class PolymorpherManager extends FormApplication {
     html.on('click', '#summon-polymorpher', this._onSummonPolymorpher.bind(this));
     html.on('click', '.actor-name', this._onOpenSheet.bind(this));
     html.on('dragstart', '#polymorpher', async (event) => {
-      event.originalEvent.dataTransfer.setData('text/plain', event.currentTarget.dataset.elid);
+      event.originalEvent?.dataTransfer?.setData('text/plain', event.currentTarget.dataset.elid);
     });
     html.on('dragend', '#polymorpher', async (event) => {
-      event.originalEvent.dataTransfer.setData('text/plain', event.currentTarget.dataset.elid);
+      event.originalEvent?.dataTransfer?.setData('text/plain', event.currentTarget.dataset.elid);
     });
   }
 
@@ -96,6 +118,7 @@ export class PolymorpherManager extends FormApplication {
         animation: '',
         number: 0,
         defaultsummontype: '',
+        compendiumid: ''
       }),
     );
     this.saveData();
@@ -201,9 +224,11 @@ export class PolymorpherManager extends FormApplication {
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
+                info( `${this.actor.name} turns into a ${sourceActor.name}`);
+                // TODO show on chat ?
+                //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                await this.actor.transformInto(
-                  // await this._transformIntoCustom(
+                const [newToken] = await this.actor.transformInto(
                   sourceActor,
                   rememberOptions(html),
                 );
@@ -229,9 +254,11 @@ export class PolymorpherManager extends FormApplication {
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
+                info( `${this.actor.name} turns into a ${sourceActor.name}`);
+                // TODO show on chat ?
+                //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                await this.actor.transformInto(
-                  // await this._transformIntoCustom(
+                const [newToken] = await this.actor.transformInto(
                   sourceActor,
                   {
                     keepBio: true,
@@ -264,9 +291,11 @@ export class PolymorpherManager extends FormApplication {
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
+                info( `${this.actor.name} turns into a ${sourceActor.name}`);
+                // TODO show on chat ?
+                //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                await this.actor.transformInto(
-                  // await this._transformIntoCustom(
+                const [newToken] = await this.actor.transformInto(
                   sourceActor,
                   {
                     transformTokens: rememberOptions(html).transformTokens,
@@ -360,7 +389,9 @@ export class PolymorpherManager extends FormApplication {
       const mutationNameOriginalToken = tokenFromTransform.id + randomID();
       arrayMutationNames.push(mutationNameOriginalToken);
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
-      //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
+      info( `${this.actor.name} mutate into a ${sourceActor.name}`);
+      // TODO show on chat ?
+      //await ChatMessage.create({content: `${this.actor.name} mutate into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
       //@ts-ignore
       await warpgate.mutate(
         tokenFromTransform.document,
@@ -479,7 +510,7 @@ export class PolymorpherManager extends FormApplication {
   }
 
   async saveData() {
-    const data: PolymorpherData[] = [];
+    let data: PolymorpherData[] = [];
     for (const polymorpher of this.element.find('.polymorpher-item')) {
       data.push({
         id: <string>polymorpher.dataset.aid,
@@ -487,14 +518,44 @@ export class PolymorpherManager extends FormApplication {
         animation: <string>$(polymorpher).find('.anim-dropdown').val(),
         number: <number>$(polymorpher).find('#polymorpher-number-val').val(),
         defaultsummontype: <string>$(polymorpher).find('.defaultSummonType').val(),
+        compendiumid: ''
       });
     }
 
     const isOrdered = <string>this.element.parent().find('.polymorpher-ordered').val() === 'true' ?? false;
     const isRandom = <string>this.element.parent().find('.polymorpher-random').val() === 'true' ?? false;
+    const currentCompendium = <string>this.element.parent().find('.polymorpher-selectcompendium').val();
 
     if (isRandom && isOrdered) {
       warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
+    }
+
+    if(currentCompendium && currentCompendium != this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM)){
+      // Reference a Compendium pack by it's callection ID
+      const pack = <CompendiumCollection<CompendiumCollection.Metadata>>game.packs.find(p => p.collection === currentCompendium);
+      if(!pack){
+        error(`No pack is found with id '${currentCompendium}'`, true);
+      }else{
+        if (!pack.indexed){
+          await pack.getIndex();
+        }
+        data = [];
+        //const compendium = <StoredDocument<Actor>[]>(await game.packs?.get(currentCompendium)?.getDocuments());
+        const compendium = <StoredDocument<Actor>[]>(await pack?.getDocuments());
+        //.sort((a, b) => a.name?.localeCompare(b.name));
+        for (const shapeOption of compendium) {
+          const polymorpher = <Actor>shapeOption;
+          // TODO we can add some filter
+          data.push({
+            id: <string>polymorpher.data._id,
+            name: <string>polymorpher.data.name,
+            animation: <string>$(polymorpher).find('.anim-dropdown').val(),
+            number: <number>$(polymorpher).find('#polymorpher-number-val').val(),
+            defaultsummontype: <string>$(polymorpher).find('.defaultSummonType').val(),
+            compendiumid: <string>currentCompendium
+          });
+        }
+      }
     }
 
     // this.actor &&
@@ -524,7 +585,16 @@ export class PolymorpherManager extends FormApplication {
   ) {
     this.minimize();
 
-    const actorToTransform = <Actor>game.actors?.get(polymorpherData.id);
+    let actorToTransform = <Actor>game.actors?.get(polymorpherData.id);
+    if(polymorpherData.compendiumid){
+      const pack = <CompendiumCollection<CompendiumCollection.Metadata>>game.packs.get(polymorpherData.compendiumid);
+      if (!pack.indexed){
+        await pack.getIndex();
+      }
+      const actorToTransformTmp = <StoredDocument<Actor>>await pack.getDocument(polymorpherData.id);
+      actorToTransform = actorToTransformTmp;
+    }
+
     const animation = polymorpherData.animation;
     if (!actorToTransform) {
       warn(
@@ -594,9 +664,11 @@ export class PolymorpherManager extends FormApplication {
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
+        info( `${this.actor.name} turns into a ${sourceActor.name}`);
+        // TODO show on chat ?
+        //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
-        await this.actor.transformInto(
-          // await this._transformIntoCustom(
+        const [newToken] = await this.actor.transformInto(
           sourceActor,
           // rememberOptions(html),
           {
@@ -634,9 +706,11 @@ export class PolymorpherManager extends FormApplication {
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
+        info( `${this.actor.name} turns into a ${sourceActor.name}`);
+        // TODO show on chat ?
+        //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
-        await this.actor.transformInto(
-          // await this._transformIntoCustom(
+        const [newToken] = await this.actor.transformInto(
           sourceActor,
           {
             keepBio: true,
@@ -666,9 +740,11 @@ export class PolymorpherManager extends FormApplication {
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
+        info( `${this.actor.name} turns into a ${sourceActor.name}`);
+        // TODO show on chat ?
+        //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
-        await this.actor.transformInto(
-          // await this._transformIntoCustom(
+        const [newToken] = await this.actor.transformInto(
           sourceActor,
           {
             keepPhysical: false,
@@ -748,7 +824,9 @@ export class PolymorpherManager extends FormApplication {
       const mutationNameOriginalToken = tokenFromTransform.id + randomID();
       arrayMutationNames.push(mutationNameOriginalToken);
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
-      //async warpgate.mutate(tokenDoc, updates = {}, callbacks = {}, options = {})
+      info( `${this.actor.name} mutate into a ${sourceActor.name}`);
+      // TODO show on chat ?
+      //await ChatMessage.create({content: `${this.actor.name} mutate into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
       //@ts-ignore
       await warpgate.mutate(
         tokenFromTransform.document,

@@ -125,32 +125,19 @@ const API = {
 
       // Do something with left click
       if (game.system.id === 'dnd5e') {
+        info(`${actor.name} reverts to their original form`);
+        // TODO show on chat ?
+        //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
         actor?.revertOriginalForm();
       } else {
         for (const revertName of arrayMutationNames) {
-          info(`Revert token ${sourceToken.name}`);
+          info(`${actor.name} reverts to their original form`);
+          // TODO show on chat ?
+          //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
           //@ts-ignore
           await warpgate.revert(sourceToken.document, revertName);
         }
-        /*
-        const tokenDataToTransform = updatesForRevert.tokenData;
-        const actorDataToTransform = updatesForRevert.actorData;
-        const updates = {
-          token: {
-            name: tokenDataToTransform.name,
-            img: tokenDataToTransform.img,
-            scale: tokenDataToTransform.scale,
-            data: tokenDataToTransform,
-          },
-          actor: {
-            data: actorDataToTransform,
-          },
-        };
-
-        //@ts-ignore
-        await warpgate.mutate(sourceToken.document, updates, {}, {});
-        */
       }
     } else {
       if (isRandom && isOrdered) {

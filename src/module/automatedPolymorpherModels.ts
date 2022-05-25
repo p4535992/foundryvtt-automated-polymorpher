@@ -30,6 +30,7 @@ export enum PolymorpherFlags {
   POLYMORPHERS = 'polymorphers',
   RANDOM = 'random',
   ORDERED = 'ordered',
+  COMPENDIUM = 'compendium',
   UPDATES_FOR_REVERT = 'updatesforrevert',
   MUTATION_NAMES_FOR_REVERT = 'mutationNamesForRevert',
 }
@@ -40,4 +41,11 @@ export class PolymorpherData {
   animation: string;
   number: number;
   defaultsummontype: string;
+  compendiumid: string;
+}
+
+export class PolymorpherCompendiumData {
+  id: string;
+  name: string;
+  selected: boolean;
 }
