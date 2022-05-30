@@ -122,6 +122,8 @@ Invoke the polymorpher manager feature from macro
 | random | <code>boolean</code> | The 'random' feature is enabled for this polymorphing | <code>0</code> |
 | animationExternal | <code>{ sequence:Sequence, timeToWait:number }</code> | Advanced: Use your personal sequence animation and the time needed to wait before the polymorph action, checkout the [Sequencer module](https://github.com/fantasycalendar/FoundryVTT-Sequencer) for more information  | <code>undefined</code> |
 
+**NOTE:** If both 'random' and 'ordered' are false the standard dialog will be rendered.
+
 **Examples**:
 
 `game.modules.get('automated-polymorpher').api.invokePolymorpherManager('Zruggig Widebrain')`
