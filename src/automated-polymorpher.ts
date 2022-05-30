@@ -17,12 +17,13 @@ import { initHooks, readyHooks, setupHooks } from './module/module';
 import { registerSettings } from './module/settings';
 import CONSTANTS from './module/constants';
 import type API from './module/api';
+import { log } from './module/lib/lib';
 
 /* ------------------------------------ */
 /* Initialize module					*/
 /* ------------------------------------ */
 Hooks.once('init', async () => {
-  console.log(`${CONSTANTS.MODULE_NAME} | Initializing ${CONSTANTS.MODULE_NAME}`);
+  log(`${CONSTANTS.MODULE_NAME} | Initializing ${CONSTANTS.MODULE_NAME}`);
 
   // Register custom module settings
   registerSettings();

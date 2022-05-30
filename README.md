@@ -164,7 +164,15 @@ let sequence = new Sequence()
 game.modules.get('automated-polymorpher').api.invokePolymorpherManager('Zruggig Widebrain', false, false, false, { sequence: sequence, timeToWait 1100})
 ```
 
-#### Integration with socketLib
+### Macro to clean up flags on token and actor
+
+####  async game.modules.get('automated-polymorpher').api.cleanUpTokenSelected() ⇒ <code>Promise.&lt;void&gt;</code>
+
+**Examples**:
+
+`game.modules.get('automated-polymorpher').api.cleanUpTokenSelected()`
+
+## Integration with socketLib
 
 
 ```
@@ -196,14 +204,6 @@ let sequence = new Sequence()
 
 game.modules.get('automated-polymorpher').socket.executeAsGM('invokePolymorpherManager',['Zruggig Widebrain', false, false, false, { sequence: sequence, timeToWait 1100}]);
 ```
-
-### Macro to clean up flags on token and actor
-
-####  async game.modules.get('automated-polymorpher').api.cleanUpTokenSelected() ⇒ <code>Promise.&lt;void&gt;</code>
-
-**Examples**:
-
-`game.modules.get('automated-polymorpher').api.cleanUpTokenSelected()`
 
 # Build
 

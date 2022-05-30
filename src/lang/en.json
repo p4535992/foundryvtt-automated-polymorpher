@@ -10,7 +10,9 @@
         "defaultSummonType": "Default summon type"
       },
       "random": "Random",
-      "ordered": "Ordered"
+      "ordered": "Ordered",
+      "selectcompendium": "Select a copendium",
+      "deleteall": "Delete All"
     },
     "actorSheetBtn": "Polymorphers",
     "animations": {

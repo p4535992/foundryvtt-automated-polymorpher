@@ -22,22 +22,22 @@ const API = {
   },
 
   async invokePolymorpherManager(
-    sourceTokenId: string,
+    sourceTokenIdOrName: string,
     removePolymorpher = false,
     ordered = false,
     random = false,
     animationExternal: { sequence: undefined; timeToWait: 0 } | undefined = undefined,
   ): Promise<void> {
-    const sourceToken = canvas.tokens?.placeables.find((t: Token) => {
-      return t.id === sourceTokenId;
+    const sourceToken = canvas.tokens?.placeables.find((t) => {
+      return t.id === sourceTokenIdOrName || t.name === sourceTokenIdOrName;
     });
     if (!sourceToken) {
-      warn(`No token founded on canvas with id '${sourceTokenId}'`, true);
+      warn(`No token founded on canvas with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
-    const actor = <Actor>sourceToken.actor;
+    const actor = sourceToken.document.actor;
     if (!actor) {
-      warn(`No actor founded on canvas with token '${sourceTokenId}'`, true);
+      warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
     const listPolymorphers: PolymorpherData[] =
