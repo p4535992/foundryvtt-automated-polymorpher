@@ -81,7 +81,14 @@ export class PolymorpherManager extends FormApplication {
     html.on('change', '#polymorpher-selectcompendium', async (event) => {
       const currentCompendium = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM) ?? '';
       if(event.currentTarget.value != currentCompendium){
-        await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, event.currentTarget.value);
+        if(event.currentTarget.value){
+          await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, event.currentTarget.value);
+          await this.loadPolymorphers();
+        }else{
+          await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, []);
+          await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, event.currentTarget.value);
+          await this.loadPolymorphers();
+        }
       }
     });
 
@@ -89,6 +96,7 @@ export class PolymorpherManager extends FormApplication {
       event.preventDefault();
       event.stopPropagation();
       await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, []);
+      $('#polymorpher-list').empty()
     });
   }
 
@@ -199,7 +207,7 @@ export class PolymorpherManager extends FormApplication {
     if (!sourceActor) {
       return;
     }
-    if (game.system.id === 'dnd5e') {
+    if (game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
       const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
       if (!canPolymorph) {
         warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
@@ -526,7 +534,7 @@ export class PolymorpherManager extends FormApplication {
       return '';
     }
 
-    const isDnd5e = game.system.id === 'dnd5e';
+    const isDnd5e = game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate');
 
     const restricted = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOwned');
     if (restricted && !actorToTransformLi.isOwner) return '';
@@ -718,7 +726,7 @@ export class PolymorpherManager extends FormApplication {
     if (!sourceActor) {
       return;
     }
-    if (game.system.id === 'dnd5e') {
+    if (game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
       const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
       if (!canPolymorph) {
         warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
@@ -763,7 +771,7 @@ export class PolymorpherManager extends FormApplication {
             } else {
               ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
             }
-            await this.wait(ANIMATIONS.animationFunctions[animation].time);
+            await wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
         info( `${this.actor.name} turns into a ${sourceActor.name}`);

@@ -128,4 +128,13 @@ export const registerSettings = function () {
     default: '#b8860b',
     config: true,
   });
+
+  game.settings.register(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.forceUseOfWarpgate.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.forceUseOfWarpgate.hint`),
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: false,
+  });
 };

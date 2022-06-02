@@ -80,6 +80,10 @@
       "hudColorButton": {
         "title": "HUD feature color button",
         "hint": "Choose what color to use for the HUD button"
+      },
+      "forceUseOfWarpgate": {
+        "title": "Force use of Warpgate",
+        "hint": "If enabled it will use the warpgate mutate function instead the system default mechanism if present, e.g. DnD5e has is own Polymorpher mechanism"
       }
     }
   }

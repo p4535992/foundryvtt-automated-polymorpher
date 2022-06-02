@@ -32,12 +32,12 @@ const API = {
       return t.id === sourceTokenIdOrName || t.name === sourceTokenIdOrName;
     });
     if (!sourceToken) {
-      warn(`No token founded on canvas with id/name '${sourceTokenIdOrName}'`, true);
+      // warn(`No token founded on canvas with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
     const actor = sourceToken.document.actor;
     if (!actor) {
-      warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
+      // warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
     const listPolymorphers: PolymorpherData[] =
@@ -74,7 +74,7 @@ const API = {
       lastElement = lastElement + ')';
     }
 
-    let tokenData = <TokenData>await actor.getTokenData();
+    let tokenDataToTransform = <TokenData>await actor.getTokenData();
     let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
         return t.actor?.id === actor.id;
       }) || undefined;
@@ -104,10 +104,10 @@ const API = {
       });
 
       const animation = polyData?.animation;
-      tokenData = updatesForRevert.tokenData || tokenData;
+      tokenDataToTransform = updatesForRevert.tokenData || tokenDataToTransform;
       tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
-          return t.id === tokenData._id;
-        }) || tokenData;
+          return t.id === tokenDataToTransform._id;
+        }) || tokenDataToTransform;
 
       if (animationExternal && animationExternal.sequence) {
         //@ts-ignore
@@ -116,15 +116,18 @@ const API = {
       } else if (animation) {
         if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
           //@ts-ignore
-          game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.execute(tokenFromTransform, tokenData);
+          game.macros
+            ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+            //@ts-ignore
+            ?.execute({ tokenFromTransform, tokenDataToTransform });
         } else {
-          ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenData);
+          ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
         }
         await wait(ANIMATIONS.animationFunctions[animation].time);
       }
 
       // Do something with left click
-      if (game.system.id === 'dnd5e') {
+      if (game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
         info(`${actor.name} reverts to their original form`);
         // TODO show on chat ?
         //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});

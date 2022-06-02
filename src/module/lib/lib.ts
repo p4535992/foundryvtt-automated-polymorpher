@@ -128,7 +128,7 @@ export async function renderAutomatedPolymorpherHud(app, html, hudToken) {
 
   const actor = <Actor>sourceToken.actor;
   if (!actor) {
-    warn(`No actor founded on canvas with token '${sourceToken.id}'`, true);
+    // warn(`No actor founded on canvas with token '${sourceToken.id}'`, true);
     return;
   }
 
@@ -162,7 +162,7 @@ function addToPolymorphButton(html, sourceToken: Token) {
 
   const actor = <Actor>sourceToken.actor;
   if (!actor) {
-    warn(`No actor founded on canvas with token '${sourceToken.id}'`, true);
+    // warn(`No actor founded on canvas with token '${sourceToken.id}'`, true);
     return;
   }
 

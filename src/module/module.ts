@@ -43,7 +43,7 @@ export const readyHooks = async () => {
   if (!automatedpolymorphers) {
     automatedpolymorphers = {};
   }
-  if (game.system.id == 'dnd5e') {
+  if (game.system.id == 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
     automatedpolymorphers['dnd5e'] = {
       // TODO PREPARE SOME PRESET
     };
