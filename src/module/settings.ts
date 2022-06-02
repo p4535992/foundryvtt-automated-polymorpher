@@ -48,7 +48,7 @@ export const registerSettings = function () {
     scope: 'world',
     config: true,
     type: Boolean,
-    default: true,
+    default: false,
   });
   game.settings.register(CONSTANTS.MODULE_NAME, 'hidebutton', {
     name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hidebutton.title`),

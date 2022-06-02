@@ -2,11 +2,11 @@ import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags, PolymorpherCompendiumData } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
-import { error, i18n, info, wait, warn } from './lib/lib';
+import { error, i18n, info, retrieveActorFromData, wait, warn } from './lib/lib';
 
 export class PolymorpherManager extends FormApplication {
   // caster: Actor;
-  summons: any[] | undefined;
+  summons: PolymorpherData[];
   // spellLevel: number | undefined;
   actor: Actor;
   token: Token;
@@ -14,7 +14,7 @@ export class PolymorpherManager extends FormApplication {
   constructor(actor: Actor, token: Token, summonData?: PolymorpherData[]) {
     super({});
     // this.caster = actor;
-    this.summons = summonData;
+    this.summons = summonData ? summonData : [];
     // this.spellLevel = spellLevel;
     this.actor = actor;
     this.token = token;
@@ -38,15 +38,26 @@ export class PolymorpherManager extends FormApplication {
     data.random = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
     data.ordered = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
 
+    const storeOnActorFlag = <boolean>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR);
+    data.storeonactor = storeOnActorFlag != null && storeOnActorFlag != undefined 
+      ? storeOnActorFlag
+      : <boolean>game.settings.get(CONSTANTS.MODULE_NAME,'storeonactor')
+
     // Retrieve compendiums with actor
     const currentCompendium = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM) ?? '';
     const compendiumsData:PolymorpherCompendiumData[] = [];
     const compDataNone = <PolymorpherCompendiumData>{
       id:'', // 'world.shapes-compendium'
-      name: 'None',
+      name: i18n(`${CONSTANTS.MODULE_NAME}.dialogs.none`),
+      selected: currentCompendium ? false : true
+    }
+    const compDataNoneNoDelete = <PolymorpherCompendiumData>{
+      id:'nonenodelete', // 'world.shapes-compendium'
+      name: i18n(`${CONSTANTS.MODULE_NAME}.dialogs.nonenodelete`),
       selected: currentCompendium ? false : true
     }
     compendiumsData.push(compDataNone);
+    compendiumsData.push(compDataNoneNoDelete);
     for(const comp of game.packs.contents){
       if(comp.metadata.type === 'Actor'){
         const compData = <PolymorpherCompendiumData>{
@@ -80,14 +91,22 @@ export class PolymorpherManager extends FormApplication {
     });
     html.on('change', '#polymorpher-selectcompendium', async (event) => {
       const currentCompendium = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM) ?? '';
-      if(event.currentTarget.value != currentCompendium){
-        if(event.currentTarget.value){
-          await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, event.currentTarget.value);
+      const changedCompendium = event.currentTarget.value;
+      if(changedCompendium != currentCompendium){
+        if(changedCompendium === 'nonenodelete'){
+          await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, changedCompendium);
           await this.loadPolymorphers();
         }else{
-          await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, []);
-          await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, event.currentTarget.value);
-          await this.loadPolymorphers();
+          if(changedCompendium){
+            $('li[data-acompendiumid="' + currentCompendium +'"]').remove();
+            await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, changedCompendium);
+            await this.loadPolymorphers();
+          }else{
+            $('#polymorpher-list').empty();
+            await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, []);
+            await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, changedCompendium);
+            await this.loadPolymorphers();
+          }
         }
       }
     });
@@ -96,7 +115,7 @@ export class PolymorpherManager extends FormApplication {
       event.preventDefault();
       event.stopPropagation();
       await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, []);
-      $('#polymorpher-list').empty()
+      $('#polymorpher-list').empty();
     });
   }
 
@@ -111,7 +130,7 @@ export class PolymorpherManager extends FormApplication {
     });
   }
 
-  _onDrop(event) {
+  async _onDrop(event) {
     let data;
     try {
       data = JSON.parse(event.dataTransfer.getData('text/plain'));
@@ -130,21 +149,23 @@ export class PolymorpherManager extends FormApplication {
       // || data?.type !== 'Actor'){
       return;
     }
-    const actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
-      return a.id === data.id || a.name === data.name;
-    });
-    this.element.find('#polymorpher-list').append(
-      this.generateLi({
-        id: data.id,
-        name: data.name,
-        animation: '',
-        number: 0,
-        defaultsummontype: '',
-        compendiumid: ''
-      },
-      actorToTransformLi),
-    );
-    this.saveData();
+    const actorToTransformLi = await retrieveActorFromData(data.id, data.name, '');
+    if(actorToTransformLi){
+      this.element.find('#polymorpher-list').append(
+        this.generateLi({
+          id: data.id,
+          name: data.name,
+          animation: '',
+          number: 0,
+          defaultsummontype: '',
+          compendiumid: ''
+        },
+        actorToTransformLi),
+      );
+      this.saveData();
+    }else{
+      warn(`No actor founded for the token with id/name '${data.name}'`, true);
+    }
   }
 
   async _onSummonPolymorpher(event) {
@@ -152,25 +173,8 @@ export class PolymorpherManager extends FormApplication {
     const animation = <string>$(event.currentTarget.parentElement.parentElement).find('.anim-dropdown').val();
     const aId = event.currentTarget.dataset.aid;
     const aName = event.currentTarget.dataset.aname;
-
-    let actorToTransform:Actor|null = null;
-    const currentCompendium = <string>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM) ?? '';
-    if(currentCompendium){
-      const pack = game.packs.get(currentCompendium);
-      if(pack){
-        await pack.getIndex();
-        for(const entityComp of pack.index){
-          const actorComp = <Actor>await pack.getDocument(entityComp._id);
-          if(actorComp.id === aId || actorComp.name === aName){
-            actorToTransform = actorComp;
-            break;
-          }
-        }
-      }
-    }
-    if(!actorToTransform){
-      actorToTransform = <Actor>game.actors?.get(aId);
-    }
+    const aCompendiumId = event.currentTarget.dataset.acompendiumid;
+    const actorToTransform = await retrieveActorFromData(aId, aName, aCompendiumId);
     if (!actorToTransform) {
       warn(
         `The actor you try to polimorphing not exists anymore, please set up again the actor on the polymorpher manager`,
@@ -198,12 +202,6 @@ export class PolymorpherManager extends FormApplication {
     }
     // Get the target actor
     const sourceActor = actorToTransform;
-    // if (data.pack) {
-    //   const pack = game.packs.find(p => p.collection === data.pack);
-    //   sourceActor = await pack.getEntity(data.id);
-    // } else {
-    //   sourceActor = game.actors.get(data.id);
-    // }
     if (!sourceActor) {
       return;
     }
@@ -269,7 +267,7 @@ export class PolymorpherManager extends FormApplication {
                 // TODO show on chat ?
                 //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                const [newToken] = await this.actor.transformInto(
+                await this.actor.transformInto(
                   sourceActor,
                   rememberOptions(html),
                 );
@@ -299,7 +297,7 @@ export class PolymorpherManager extends FormApplication {
                 // TODO show on chat ?
                 //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                const [newToken] = await this.actor.transformInto(
+                await this.actor.transformInto(
                   sourceActor,
                   {
                     keepBio: true,
@@ -336,7 +334,7 @@ export class PolymorpherManager extends FormApplication {
                 // TODO show on chat ?
                 //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                const [newToken] = await this.actor.transformInto(
+                await this.actor.transformInto(
                   sourceActor,
                   {
                     transformTokens: rememberOptions(html).transformTokens,
@@ -465,7 +463,11 @@ export class PolymorpherManager extends FormApplication {
 
   async _onOpenSheet(event) {
     const actorId = event.currentTarget.parentElement.dataset.aid;
-    const actorFromTransform = game.actors?.get(actorId);
+    const actorName = event.currentTarget.parentElement.dataset.aname;
+    // TODO ADD SOME CHECK FOR NO LINKED ACTOR ?
+    const actorFromTransform = <Actor>game.actors?.contents.find((a) => {
+      return a.id === actorId || a.name === actorName;
+    });
     if (actorFromTransform) {
       actorFromTransform.sheet?.render(true);
     }
@@ -480,9 +482,11 @@ export class PolymorpherManager extends FormApplication {
       //   : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
       <PolymorpherData[]>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
 
-    const alredyImportedFromCompendium:string[] = []
+    const namesAlreadyImportedFromCompendium:string[] = []
     const currentCompendium = <string>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM) ?? '';
-    if(currentCompendium){
+    if(currentCompendium &&
+      currentCompendium != 'none' &&
+      currentCompendium != 'nonenodelete'){
       const pack = game.packs.get(currentCompendium);
       if(pack){
         await pack.getIndex();
@@ -494,7 +498,7 @@ export class PolymorpherManager extends FormApplication {
             });
             if(polyDataTmp){
               this.element.find('#polymorpher-list').append(this.generateLi(polyDataTmp,actorComp));
-              alredyImportedFromCompendium.push(<string>actorComp.name);
+              namesAlreadyImportedFromCompendium.push(<string>actorComp.name);
             }else{
               const polydata = <PolymorpherData>{
                 id: actorComp.id,
@@ -505,7 +509,7 @@ export class PolymorpherManager extends FormApplication {
                 compendiumid: currentCompendium
               }
               this.element.find('#polymorpher-list').append(this.generateLi(polydata,actorComp));
-              alredyImportedFromCompendium.push(<string>actorComp.name);
+              namesAlreadyImportedFromCompendium.push(<string>actorComp.name);
             }
           }
         }
@@ -514,14 +518,15 @@ export class PolymorpherManager extends FormApplication {
 
     if (data) {
       for (const polymorpher of data) {
-        const actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
-          return a.id === polymorpher.id || a.name === polymorpher.name;
-        });
+        const aId = polymorpher.id;
+        const aName = polymorpher.name;
+        const acompendiumid = polymorpher.compendiumid;
+        const actorToTransformLi = await retrieveActorFromData(aId, aName, acompendiumid);
         if(!actorToTransformLi){
-          // warn(`No actor founded for the token with id/name '${polymorpher.name}'`, true);
+          warn(`No actor founded for the token with id/name '${polymorpher.name}'`, true);
           continue;
         }
-        if(!alredyImportedFromCompendium.includes(polymorpher.name)){
+        if(!namesAlreadyImportedFromCompendium.includes(polymorpher.name)){
           this.element.find('#polymorpher-list').append(this.generateLi(polymorpher,actorToTransformLi));
         }
       }
@@ -622,13 +627,18 @@ export class PolymorpherManager extends FormApplication {
 
     const isOrdered = <string>this.element.parent().find('.polymorpher-ordered').val() === 'true' ?? false;
     const isRandom = <string>this.element.parent().find('.polymorpher-random').val() === 'true' ?? false;
+    const isStoreonactor = <string>this.element.parent().find('.polymorpher-storeonactor').val() === 'true' ?? false;
+    
     const currentCompendium = <string>this.element.parent().find('.polymorpher-selectcompendium').val();
 
     if (isRandom && isOrdered) {
       warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
     }
 
-    if(currentCompendium && currentCompendium != this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM)){
+    if(currentCompendium &&
+      currentCompendium != 'none' &&
+      currentCompendium != 'nonenodelete' && 
+      currentCompendium != this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM)){
       // Reference a Compendium pack by it's callection ID
       const pack = <CompendiumCollection<CompendiumCollection.Metadata>>game.packs.find(p => p.collection === currentCompendium);
       if(!pack){
@@ -638,7 +648,6 @@ export class PolymorpherManager extends FormApplication {
           await pack.getIndex();
         }
         data = [];
-        //const compendium = <StoredDocument<Actor>[]>(await game.packs?.get(currentCompendium)?.getDocuments());
         const compendium = <StoredDocument<Actor>[]>(await pack?.getDocuments());
         //.sort((a, b) => a.name?.localeCompare(b.name));
         for (const shapeOption of compendium) {
@@ -665,6 +674,7 @@ export class PolymorpherManager extends FormApplication {
 
     await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM, isRandom);
     await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED, isOrdered);
+    await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR, isStoreonactor);
   }
 
   //@ts-ignore
@@ -687,25 +697,8 @@ export class PolymorpherManager extends FormApplication {
     const animation = polymorpherData.animation;
     const aId = polymorpherData.id;
     const aName = polymorpherData.name;
-
-    let actorToTransform:Actor|null = null;
-    const currentCompendium = polymorpherData.compendiumid;
-    if(currentCompendium){
-      const pack = game.packs.get(currentCompendium);
-      if(pack){
-        await pack.getIndex();
-        for(const entityComp of pack.index){
-          const actorComp = <Actor>await pack.getDocument(entityComp._id);
-          if(actorComp.id === aId || actorComp.name === aName){
-            actorToTransform = actorComp;
-            break;
-          }
-        }
-      }
-    }
-    if(!actorToTransform){
-      actorToTransform = <Actor>game.actors?.get(aId);
-    }
+    const aCompendiumId =  polymorpherData.compendiumid;
+    const actorToTransform = await retrieveActorFromData(aId,aName,aCompendiumId);
     if (!actorToTransform) {
       warn(
         `The actor you try to polymorphism not exists anymore, please set up again the actor on the polymorpher manager`,
@@ -778,7 +771,7 @@ export class PolymorpherManager extends FormApplication {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
-        const [newToken] = await this.actor.transformInto(
+        await this.actor.transformInto(
           sourceActor,
           // rememberOptions(html),
           {
@@ -820,7 +813,7 @@ export class PolymorpherManager extends FormApplication {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
-        const [newToken] = await this.actor.transformInto(
+        await this.actor.transformInto(
           sourceActor,
           {
             keepBio: true,
@@ -854,7 +847,7 @@ export class PolymorpherManager extends FormApplication {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
-        const [newToken] = await this.actor.transformInto(
+        await this.actor.transformInto(
           sourceActor,
           {
             keepPhysical: false,
@@ -963,18 +956,23 @@ export class SimplePolymorpherManager extends PolymorpherManager {
   }
 
   async activateListeners(html) {
-    for (const summon of <any[]>this.summons) {
-      const actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
-        return a.id === summon.id || a.name === summon.name;
-      });
-      this.element.find('#polymorpher-list').append(this.generateLi(summon,actorToTransformLi));
+    for (const summon of this.summons) {
+      const aId = summon.id;
+      const aName = summon.name;
+      const aCompendiumId = summon.compendiumid;
+      const actorToTransformLi = await retrieveActorFromData(aId,aName,aCompendiumId);
+      if(actorToTransformLi){
+        this.element.find('#polymorpher-list').append(this.generateLi(summon,actorToTransformLi));
+      }else{
+        warn(`No actor founded for the token with id/name '${summon.name}'`, true);
+      }
     }
 
     html.on('click', '#summon-polymorpher', this._onSummonPolymorpher.bind(this));
     html.on('click', '.actor-name', this._onOpenSheet.bind(this));
   }
 
-  _onDrop(event) {
+  async _onDrop(event) {
     // DO NOTHING
   }
 

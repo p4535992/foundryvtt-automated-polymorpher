@@ -12,7 +12,10 @@
       "random": "Random",
       "ordered": "Ordered",
       "selectcompendium": "Select a copendium",
-      "deleteall": "Delete All"
+      "deleteall": "Delete All",
+      "storeonactor": "Store Polymorphers on Actor",
+      "none": "None",
+      "nonenodelete": "None but not delete the loaded actors"
     },
     "actorSheetBtn": "Polymorphers",
     "animations": {
@@ -39,7 +42,7 @@
     "settings": {
       "storeonactor": {
         "title": "Store Polymorphers on Actor",
-        "hint": "Store the polymorphers on the actor instead of the user by default."
+        "hint": "Store the polymorphers on the actor instead of the token by default."
       },
       "enableautomations": {
         "title": "Enable Automations",

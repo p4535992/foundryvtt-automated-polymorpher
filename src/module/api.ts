@@ -2,7 +2,7 @@ import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
-import { error, info, wait, warn } from './lib/lib';
+import { error, info, retrieveActorFromToken, wait, warn } from './lib/lib';
 import { PolymorpherManager } from './polymorphermanager';
 
 const API = {
@@ -35,7 +35,7 @@ const API = {
       // warn(`No token founded on canvas with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
-    const actor = sourceToken.document.actor;
+    const actor = retrieveActorFromToken(sourceToken);
     if (!actor) {
       // warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
       return;
@@ -80,21 +80,25 @@ const API = {
       }) || undefined;
 
     if (removePolymorpher) {
-      const updatesForRevert: any = sourceToken.actor?.getFlag(
+      const updatesForRevert: any = actor?.getFlag(
         CONSTANTS.MODULE_NAME,
         PolymorpherFlags.UPDATES_FOR_REVERT,
       );
       if (!updatesForRevert) {
-        await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-        await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+        await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+        await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
         warn(`Can't revert this token without the flag '${PolymorpherFlags.UPDATES_FOR_REVERT}'`, true);
         return;
       }
-      const arrayMutationNames: string[] = <string[]>(
+      let arrayMutationNames: string[] = <string[]>(
         actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
       );
-      await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-      await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+      if(!arrayMutationNames || arrayMutationNames.length == 0){
+        arrayMutationNames = [];
+        warn(`Array mutation names for the revert is null or empty`);
+      }
+      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
 
       const polyData = listPolymorphers.find((a) => {
         return lastElement.toLowerCase().includes(a.name.toLowerCase());
@@ -134,12 +138,17 @@ const API = {
         //@ts-ignore
         actor?.revertOriginalForm();
       } else {
-        for (const revertName of arrayMutationNames) {
-          info(`${actor.name} reverts to their original form`);
-          // TODO show on chat ?
-          //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+        if(arrayMutationNames.length > 0){
+          for (const revertName of arrayMutationNames) {
+            info(`${actor.name} reverts to their original form`);
+            // TODO show on chat ?
+            //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+            //@ts-ignore
+            await warpgate.revert(sourceToken.document, revertName);
+          }
+        }else{
           //@ts-ignore
-          await warpgate.revert(sourceToken.document, revertName);
+          await warpgate.revert(sourceToken.document, '');
         }
       }
     } else {

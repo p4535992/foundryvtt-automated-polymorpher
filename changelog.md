@@ -1,3 +1,9 @@
+### 1.0.25
+
+- NEW FEATURE: Integration for load actors directly from compendium
+- NEW FEATURE: Add module settings for enable Warpgate mutate function like a preference, on system with their own polymorph mcheanism like Dnd5e
+- NEW FEATURE: Integration for store actos directly on actor instead token on the dialog html
+
 ### 1.0.24
 
 - Add module setting for apply a custom color to the hud button
