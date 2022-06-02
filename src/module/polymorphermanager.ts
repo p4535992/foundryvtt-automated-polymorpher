@@ -39,32 +39,33 @@ export class PolymorpherManager extends FormApplication {
     data.ordered = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
 
     const storeOnActorFlag = <boolean>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR);
-    data.storeonactor = storeOnActorFlag != null && storeOnActorFlag != undefined 
-      ? storeOnActorFlag
-      : <boolean>game.settings.get(CONSTANTS.MODULE_NAME,'storeonactor')
+    data.storeonactor =
+      storeOnActorFlag != null && storeOnActorFlag != undefined
+        ? storeOnActorFlag
+        : <boolean>game.settings.get(CONSTANTS.MODULE_NAME, 'storeonactor');
 
     // Retrieve compendiums with actor
     const currentCompendium = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM) ?? '';
-    const compendiumsData:PolymorpherCompendiumData[] = [];
+    const compendiumsData: PolymorpherCompendiumData[] = [];
     const compDataNone = <PolymorpherCompendiumData>{
-      id:'', // 'world.shapes-compendium'
+      id: '', // 'world.shapes-compendium'
       name: i18n(`${CONSTANTS.MODULE_NAME}.dialogs.none`),
-      selected: currentCompendium ? false : true
-    }
+      selected: currentCompendium ? false : true,
+    };
     const compDataNoneNoDelete = <PolymorpherCompendiumData>{
-      id:'nonenodelete', // 'world.shapes-compendium'
+      id: 'nonenodelete', // 'world.shapes-compendium'
       name: i18n(`${CONSTANTS.MODULE_NAME}.dialogs.nonenodelete`),
-      selected: currentCompendium ? false : true
-    }
+      selected: currentCompendium ? false : true,
+    };
     compendiumsData.push(compDataNone);
     compendiumsData.push(compDataNoneNoDelete);
-    for(const comp of game.packs.contents){
-      if(comp.metadata.type === 'Actor'){
+    for (const comp of game.packs.contents) {
+      if (comp.metadata.type === 'Actor') {
         const compData = <PolymorpherCompendiumData>{
           id: comp.collection, // 'world.shapes-compendium'
           name: comp.metadata.label,
-          selected: currentCompendium === comp.collection ? true : false
-        }
+          selected: currentCompendium === comp.collection ? true : false,
+        };
         compendiumsData.push(compData);
       }
     }
@@ -72,7 +73,7 @@ export class PolymorpherManager extends FormApplication {
     return data;
   }
 
-  async activateListeners(html:JQuery<HTMLElement>) {
+  async activateListeners(html: JQuery<HTMLElement>) {
     html
       .find('#polymorpher-list')
       .before(
@@ -92,16 +93,16 @@ export class PolymorpherManager extends FormApplication {
     html.on('change', '#polymorpher-selectcompendium', async (event) => {
       const currentCompendium = this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM) ?? '';
       const changedCompendium = event.currentTarget.value;
-      if(changedCompendium != currentCompendium){
-        if(changedCompendium === 'nonenodelete'){
+      if (changedCompendium != currentCompendium) {
+        if (changedCompendium === 'nonenodelete') {
           await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, changedCompendium);
           await this.loadPolymorphers();
-        }else{
-          if(changedCompendium){
-            $('li[data-acompendiumid="' + currentCompendium +'"]').remove();
+        } else {
+          if (changedCompendium) {
+            $('li[data-acompendiumid="' + currentCompendium + '"]').remove();
             await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, changedCompendium);
             await this.loadPolymorphers();
-          }else{
+          } else {
             $('#polymorpher-list').empty();
             await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS, []);
             await this.actor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM, changedCompendium);
@@ -150,20 +151,22 @@ export class PolymorpherManager extends FormApplication {
       return;
     }
     const actorToTransformLi = await retrieveActorFromData(data.id, data.name, '');
-    if(actorToTransformLi){
+    if (actorToTransformLi) {
       this.element.find('#polymorpher-list').append(
-        this.generateLi({
-          id: data.id,
-          name: data.name,
-          animation: '',
-          number: 0,
-          defaultsummontype: '',
-          compendiumid: ''
-        },
-        actorToTransformLi),
+        this.generateLi(
+          {
+            id: data.id,
+            name: data.name,
+            animation: '',
+            number: 0,
+            defaultsummontype: '',
+            compendiumid: '',
+          },
+          actorToTransformLi,
+        ),
       );
       this.saveData();
-    }else{
+    } else {
       warn(`No actor founded for the token with id/name '${data.name}'`, true);
     }
   }
@@ -263,14 +266,11 @@ export class PolymorpherManager extends FormApplication {
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
-                info( `${this.actor.name} turns into a ${sourceActor.name}`);
+                info(`${this.actor.name} turns into a ${sourceActor.name}`);
                 // TODO show on chat ?
                 //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                await this.actor.transformInto(
-                  sourceActor,
-                  rememberOptions(html),
-                );
+                await this.actor.transformInto(sourceActor, rememberOptions(html));
                 if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                   this.close();
                 } else {
@@ -293,21 +293,18 @@ export class PolymorpherManager extends FormApplication {
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
-                info( `${this.actor.name} turns into a ${sourceActor.name}`);
+                info(`${this.actor.name} turns into a ${sourceActor.name}`);
                 // TODO show on chat ?
                 //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                await this.actor.transformInto(
-                  sourceActor,
-                  {
-                    keepBio: true,
-                    keepClass: true,
-                    keepMental: true,
-                    mergeSaves: true,
-                    mergeSkills: true,
-                    transformTokens: rememberOptions(html).transformTokens,
-                  },
-                );
+                await this.actor.transformInto(sourceActor, {
+                  keepBio: true,
+                  keepClass: true,
+                  keepMental: true,
+                  mergeSaves: true,
+                  mergeSkills: true,
+                  transformTokens: rememberOptions(html).transformTokens,
+                });
                 if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                   this.close();
                 } else {
@@ -330,16 +327,13 @@ export class PolymorpherManager extends FormApplication {
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
-                info( `${this.actor.name} turns into a ${sourceActor.name}`);
+                info(`${this.actor.name} turns into a ${sourceActor.name}`);
                 // TODO show on chat ?
                 //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                await this.actor.transformInto(
-                  sourceActor,
-                  {
-                    transformTokens: rememberOptions(html).transformTokens,
-                  },
-                );
+                await this.actor.transformInto(sourceActor, {
+                  transformTokens: rememberOptions(html).transformTokens,
+                });
                 if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                   this.close();
                 } else {
@@ -403,24 +397,34 @@ export class PolymorpherManager extends FormApplication {
       } else {
         updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       }
+
+      const actorDataTmp = duplicate(actorToTransform.data);
+      setProperty(
+        actorDataTmp,
+        `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.UPDATES_FOR_REVERT}`,
+        updatesForRevert,
+      );
+
       const updates = {
         token: {
           name: tokenDataToTransform.name,
           img: tokenDataToTransform.img,
           scale: tokenDataToTransform.scale,
           data: tokenDataToTransform,
+          // actor: actorToTransform
           actor: {
-            //   name: actorToTransform.name,
-            //   data: actorToTransform.data
-            data: {
-              flags: {
-                'automated-polymorpher': {
-                  updatesforrevert: updatesForRevert,
-                },
-              },
-            },
+            // name: actorToTransform.name,
+            data: actorDataTmp.data,
+            // data: {
+            //   flags: {
+            //     'automated-polymorpher': {
+            //       updatesforrevert: updatesForRevert,
+            //     },
+            //   },
+            // },
           },
         },
+        actor: actorToTransform,
       };
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
       const arrayMutationNames: string[] =
@@ -428,7 +432,7 @@ export class PolymorpherManager extends FormApplication {
       const mutationNameOriginalToken = tokenFromTransform.id + randomID();
       arrayMutationNames.push(mutationNameOriginalToken);
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
-      info( `${this.actor.name} mutate into a ${sourceActor.name}`);
+      info(`${this.actor.name} mutate into a ${sourceActor.name}`);
       // TODO show on chat ?
       //await ChatMessage.create({content: `${this.actor.name} mutate into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
       //@ts-ignore
@@ -482,33 +486,31 @@ export class PolymorpherManager extends FormApplication {
       //   : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
       <PolymorpherData[]>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
 
-    const namesAlreadyImportedFromCompendium:string[] = []
+    const namesAlreadyImportedFromCompendium: string[] = [];
     const currentCompendium = <string>this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM) ?? '';
-    if(currentCompendium &&
-      currentCompendium != 'none' &&
-      currentCompendium != 'nonenodelete'){
+    if (currentCompendium && currentCompendium != 'none' && currentCompendium != 'nonenodelete') {
       const pack = game.packs.get(currentCompendium);
-      if(pack){
+      if (pack) {
         await pack.getIndex();
-        for(const entityComp of pack.index){
+        for (const entityComp of pack.index) {
           const actorComp = <Actor>await pack.getDocument(entityComp._id);
-          if(actorComp){
+          if (actorComp) {
             const polyDataTmp = data.find((a) => {
               return a.id === actorComp.id || a.name === actorComp.name;
             });
-            if(polyDataTmp){
-              this.element.find('#polymorpher-list').append(this.generateLi(polyDataTmp,actorComp));
+            if (polyDataTmp) {
+              this.element.find('#polymorpher-list').append(this.generateLi(polyDataTmp, actorComp));
               namesAlreadyImportedFromCompendium.push(<string>actorComp.name);
-            }else{
+            } else {
               const polydata = <PolymorpherData>{
                 id: actorComp.id,
                 name: actorComp.name,
                 animation: '',
                 number: 1,
                 defaultsummontype: '',
-                compendiumid: currentCompendium
-              }
-              this.element.find('#polymorpher-list').append(this.generateLi(polydata,actorComp));
+                compendiumid: currentCompendium,
+              };
+              this.element.find('#polymorpher-list').append(this.generateLi(polydata, actorComp));
               namesAlreadyImportedFromCompendium.push(<string>actorComp.name);
             }
           }
@@ -522,19 +524,18 @@ export class PolymorpherManager extends FormApplication {
         const aName = polymorpher.name;
         const acompendiumid = polymorpher.compendiumid;
         const actorToTransformLi = await retrieveActorFromData(aId, aName, acompendiumid);
-        if(!actorToTransformLi){
+        if (!actorToTransformLi) {
           warn(`No actor founded for the token with id/name '${polymorpher.name}'`, true);
           continue;
         }
-        if(!namesAlreadyImportedFromCompendium.includes(polymorpher.name)){
-          this.element.find('#polymorpher-list').append(this.generateLi(polymorpher,actorToTransformLi));
+        if (!namesAlreadyImportedFromCompendium.includes(polymorpher.name)) {
+          this.element.find('#polymorpher-list').append(this.generateLi(polymorpher, actorToTransformLi));
         }
       }
     }
   }
 
-  generateLi(data: PolymorpherData, actorToTransformLi:Actor) {
-    
+  generateLi(data: PolymorpherData, actorToTransformLi: Actor) {
     if (!actorToTransformLi) {
       return '';
     }
@@ -569,9 +570,9 @@ export class PolymorpherManager extends FormApplication {
         <select class="anim-dropdown">
             ${this.getAnimations(data.animation)}
         </select>
-        ${isDnd5e
-            ? 
-            `<select 
+        ${
+          isDnd5e
+            ? `<select 
               id="automated-polymorpher.defaultSummonType" 
               class="defaultSummonType" name="defaultSummonType" 
               data-dtype="String" 
@@ -621,34 +622,38 @@ export class PolymorpherManager extends FormApplication {
         animation: <string>$(polymorpher).find('.anim-dropdown').val(),
         number: <number>$(polymorpher).find('#polymorpher-number-val').val(),
         defaultsummontype: <string>$(polymorpher).find('.defaultSummonType').val(),
-        compendiumid:<string>polymorpher.dataset.acompendiumid,
+        compendiumid: <string>polymorpher.dataset.acompendiumid,
       });
     }
 
     const isOrdered = <string>this.element.parent().find('.polymorpher-ordered').val() === 'true' ?? false;
     const isRandom = <string>this.element.parent().find('.polymorpher-random').val() === 'true' ?? false;
     const isStoreonactor = <string>this.element.parent().find('.polymorpher-storeonactor').val() === 'true' ?? false;
-    
+
     const currentCompendium = <string>this.element.parent().find('.polymorpher-selectcompendium').val();
 
     if (isRandom && isOrdered) {
       warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
     }
 
-    if(currentCompendium &&
+    if (
+      currentCompendium &&
       currentCompendium != 'none' &&
-      currentCompendium != 'nonenodelete' && 
-      currentCompendium != this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM)){
+      currentCompendium != 'nonenodelete' &&
+      currentCompendium != this.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.COMPENDIUM)
+    ) {
       // Reference a Compendium pack by it's callection ID
-      const pack = <CompendiumCollection<CompendiumCollection.Metadata>>game.packs.find(p => p.collection === currentCompendium);
-      if(!pack){
+      const pack = <CompendiumCollection<CompendiumCollection.Metadata>>(
+        game.packs.find((p) => p.collection === currentCompendium)
+      );
+      if (!pack) {
         error(`No pack is found with id '${currentCompendium}'`, true);
-      }else{
-        if (!pack.indexed){
+      } else {
+        if (!pack.indexed) {
           await pack.getIndex();
         }
         data = [];
-        const compendium = <StoredDocument<Actor>[]>(await pack?.getDocuments());
+        const compendium = <StoredDocument<Actor>[]>await pack?.getDocuments();
         //.sort((a, b) => a.name?.localeCompare(b.name));
         for (const shapeOption of compendium) {
           const polymorpher = <Actor>shapeOption;
@@ -659,7 +664,7 @@ export class PolymorpherManager extends FormApplication {
             animation: <string>$(polymorpher).find('.anim-dropdown').val(),
             number: <number>$(polymorpher).find('#polymorpher-number-val').val(),
             defaultsummontype: <string>$(polymorpher).find('.defaultSummonType').val(),
-            compendiumid: <string>currentCompendium
+            compendiumid: <string>currentCompendium,
           });
         }
       }
@@ -679,7 +684,7 @@ export class PolymorpherManager extends FormApplication {
 
   //@ts-ignore
   close(noSave = false) {
-    if (!noSave){
+    if (!noSave) {
       this.saveData();
     }
     super.close();
@@ -697,8 +702,8 @@ export class PolymorpherManager extends FormApplication {
     const animation = polymorpherData.animation;
     const aId = polymorpherData.id;
     const aName = polymorpherData.name;
-    const aCompendiumId =  polymorpherData.compendiumid;
-    const actorToTransform = await retrieveActorFromData(aId,aName,aCompendiumId);
+    const aCompendiumId = polymorpherData.compendiumid;
+    const actorToTransform = await retrieveActorFromData(aId, aName, aCompendiumId);
     if (!actorToTransform) {
       warn(
         `The actor you try to polymorphism not exists anymore, please set up again the actor on the polymorpher manager`,
@@ -767,7 +772,7 @@ export class PolymorpherManager extends FormApplication {
             await wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
-        info( `${this.actor.name} turns into a ${sourceActor.name}`);
+        info(`${this.actor.name} turns into a ${sourceActor.name}`);
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
@@ -809,21 +814,18 @@ export class PolymorpherManager extends FormApplication {
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
-        info( `${this.actor.name} turns into a ${sourceActor.name}`);
+        info(`${this.actor.name} turns into a ${sourceActor.name}`);
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
-        await this.actor.transformInto(
-          sourceActor,
-          {
-            keepBio: true,
-            keepClass: true,
-            keepMental: true,
-            mergeSaves: true,
-            mergeSkills: true,
-            transformTokens: true,
-          },
-        );
+        await this.actor.transformInto(sourceActor, {
+          keepBio: true,
+          keepClass: true,
+          keepMental: true,
+          mergeSaves: true,
+          mergeSkills: true,
+          transformTokens: true,
+        });
       } else if (polymorpherData.defaultsummontype === 'DND5E.Polymorph') {
         if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
@@ -843,28 +845,25 @@ export class PolymorpherManager extends FormApplication {
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
-        info( `${this.actor.name} turns into a ${sourceActor.name}`);
+        info(`${this.actor.name} turns into a ${sourceActor.name}`);
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
-        await this.actor.transformInto(
-          sourceActor,
-          {
-            keepPhysical: false,
-            keepMental: false,
-            keepSaves: false,
-            keepSkills: false,
-            mergeSaves: false,
-            mergeSkills: false,
-            keepClass: false,
-            keepFeats: false,
-            keepSpells: false,
-            keepItems: false,
-            keepBio: false,
-            keepVision: true,
-            transformTokens: true,
-          },
-        );
+        await this.actor.transformInto(sourceActor, {
+          keepPhysical: false,
+          keepMental: false,
+          keepSaves: false,
+          keepSkills: false,
+          mergeSaves: false,
+          mergeSkills: false,
+          keepClass: false,
+          keepFeats: false,
+          keepSpells: false,
+          keepItems: false,
+          keepBio: false,
+          keepVision: true,
+          transformTokens: true,
+        });
       } else {
         warn(
           `No default summon type is setted for any polymorphing actor on the list associated to this actor ${actorToTransform.name}`,
@@ -902,24 +901,34 @@ export class PolymorpherManager extends FormApplication {
       } else {
         updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       }
+
+      const actorDataTmp = duplicate(actorToTransform.data);
+      setProperty(
+        actorDataTmp,
+        `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.UPDATES_FOR_REVERT}`,
+        updatesForRevert,
+      );
+
       const updates = {
         token: {
           name: tokenDataToTransform.name,
           img: tokenDataToTransform.img,
           scale: tokenDataToTransform.scale,
           data: tokenDataToTransform,
+          // actor: actorToTransform
           actor: {
-            //   name: actorToTransform.name,
-            //   data: actorToTransform.data
-            data: {
-              flags: {
-                'automated-polymorpher': {
-                  updatesforrevert: updatesForRevert,
-                },
-              },
-            },
+            // name: actorToTransform.name,
+            data: actorDataTmp.data,
+            // data: {
+            //   flags: {
+            //     'automated-polymorpher': {
+            //       updatesforrevert: updatesForRevert,
+            //     },
+            //   },
+            // },
           },
         },
+        actor: actorToTransform,
       };
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
       const arrayMutationNames: string[] =
@@ -927,7 +936,7 @@ export class PolymorpherManager extends FormApplication {
       const mutationNameOriginalToken = tokenFromTransform.id + randomID();
       arrayMutationNames.push(mutationNameOriginalToken);
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
-      info( `${this.actor.name} mutate into a ${sourceActor.name}`);
+      info(`${this.actor.name} mutate into a ${sourceActor.name}`);
       // TODO show on chat ?
       //await ChatMessage.create({content: `${this.actor.name} mutate into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
       //@ts-ignore
@@ -960,10 +969,10 @@ export class SimplePolymorpherManager extends PolymorpherManager {
       const aId = summon.id;
       const aName = summon.name;
       const aCompendiumId = summon.compendiumid;
-      const actorToTransformLi = await retrieveActorFromData(aId,aName,aCompendiumId);
-      if(actorToTransformLi){
-        this.element.find('#polymorpher-list').append(this.generateLi(summon,actorToTransformLi));
-      }else{
+      const actorToTransformLi = await retrieveActorFromData(aId, aName, aCompendiumId);
+      if (actorToTransformLi) {
+        this.element.find('#polymorpher-list').append(this.generateLi(summon, actorToTransformLi));
+      } else {
         warn(`No actor founded for the token with id/name '${summon.name}'`, true);
       }
     }

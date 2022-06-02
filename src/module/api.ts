@@ -10,15 +10,52 @@ const API = {
     if (!Array.isArray(inAttributes)) {
       throw error('invokePolymorpherManager | inAttributes must be of type array');
     }
-    const [sourceToken, removePolymorpher, ordered, random, animationExternal] = inAttributes;
+    const [sourceTokenIdOrName, removePolymorpher, ordered, random, animationExternal] = inAttributes;
     const result = await (this as typeof API).invokePolymorpherManager(
-      sourceToken,
+      sourceTokenIdOrName,
       removePolymorpher,
       ordered,
       random,
       animationExternal,
     );
     return result;
+  },
+
+  async invokePolymorpherManagerFromActorArr(...inAttributes: any[]) {
+    if (!Array.isArray(inAttributes)) {
+      throw error('invokePolymorpherManagerFromActor | inAttributes must be of type array');
+    }
+    const [sourceActorIdOrName, removePolymorpher, ordered, random, animationExternal] = inAttributes;
+    const result = await (this as typeof API).invokePolymorpherManagerFromActor(
+      sourceActorIdOrName,
+      removePolymorpher,
+      ordered,
+      random,
+      animationExternal,
+    );
+    return result;
+  },
+
+  async invokePolymorpherManagerFromActor(
+    sourceActorIdOrName: string,
+    removePolymorpher = false,
+    ordered = false,
+    random = false,
+    animationExternal: { sequence: undefined; timeToWait: 0 } | undefined = undefined,
+  ): Promise<void> {
+    for (const tokenOnCanvas of <Token[]>canvas.tokens?.placeables) {
+      const actor = retrieveActorFromToken(tokenOnCanvas);
+      if (actor && (actor.id === sourceActorIdOrName || actor.name === sourceActorIdOrName)) {
+        this._invokePolymorpherManagerInner(
+          actor,
+          tokenOnCanvas,
+          removePolymorpher,
+          ordered,
+          random,
+          animationExternal,
+        );
+      }
+    }
   },
 
   async invokePolymorpherManager(
@@ -32,14 +69,37 @@ const API = {
       return t.id === sourceTokenIdOrName || t.name === sourceTokenIdOrName;
     });
     if (!sourceToken) {
-      // warn(`No token founded on canvas with id/name '${sourceTokenIdOrName}'`, true);
+      warn(`No token founded on canvas with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
     const actor = retrieveActorFromToken(sourceToken);
     if (!actor) {
-      // warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
+      warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
+    this._invokePolymorpherManagerInner(actor, sourceToken, removePolymorpher, ordered, random, animationExternal);
+  },
+
+  async _invokePolymorpherManagerInner(
+    actor: Actor,
+    sourceToken: Token,
+    removePolymorpher = false,
+    ordered = false,
+    random = false,
+    animationExternal: { sequence: undefined; timeToWait: 0 } | undefined = undefined,
+  ): Promise<void> {
+    // const sourceToken = canvas.tokens?.placeables.find((t) => {
+    //   return t.id === sourceTokenIdOrName || t.name === sourceTokenIdOrName;
+    // });
+    // if (!sourceToken) {
+    //   // warn(`No token founded on canvas with id/name '${sourceTokenIdOrName}'`, true);
+    //   return;
+    // }
+    // const actor = retrieveActorFromToken(sourceToken);
+    // if (!actor) {
+    //   // warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
+    //   return;
+    // }
     const listPolymorphers: PolymorpherData[] =
       // actor &&
       // (<boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
@@ -80,10 +140,7 @@ const API = {
       }) || undefined;
 
     if (removePolymorpher) {
-      const updatesForRevert: any = actor?.getFlag(
-        CONSTANTS.MODULE_NAME,
-        PolymorpherFlags.UPDATES_FOR_REVERT,
-      );
+      const updatesForRevert: any = actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       if (!updatesForRevert) {
         await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
         await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
@@ -93,7 +150,7 @@ const API = {
       let arrayMutationNames: string[] = <string[]>(
         actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
       );
-      if(!arrayMutationNames || arrayMutationNames.length == 0){
+      if (!arrayMutationNames || arrayMutationNames.length == 0) {
         arrayMutationNames = [];
         warn(`Array mutation names for the revert is null or empty`);
       }
@@ -138,7 +195,7 @@ const API = {
         //@ts-ignore
         actor?.revertOriginalForm();
       } else {
-        if(arrayMutationNames.length > 0){
+        if (arrayMutationNames.length > 0) {
           for (const revertName of arrayMutationNames) {
             info(`${actor.name} reverts to their original form`);
             // TODO show on chat ?
@@ -146,7 +203,7 @@ const API = {
             //@ts-ignore
             await warpgate.revert(sourceToken.document, revertName);
           }
-        }else{
+        } else {
           //@ts-ignore
           await warpgate.revert(sourceToken.document, '');
         }

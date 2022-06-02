@@ -171,13 +171,13 @@ function addToPolymorphButton(html, sourceToken: Token) {
 
   button.find('i').on('click', async (ev) => {
     for (const targetToken of <Token[]>canvas.tokens?.controlled) {
-      API.invokePolymorpherManager(targetToken.id, false, ordered, random);
+      API._invokePolymorpherManagerInner(actor, targetToken, false, ordered, random);
     }
   });
   button.find('i').on('contextmenu', async (ev) => {
     for (const targetToken of <Token[]>canvas.tokens?.controlled) {
       // Do somethign with right click
-      API.invokePolymorpherManager(targetToken.id, true, ordered, random);
+      API._invokePolymorpherManagerInner(actor, targetToken, true, ordered, random);
     }
   });
 }
@@ -190,7 +190,7 @@ function addToPolymorphButton(html, sourceToken: Token) {
 //   button = addSlash(button);
 
 //   button.find('i').on('click', async (ev) => {
-//     API.invokePolymorpherManager(sourceToken,true);
+//     API._invokePolymorpherManagerInner(actor,sourceToken,true);
 //   });
 //   button.find('i').on('contextmenu', async (ev) => {
 //     // Do something with right click
@@ -268,47 +268,48 @@ function removeSlash(button) {
   slash.remove();
 }
 
-
-export function retrieveActorFromToken(sourceToken:Token):Actor|undefined{
-  if(!sourceToken.actor){
+export function retrieveActorFromToken(sourceToken: Token): Actor | undefined {
+  if (!sourceToken.actor) {
     return undefined;
   }
   const storeOnActorFlag = <boolean>sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR);
-  if(!storeOnActorFlag){
+  if (!storeOnActorFlag) {
     return sourceToken.actor;
   }
-  let actor:Actor|undefined = undefined;
-  if(sourceToken.data.actorLink){
+  let actor: Actor | undefined = undefined;
+  if (sourceToken.data.actorLink) {
     actor = <Actor>game.actors?.get(<string>sourceToken.data.actorId);
   }
   // DO NOT NEED THIS
   // if(!actor){
   //   actor = <Actor>game.actors?.get(<string>sourceToken.actor?.id);
   // }
-  if(!actor){
+  if (!actor) {
     actor = sourceToken.actor;
   }
   return actor;
 }
 
-export async function retrieveActorFromData(aId:string, aName:string, currentCompendium:string):Promise<Actor|null>{
-  let actorToTransformLi:Actor|null = null;
-  if(currentCompendium &&
-    currentCompendium != 'none' &&
-    currentCompendium != 'nonenodelete'){
+export async function retrieveActorFromData(
+  aId: string,
+  aName: string,
+  currentCompendium: string,
+): Promise<Actor | null> {
+  let actorToTransformLi: Actor | null = null;
+  if (currentCompendium && currentCompendium != 'none' && currentCompendium != 'nonenodelete') {
     const pack = game.packs.get(currentCompendium);
-    if(pack){
+    if (pack) {
       await pack.getIndex();
-      for(const entityComp of pack.index){
+      for (const entityComp of pack.index) {
         const actorComp = <Actor>await pack.getDocument(entityComp._id);
-        if(actorComp.id === aId || actorComp.name === aName){
+        if (actorComp.id === aId || actorComp.name === aName) {
           actorToTransformLi = actorComp;
           break;
         }
       }
     }
   }
-  if(!actorToTransformLi){
+  if (!actorToTransformLi) {
     actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
       return a.id === aId || a.name === aName;
     });

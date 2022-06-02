@@ -108,7 +108,7 @@ the actions on the hud button are of two types left click and right click.
 
 # API
 
-###  async game.modules.get('automated-polymorpher').api.invokePolymorpherManager(sourceTokenId: string, removePolymorpher = false, ordered = false, random = false, animationExternal:{ sequence:Sequence, timeToWait:number }|undefined = undefined) ⇒ <code>Promise.&lt;void&gt;</code>
+###  async game.modules.get('automated-polymorpher').api.invokePolymorpherManager(sourceTokenIdOrName: string, removePolymorpher = false, ordered = false, random = false, animationExternal:{ sequence:Sequence, timeToWait:number }|undefined = undefined) ⇒ <code>Promise.&lt;void&gt;</code>
 
 Invoke the polymorpher manager feature from macro
 
@@ -162,6 +162,62 @@ let sequence = new Sequence()
         .scale(0.5)
 
 game.modules.get('automated-polymorpher').api.invokePolymorpherManager('Zruggig Widebrain', false, false, false, { sequence: sequence, timeToWait 1100})
+```
+
+###  async game.modules.get('automated-polymorpher').api.invokePolymorpherManagerFromActor(sourceActorIdOrName: string, removePolymorpher = false, ordered = false, random = false, animationExternal:{ sequence:Sequence, timeToWait:number }|undefined = undefined) ⇒ <code>Promise.&lt;void&gt;</code>
+
+Invoke the polymorpher manager feature from macro
+
+**Returns**: <code>Promise.&lt;void&gt;</code> - A empty promise
+
+| Param | Type | Description | Default |
+| --- | --- | --- | --- |
+| sourceActorIdOrName | <code>string</code> | The id or the name of the actor (not the token) | <code>undefined</code> |
+| removePolymorpher | <code>boolean</code> | This action should revert the polymorpher if the current token is polymorphed | <code>false</code> |
+| ordered | <code>boolean</code> | The 'ordered' feature is enabled for this polymorphing | <code>false</code> |
+| random | <code>boolean</code> | The 'random' feature is enabled for this polymorphing | <code>0</code> |
+| animationExternal | <code>{ sequence:Sequence, timeToWait:number }</code> | Advanced: Use your personal sequence animation and the time needed to wait before the polymorph action, checkout the [Sequencer module](https://github.com/fantasycalendar/FoundryVTT-Sequencer) for more information  | <code>undefined</code> |
+
+**NOTE:** If both 'random' and 'ordered' are false the standard dialog will be rendered.
+
+**Examples**:
+
+`game.modules.get('automated-polymorpher').api.invokePolymorpherManagerFromActor('Zruggig Widebrain')`
+
+`game.modules.get('automated-polymorpher').api.invokePolymorpherManagerFromActor('Zruggig Widebrain', true)`
+
+`game.modules.get('automated-polymorpher').api.invokePolymorpherManagerFromActor('Zruggig Widebrain', false, false)`
+
+`game.modules.get('automated-polymorpher').api.invokePolymorpherManagerFromActor('Zruggig Widebrain', false, false, false)`
+
+```
+let sequence = new Sequence()
+    .effect()
+        .file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/electricity/electrivity_blast_CIRCLE.webm")
+        .atLocation(tokenD)
+        .scale(0.35)
+    .wait(1000)
+        .effect()
+        .file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/electricity/lightning_bolt_RECTANGLE_05.webm")
+        .atLocation(tokenD)
+        .reachTowards({
+            x: tokenD.center.x + canvas.grid.size*5,
+            y: tokenD.center.y
+        })
+    .wait(100)
+    .animation()
+        .on(tokenD)
+        .teleportTo({
+            x: tokenD.x + canvas.grid.size*5,
+            y: tokenD.y
+        })
+        .waitUntilFinished()
+    .effect()
+        .file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/electricity/electric_ball_CIRCLE_06.webm")
+        .atLocation(tokenD)
+        .scale(0.5)
+
+game.modules.get('automated-polymorpher').api.invokePolymorpherManagerFromActor('Zruggig Widebrain', false, false, false, { sequence: sequence, timeToWait 1100})
 ```
 
 ### Macro to clean up flags on token and actor

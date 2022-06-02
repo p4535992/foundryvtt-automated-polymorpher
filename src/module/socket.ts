@@ -44,6 +44,10 @@ export function registerSocket() {
     API.invokePolymorpherManagerArr(...args),
   );
 
+  automatedPolymorpherSocket.register('invokePolymorpherManagerFromActor', (...args) =>
+    API.invokePolymorpherManagerFromActorArr(...args),
+  );
+
   /**
    * UI sockets
    */

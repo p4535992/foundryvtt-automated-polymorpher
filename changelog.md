@@ -1,8 +1,10 @@
-### 1.0.25
+### 1.0.3
 
 - NEW FEATURE: Integration for load actors directly from compendium
 - NEW FEATURE: Add module settings for enable Warpgate mutate function like a preference, on system with their own polymorph mcheanism like Dnd5e
 - NEW FEATURE: Integration for store actos directly on actor instead token on the dialog html
+- NEW API: Add api for call polymoprhing with actor reference instead token reference
+- Some bug fixing
 
 ### 1.0.24
 
