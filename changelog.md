@@ -1,4 +1,8 @@
-### 1.0.3
+### 1.0.31
+
+- Bug fix on hud click
+
+### 1.0.30
 
 - NEW FEATURE: Integration for load actors directly from compendium
 - NEW FEATURE: Add module settings for enable Warpgate mutate function like a preference, ke sense only on systems with their own polymorph mcheanism like Dnd5e

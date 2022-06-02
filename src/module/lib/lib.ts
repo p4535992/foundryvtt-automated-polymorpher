@@ -171,13 +171,19 @@ function addToPolymorphButton(html, sourceToken: Token) {
 
   button.find('i').on('click', async (ev) => {
     for (const targetToken of <Token[]>canvas.tokens?.controlled) {
-      API._invokePolymorpherManagerInner(actor, targetToken, false, ordered, random);
+      const targetActor = retrieveActorFromToken(targetToken);
+      if(targetActor){
+        API._invokePolymorpherManagerInner(targetActor, targetToken, false, ordered, random);
+      }
     }
   });
   button.find('i').on('contextmenu', async (ev) => {
     for (const targetToken of <Token[]>canvas.tokens?.controlled) {
       // Do somethign with right click
-      API._invokePolymorpherManagerInner(actor, targetToken, true, ordered, random);
+      const targetActor = retrieveActorFromToken(targetToken);
+      if(targetActor){
+        API._invokePolymorpherManagerInner(targetActor, targetToken, true, ordered, random);
+      }
     }
   });
 }
