@@ -1,3 +1,7 @@
+### 1.0.32
+
+- Little bug fix on api methods
+
 ### 1.0.31
 
 - Bug fix on hud click
