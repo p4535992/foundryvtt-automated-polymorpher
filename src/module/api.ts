@@ -1,9 +1,16 @@
 import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
 import { ANIMATIONS } from './animations';
-import { PolymorpherData, PolymorpherFlags } from './automatedPolymorpherModels';
+import {
+  PolymorpherData,
+  PolymorpherFlags,
+  TransformOptions,
+  TransformOptionsDnd5e,
+} from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
 import { error, info, retrieveActorFromToken, wait, warn } from './lib/lib';
 import { PolymorpherManager } from './polymorphermanager';
+import dnd5e from './systems/dnd5e';
+import generic from './systems/generic';
 
 const API = {
   async invokePolymorpherManagerArr(...inAttributes: any[]) {
@@ -189,12 +196,12 @@ const API = {
       }
 
       // Do something with left click
-      if (game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
+      if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
         info(`${actor.name} reverts to their original form`);
         // TODO show on chat ?
         //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-        //@ts-ignore
-        actor?.revertOriginalForm();
+        //actor?.revertOriginalForm();
+        API.revertOriginalForm(actor,false);
       } else {
         if (arrayMutationNames.length > 0) {
           for (const revertName of arrayMutationNames) {
@@ -290,6 +297,51 @@ const API = {
       } else {
         warn(`No token found on the canvas for id '${token.id}'`, true);
       }
+    }
+  },
+
+  get polymorphSetting(): TransformOptions | TransformOptionsDnd5e {
+    return <TransformOptions | TransformOptionsDnd5e>game.settings.get(CONSTANTS.MODULE_NAME, 'polymorphSetting');
+  },
+
+  async transformInto(
+    actorThis: Actor,
+    target: Actor,
+    transformOptions: TransformOptions | TransformOptionsDnd5e,
+    renderSheet: boolean,
+  ): Promise<any> {
+    if (game.system.id === 'dnd5e') {
+      return dnd5e.transformInto(actorThis, target, <TransformOptionsDnd5e>transformOptions, renderSheet);
+    } else {
+      return generic.transformInto(actorThis, target, transformOptions, renderSheet);
+    }
+  },
+
+  /**
+   * If this actor was transformed with transformTokens enabled, then its
+   * active tokens need to be returned to their original state. If not, then
+   * we can safely just delete this actor.
+   * @param {boolean} [renderSheet] Render Sheet after revert the transformation.
+   * @returns {Promise<Actor>|null}  Original actor if it was reverted.
+   */
+  async revertOriginalForm(actorThis: Actor, renderSheet: boolean) {
+    if (game.system.id === 'dnd5e') {
+      return dnd5e.revertOriginalForm(actorThis, renderSheet);
+    } else {
+      return generic.revertOriginalForm(actorThis, renderSheet);
+    }
+  },
+
+  async renderDialogTransformOptions(
+    tokenFromTransform: Token,
+    actorFromTransform: Actor,
+    actorToTransform: Actor,
+    animation: string,
+  ): Promise<Dialog<DialogOptions>> {
+    if (game.system.id === 'dnd5e') {
+      return dnd5e.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
+    } else {
+      return generic.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
     }
   },
 };

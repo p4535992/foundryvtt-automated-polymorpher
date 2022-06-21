@@ -1,11 +1,16 @@
-
-import type { ActorData, PrototypeTokenData, TokenData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
-import { PolymorpherFlags } from "../automatedPolymorpherModels";
-import CONSTANTS from "../constants";
-import { warn } from "../lib/lib";
+import { TransformOptions } from './../automatedPolymorpherModels';
+import type {
+  ActorData,
+  PrototypeTokenData,
+  TokenData,
+} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
+import { ANIMATIONS } from '../animations';
+import { PolymorpherFlags, TransformOptionsDnd5e } from '../automatedPolymorpherModels';
+import CONSTANTS from '../constants';
+import { i18n, info, warn } from '../lib/lib';
 
 export default {
-    /**
+  /**
    * Options that determine what properties of the original actor are kept and which are replaced with
    * the target actor.
    *
@@ -26,8 +31,47 @@ export default {
    * @property {boolean} [removeAE=false]        Remove active effects
    * @property {boolean} [keepAEOnlyOriginNotEquipment=false] Keep only active effects which origin is not equipment
    * @property {boolean} [transformTokens=true]  Transform linked tokens too
-   * @property {boolean} [renderSheet=true]  Render the sheet of the transformed actor after the polymorph
    */
+  polymorphSettings: {
+    keepPhysical: false,
+    keepMental: false,
+    keepSaves: false,
+    keepSkills: false,
+    mergeSaves: false,
+    mergeSkills: false,
+    keepClass: false,
+    keepFeats: false,
+    keepSpells: false,
+    keepItems: false,
+    keepBio: false,
+    keepVision: true,
+    keepSelf: false,
+    removeAE: false,
+    keepAEOnlyOriginNotEquipment: false,
+    transformTokens: true,
+  },
+
+  /**
+   * Settings to configure how actors are merged when polymorphing is applied.
+   * @enum {string}
+   */
+  i18nPolymorphSettings: {
+    keepPhysical: 'DND5E.PolymorphKeepPhysical',
+    keepMental: 'DND5E.PolymorphKeepMental',
+    keepSaves: 'DND5E.PolymorphKeepSaves',
+    keepSkills: 'DND5E.PolymorphKeepSkills',
+    mergeSaves: 'DND5E.PolymorphMergeSaves',
+    mergeSkills: 'DND5E.PolymorphMergeSkills',
+    keepClass: 'DND5E.PolymorphKeepClass',
+    keepFeats: 'DND5E.PolymorphKeepFeats',
+    keepSpells: 'DND5E.PolymorphKeepSpells',
+    keepItems: 'DND5E.PolymorphKeepItems',
+    keepBio: 'DND5E.PolymorphKeepBio',
+    keepVision: 'DND5E.PolymorphKeepVision',
+    keepSelf: 'DND5E.PolymorphKeepSelf',
+    removeAE: 'DND5E.PolymorphRemoveAE',
+    keepAEOnlyOriginNotEquipment: 'DND5E.PolymorphKeepAEOnlyOriginNotEquipment',
+  },
 
   /**
    * Transform this Actor into another one.
@@ -37,11 +81,28 @@ export default {
    * @param {TransformationOptions} [options={}]  Options that determine how the transformation is performed.
    * @returns {Promise<Array<Token>>|null}        Updated token if the transformation was performed.
    */
-  async transformInto(actorThis:Actor, target:Actor, { keepPhysical=false, keepMental=false, keepSaves=false, keepSkills=false,
-    mergeSaves=false, mergeSkills=false, keepClass=false, keepFeats=false, keepSpells=false,
-    keepItems=false, keepBio=false, keepVision=false,
-    keepSelf=false, removeAE=false, keepAEOnlyOriginNotEquipment=false,
-    transformTokens=true}={}, renderSheet=true) {
+  async transformInto(
+    actorThis: Actor,
+    target: Actor,
+    transformOptions: TransformOptionsDnd5e | undefined = undefined,
+    renderSheet = true,
+  ) {
+    const keepPhysical = transformOptions?.keepPhysical || false;
+    const keepMental = transformOptions?.keepMental || false;
+    const keepSaves = transformOptions?.keepSaves || false;
+    const keepSkills = transformOptions?.keepSkills || false;
+    const mergeSaves = transformOptions?.mergeSaves || false;
+    const mergeSkills = transformOptions?.mergeSkills || false;
+    const keepClass = transformOptions?.keepClass || false;
+    const keepFeats = transformOptions?.keepFeats || false;
+    const keepSpells = transformOptions?.keepSpells || false;
+    const keepItems = transformOptions?.keepItems || false;
+    const keepBio = transformOptions?.keepBio || false;
+    const keepVision = transformOptions?.keepVision || false;
+    const keepSelf = transformOptions?.keepSelf || false;
+    const removeAE = transformOptions?.removeAE || false;
+    const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
+    const transformTokens = transformOptions?.transformTokens || false;
 
     // Ensure the player is allowed to polymorph
     // const allowed = game.settings.get("dnd5e", "allowPolymorphing");
@@ -54,16 +115,19 @@ export default {
     // MOD 4535992
     //o.flags.dnd5e = o.flags.dnd5e || {};
     //o.flags.dnd5e.transformOptions = {mergeSkills, mergeSaves};
-    if(getProperty(o.flags, `${CONSTANTS.MODULE_NAME}`)){
-      setProperty(o.flags, `${CONSTANTS.MODULE_NAME}`,{});
+    if (getProperty(o.flags, `${CONSTANTS.MODULE_NAME}`)) {
+      setProperty(o.flags, `${CONSTANTS.MODULE_NAME}`, {});
     }
-    setProperty(o.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`, {mergeSkills, mergeSaves});
+    setProperty(o.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`, {
+      mergeSkills,
+      mergeSaves,
+    });
     const source = <any>target.toJSON();
 
     let d = <any>new Object();
-    if(keepSelf){
+    if (keepSelf) {
       // Keep Self
-      mergeObject(d,o);
+      mergeObject(d, o);
     }
 
     // Prepare new data to merge from the source
@@ -76,7 +140,7 @@ export default {
       img: source.img, // New appearance
       permission: o.permission, // Use the original actor permissions
       folder: o.folder, // Be displayed in the same sidebar folder
-      flags: o.flags // Use the original actor flags
+      flags: o.flags, // Use the original actor flags
     };
 
     // Specifically delete some data attributes
@@ -100,101 +164,103 @@ export default {
     d.data.attributes.ac.flat = target.data.data.attributes.ac.value; // Override AC
 
     // Token appearance updates
-    d.token = <PrototypeTokenData>{name: d.name};
-    for (const k of ["width", "height", "scale", "img", "mirrorX", "mirrorY", "tint", "alpha", "lockRotation"] ) {
+    d.token = <PrototypeTokenData>{ name: d.name };
+    for (const k of ['width', 'height', 'scale', 'img', 'mirrorX', 'mirrorY', 'tint', 'alpha', 'lockRotation']) {
       d.token[k] = source.token[k];
     }
 
-    if ( source.token.randomImg ) {
+    if (source.token.randomImg) {
       const images = await target.getTokenImages();
       d.token.img = <string>images[Math.floor(Math.random() * images.length)];
     }
 
-    if(!keepSelf){
-
-    const vision = keepVision ? o.token : source.token;
-    for (const k of ["dimSight", "brightSight", "dimLight", "brightLight", "vision", "sightAngle"] ) {
-      d.token[k] = vision[k];
-    }
-
-    // Transfer ability scores
-    //@ts-ignore
-    const abilities = d.data.abilities;
-    for (const k of Object.keys(abilities) ) {
-      const oa = o.data.abilities[k];
-      const prof = abilities[k].proficient;
-      if ( keepPhysical && ["str", "dex", "con"].includes(k) ) abilities[k] = oa;
-      else if ( keepMental && ["int", "wis", "cha"].includes(k) ) abilities[k] = oa;
-      if ( keepSaves ) abilities[k].proficient = oa.proficient;
-      else if ( mergeSaves ) abilities[k].proficient = Math.max(prof, oa.proficient);
-    }
-
-    // Transfer skills
-    if ( keepSkills ) d.data.skills = o.data.skills;
-    else if ( mergeSkills ) {
-      // eslint-disable-next-line prefer-const
-      for ( let [k, s] of Object.entries(d.data.skills) ) {
-        //@ts-ignore
-        s.value = Math.max(<number>(<any>s).value, o.data.skills[k].value);
+    if (!keepSelf) {
+      const vision = keepVision ? o.token : source.token;
+      for (const k of ['dimSight', 'brightSight', 'dimLight', 'brightLight', 'vision', 'sightAngle']) {
+        d.token[k] = vision[k];
       }
-    }
 
-    // Keep specific items from the original data
-    d.items = d.items.concat(o.items.filter(i => {
-      if ( ["class", "subclass"].includes(i.type) ) return keepClass;
-      else if ( i.type === "feat" ) return keepFeats;
-      else if ( i.type === "spell" ) return keepSpells;
-      else return keepItems;
-    }));
+      // Transfer ability scores
+      //@ts-ignore
+      const abilities = d.data.abilities;
+      for (const k of Object.keys(abilities)) {
+        const oa = o.data.abilities[k];
+        const prof = abilities[k].proficient;
+        if (keepPhysical && ['str', 'dex', 'con'].includes(k)) abilities[k] = oa;
+        else if (keepMental && ['int', 'wis', 'cha'].includes(k)) abilities[k] = oa;
+        if (keepSaves) abilities[k].proficient = oa.proficient;
+        else if (mergeSaves) abilities[k].proficient = Math.max(prof, oa.proficient);
+      }
 
-    // Transfer classes for NPCs
-    if ( !keepClass && d.data.details.cr ) {
-      d.items.push({
-        type: "class",
-        name: game.i18n.localize("DND5E.PolymorphTmpClass"),
-        data: { levels: d.data.details.cr }
-      });
-    }
-
-    // Keep biography
-    if (keepBio) d.data.details.biography = o.data.details.biography;
-
-    // Keep senses
-    if (keepVision) d.data.traits.senses = o.data.traits.senses;
-
-    // Not keep active effects
-    if(removeAE && !keepAEOnlyOriginNotEquipment) d.effects = [];
-
-    // Keep active effects only origin not equipment
-    if(keepAEOnlyOriginNotEquipment){
-      const tokenEffects = foundry.utils.deepClone(d.effects) || [];
-      const notEquipItems = ["feat", "spell", "class", "subclass"];
-      const tokenEffectsNotEquipment:any[] = [];
-      for(const effect of tokenEffects) {
-        if(!effect.origin.toLowerCase().startsWith("item")){
-          tokenEffectsNotEquipment.push(effect);
+      // Transfer skills
+      if (keepSkills) d.data.skills = o.data.skills;
+      else if (mergeSkills) {
+        // eslint-disable-next-line prefer-const
+        for (let [k, s] of Object.entries(d.data.skills)) {
+          //@ts-ignore
+          s.value = Math.max(<number>(<any>s).value, o.data.skills[k].value);
         }
       }
-      d.effects = tokenEffectsNotEquipment;
-    }
 
+      // Keep specific items from the original data
+      d.items = d.items.concat(
+        o.items.filter((i) => {
+          if (['class', 'subclass'].includes(i.type)) return keepClass;
+          else if (i.type === 'feat') return keepFeats;
+          else if (i.type === 'spell') return keepSpells;
+          else return keepItems;
+        }),
+      );
+
+      // Transfer classes for NPCs
+      if (!keepClass && d.data.details.cr) {
+        d.items.push({
+          type: 'class',
+          name: game.i18n.localize('DND5E.PolymorphTmpClass'),
+          data: { levels: d.data.details.cr },
+        });
+      }
+
+      // Keep biography
+      if (keepBio) d.data.details.biography = o.data.details.biography;
+
+      // Keep senses
+      if (keepVision) d.data.traits.senses = o.data.traits.senses;
+
+      // Not keep active effects
+      if (removeAE && !keepAEOnlyOriginNotEquipment) d.effects = [];
+
+      // Keep active effects only origin not equipment
+      if (keepAEOnlyOriginNotEquipment) {
+        const tokenEffects = foundry.utils.deepClone(d.effects) || [];
+        const notEquipItems = ['feat', 'spell', 'class', 'subclass'];
+        const tokenEffectsNotEquipment: any[] = [];
+        for (const effect of tokenEffects) {
+          if (!effect.origin.toLowerCase().startsWith('item')) {
+            tokenEffectsNotEquipment.push(effect);
+          }
+        }
+        d.effects = tokenEffectsNotEquipment;
+      }
     }
 
     // Set new data flags
     // if ( !actorThis.isPolymorphed || !d.flags.dnd5e.originalActor ) d.flags.dnd5e.originalActor = actorThis.id;
     // d.flags.dnd5e.isPolymorphed = true;
-    if ( !actorThis.getFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.IS_POLYMORPHED) ||
-      !getProperty(d.flags,`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}` )) {
-        setProperty(d.flags,`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,actorThis.id);
+    if (
+      !actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
+      !getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
+    ) {
+      setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, actorThis.id);
     }
-    setProperty(d.flags,`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`,true);
-    setProperty(d.flags,`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR}`,source.getTokenData());
+    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR}`, source.getTokenData());
 
     // Update unlinked Tokens in place since they can simply be re-dropped from the base actor
-    if ( actorThis.isToken ) {
+    if (actorThis.isToken) {
       const tokenData = d.token;
       // tokenData.actorData = d;
-      setProperty(tokenData,`actorData`,d);
+      setProperty(tokenData, `actorData`, d);
       //@ts-ignore
       delete tokenData.actorData.token;
       return actorThis.token?.update(tokenData);
@@ -212,23 +278,20 @@ export default {
      * @param {object} data                    The data that will be used to create the new transformed actor.
      * @param {TransformationOptions} options  Options that determine how the transformation is performed.
      */
-    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.transformActor`, actorThis, target, d, {
-      keepPhysical, keepMental, keepSaves, keepSkills, mergeSaves, mergeSkills,
-      keepClass, keepFeats, keepSpells, keepItems, keepBio, keepVision, keepSelf, removeAE, keepAEOnlyOriginNotEquipment, transformTokens, renderSheet
-    });
+    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.transformActor`, actorThis, target, d, transformOptions, renderSheet);
 
     // Some info like height and weight of the token are reset to default
     // after the constructor of the actor is invoked solved with a backup of the info of the token
     const tokenBackup = duplicate(d.token);
     // Create new Actor with transformed data
     //@ts-ignore
-    const newActor = await actorThis.constructor.create(d, {renderSheet: renderSheet});
+    const newActor = await actorThis.constructor.create(d, { renderSheet: renderSheet });
     mergeObject(d.token, tokenBackup);
 
     // Update placed Token instances
-    if ( !transformTokens ) return;
+    if (!transformTokens) return;
     const tokens = actorThis.getActiveTokens(true);
-    const updates = tokens.map(t => {
+    const updates = tokens.map((t) => {
       const newTokenData = foundry.utils.deepClone(d.token);
       newTokenData._id = t.data._id;
       //@ts-ignore
@@ -237,10 +300,8 @@ export default {
       return newTokenData;
     });
     //@ts-ignore
-    return canvas.scene?.updateEmbeddedDocuments("Token", updates);
+    return canvas.scene?.updateEmbeddedDocuments('Token', updates);
   },
-
-  /* -------------------------------------------- */
 
   /**
    * If this actor was transformed with transformTokens enabled, then its
@@ -249,10 +310,10 @@ export default {
    * @param {boolean} [renderSheet] Render Sheet after revert the transformation.
    * @returns {Promise<Actor>|null}  Original actor if it was reverted.
    */
-  async revertOriginalForm(actorThis:Actor, renderSheet=true) {
-    if ( !actorThis.getFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.IS_POLYMORPHED) ) return;
-    if ( !actorThis.isOwner ) {
-      return warn(game.i18n.localize("DND5E.PolymorphRevertWarn"), true);
+  async revertOriginalForm(actorThis: Actor, renderSheet = true) {
+    if (!actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) return;
+    if (!actorThis.isOwner) {
+      return warn(game.i18n.localize('DND5E.PolymorphRevertWarn'), true);
     }
 
     /**
@@ -264,57 +325,84 @@ export default {
      */
     Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, actorThis, renderSheet);
 
-    const previousOriginalActorTokenData = <TokenData>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
+    const previousOriginalActorTokenData = <TokenData>(
+      actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR)
+    );
     let isTheOriginalActor = false;
-    if(!previousOriginalActorTokenData){
+    if (!previousOriginalActorTokenData) {
       isTheOriginalActor = true;
     }
 
     // If we are reverting an unlinked token, simply replace it with the base actor prototype
-    if ( actorThis.isToken ) {
+    if (actorThis.isToken) {
       // Obtain a reference to the base actor prototype
       const baseActor = <Actor>game.actors?.get(<string>actorThis.token?.data.actorId);
 
-      if ( !baseActor ) {
-        if(!previousOriginalActorTokenData){
-          warn(game.i18n.format("DND5E.PolymorphRevertNoOriginalActorWarn", { reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR) }), true);
+      if (!baseActor) {
+        if (!previousOriginalActorTokenData) {
+          warn(
+            game.i18n.format('DND5E.PolymorphRevertNoOriginalActorWarn', {
+              reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
+            }),
+            true,
+          );
           return;
         }
       }
-      const prototypeTokenData = previousOriginalActorTokenData ? previousOriginalActorTokenData : await baseActor.getTokenData();
-      const tokenUpdate = {actorData: {}};
-      for ( const k of ["width", "height", "scale", "img", "mirrorX", "mirrorY", "tint", "alpha", "lockRotation", "name"] ) {
+      const prototypeTokenData = previousOriginalActorTokenData
+        ? previousOriginalActorTokenData
+        : await baseActor.getTokenData();
+      const tokenUpdate = { actorData: {} };
+      for (const k of [
+        'width',
+        'height',
+        'scale',
+        'img',
+        'mirrorX',
+        'mirrorY',
+        'tint',
+        'alpha',
+        'lockRotation',
+        'name',
+      ]) {
         tokenUpdate[k] = prototypeTokenData[k];
       }
-      await actorThis.token?.update(tokenUpdate, {recursive: false});
+      await actorThis.token?.update(tokenUpdate, { recursive: false });
       await actorThis.sheet?.close();
       const actor = <Actor>actorThis.token?.getActor();
 
-      if(isTheOriginalActor){
-        await actorThis.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.IS_POLYMORPHED);
+      if (isTheOriginalActor) {
+        await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
       }
-      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
+      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
 
-      if ( renderSheet ) {
+      if (renderSheet) {
         actor.sheet?.render(true);
       }
       return actor;
     }
 
     // Obtain a reference to the original actor
-    const original = <Actor>game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR));
-    if ( !original ) {
-      if(!previousOriginalActorTokenData){
-        warn(game.i18n.format("DND5E.PolymorphRevertNoOriginalActorWarn", { reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR) }), true);
+    const original = <Actor>(
+      game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
+    );
+    if (!original) {
+      if (!previousOriginalActorTokenData) {
+        warn(
+          game.i18n.format('DND5E.PolymorphRevertNoOriginalActorWarn', {
+            reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
+          }),
+          true,
+        );
         return;
       }
     }
     // Get the Tokens which represent this actor
-    if ( canvas.ready ) {
+    if (canvas.ready) {
       const tokens = actorThis.getActiveTokens(true);
       const tokenData = previousOriginalActorTokenData ? previousOriginalActorTokenData : await original.getTokenData();
-      const tokenUpdates = tokens.map(t => {
-      const update = duplicate(tokenData);
+      const tokenUpdates = tokens.map((t) => {
+        const update = duplicate(tokenData);
         update._id = t.id;
         //@ts-ignore
         delete update.x;
@@ -322,30 +410,173 @@ export default {
         delete update.y;
         return update;
       });
-      await canvas.scene?.updateEmbeddedDocuments("Token", tokenUpdates);
-    } else if(previousOriginalActorTokenData) {
+      await canvas.scene?.updateEmbeddedDocuments('Token', tokenUpdates);
+    } else if (previousOriginalActorTokenData) {
       const tokenData = previousOriginalActorTokenData;
       const update = duplicate(tokenData);
       //@ts-ignore
       delete update.x;
       //@ts-ignore
       delete update.y;
-      await canvas.scene?.updateEmbeddedDocuments("Token", [update]);
+      await canvas.scene?.updateEmbeddedDocuments('Token', [update]);
     }
 
-    if(isTheOriginalActor){
-      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.IS_POLYMORPHED);
+    if (isTheOriginalActor) {
+      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
     }
-    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
+    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
 
     // Delete the polymorphed version of the actor, if possible
     const isRendered = actorThis.sheet?.rendered;
-    if ( game.user?.isGM ) await actorThis.delete();
-    else if ( isRendered ) actorThis.sheet?.close();
-    if ( isRendered && renderSheet ) {
+    if (game.user?.isGM) await actorThis.delete();
+    else if (isRendered) actorThis.sheet?.close();
+    if (isRendered && renderSheet) {
       original.sheet?.render(isRendered);
     }
     return original;
-  }
+  },
 
-}
+  async renderDialogTransformOptions(actorFromTransform: Actor, actorToTransform: Actor, animation: string) {
+    const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
+    const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
+        return t.actor?.id === actorFromTransform.id;
+      }) || undefined;
+    // Define a function to record polymorph settings for future use
+    const rememberOptions = (html) => {
+      const options = {};
+      html.find('input').each((i, el) => {
+        options[el.name] = el.checked;
+      });
+      const settings = mergeObject(this.transformOptions || {}, options);
+      //game.settings.set('dnd5e', 'polymorphSettings', settings);
+      return settings;
+    };
+
+    // Create and render the Dialog
+    return new Dialog(
+      {
+        title: i18n('DND5E.PolymorphPromptTitle'),
+        //@ts-ignore
+        content: {
+          options: this.polymorphSetting,
+          i18n: this.i18nPolymorphSettings,
+          isToken: actorFromTransform.isToken,
+        },
+        default: 'accept',
+        buttons: {
+          accept: {
+            icon: '<i class="fas fa-check"></i>',
+            label: i18n('DND5E.PolymorphAcceptSettings'),
+            callback: async (html) => {
+              if (tokenFromTransform) {
+                if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+                  game.macros
+                    ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                    //@ts-ignore
+                    ?.execute(tokenFromTransform, tokenDataToTransform);
+                } else {
+                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+                }
+                await this.wait(ANIMATIONS.animationFunctions[animation].time);
+              }
+              info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
+              // TODO show on chat ?
+              //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+              await this.transformInto(
+                actorFromTransform,
+                actorToTransform,
+                rememberOptions(html),
+                false);
+              if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
+                this.close();
+              } else {
+                this.maximize();
+              }
+            },
+          },
+          wildshape: {
+            icon: '<i class="fas fa-paw"></i>',
+            label: i18n('DND5E.PolymorphWildShape'),
+            callback: async (html) => {
+              if (tokenFromTransform) {
+                if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+                  game.macros
+                    ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                    //@ts-ignore
+                    ?.execute(tokenFromTransform, tokenDataToTransform);
+                } else {
+                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+                }
+                await this.wait(ANIMATIONS.animationFunctions[animation].time);
+              }
+              info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
+              // TODO show on chat ?
+              //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+              //@ts-ignore
+              await this.transformInto(
+                actorFromTransform,
+                actorToTransform,
+                {
+                  keepBio: true,
+                  keepClass: true,
+                  keepMental: true,
+                  mergeSaves: true,
+                  mergeSkills: true,
+                  transformTokens: rememberOptions(html).transformTokens,
+                },
+                false);
+              if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
+                this.close();
+              } else {
+                this.maximize();
+              }
+            },
+          },
+          polymorph: {
+            icon: '<i class="fas fa-pastafarianism"></i>',
+            label: i18n('DND5E.Polymorph'),
+            callback: async (html) => {
+              if (tokenFromTransform) {
+                if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+                  game.macros
+                    ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                    //@ts-ignore
+                    ?.execute(tokenFromTransform, tokenDataToTransform);
+                } else {
+                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+                }
+                await this.wait(ANIMATIONS.animationFunctions[animation].time);
+              }
+              info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
+              // TODO show on chat ?
+              //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+              //@ts-ignore
+              await this.transformInto(
+                actorFromTransform,
+                actorToTransform,
+                {
+                  transformTokens: rememberOptions(html).transformTokens,
+                },
+                false);
+              if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
+                this.close();
+              } else {
+                this.maximize();
+              }
+            },
+          },
+          cancel: {
+            icon: '<i class="fas fa-times"></i>',
+            label: i18n('Cancel'),
+          },
+        },
+      },
+      {
+        classes: ['dialog', 'dnd5e'],
+        width: 600,
+        template: `modules/${CONSTANTS.MODULE_NAME}/templates/polymorph-prompt.hbs`,
+      },
+      // ).render(true);
+    );
+  },
+};

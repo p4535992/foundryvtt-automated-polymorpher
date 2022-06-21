@@ -1,5 +1,6 @@
 import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
 import { ANIMATIONS } from './animations';
+import API from './api';
 import { PolymorpherData, PolymorpherFlags, PolymorpherCompendiumData } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
 import { error, i18n, info, retrieveActorFromData, wait, warn } from './lib/lib';
@@ -186,7 +187,7 @@ export class PolymorpherManager extends FormApplication {
       return;
     }
     // const duplicates = <number>$(event.currentTarget.parentElement.parentElement).find('#polymorpher-number-val').val();
-    const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
+    // const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
     //@ts-ignore
     // const tokenFromTransform = await warpgate.crosshairs.show({
     //   size: Math.max(tokenData.width,tokenData.height)*tokenData.scale,
@@ -204,27 +205,16 @@ export class PolymorpherManager extends FormApplication {
       tokenFromTransform = this.token;
     }
     // Get the target actor
-    const sourceActor = actorToTransform;
-    if (!sourceActor) {
+    if (!actorToTransform) {
       return;
     }
+    /*
     if (game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
       const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
       if (!canPolymorph) {
         warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
         return false;
       }
-
-      // Define a function to record polymorph settings for future use
-      const rememberOptions = (html) => {
-        const options = {};
-        html.find('input').each((i, el) => {
-          options[el.name] = el.checked;
-        });
-        const settings = mergeObject(<any>game.settings.get('dnd5e', 'polymorphSettings') || {}, options);
-        game.settings.set('dnd5e', 'polymorphSettings', settings);
-        return settings;
-      };
 
       // Prepare flag for revert ???
       let updatesForRevert: any = {};
@@ -237,6 +227,17 @@ export class PolymorpherManager extends FormApplication {
         updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       }
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+
+      // Define a function to record polymorph settings for future use
+      const rememberOptions = (html) => {
+        const options = {};
+        html.find('input').each((i, el) => {
+          options[el.name] = el.checked;
+        });
+        const settings = mergeObject(<any>game.settings.get('dnd5e', 'polymorphSettings') || {}, options);
+        game.settings.set('dnd5e', 'polymorphSettings', settings);
+        return settings;
+      };
 
       // Create and render the Dialog
       return new Dialog(
@@ -266,11 +267,11 @@ export class PolymorpherManager extends FormApplication {
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
-                info(`${this.actor.name} turns into a ${sourceActor.name}`);
+                info(`${this.actor.name} turns into a ${actorToTransform.name}`);
                 // TODO show on chat ?
-                //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+                //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                await this.actor.transformInto(sourceActor, rememberOptions(html));
+                await this.actor.transformInto(actorToTransform, rememberOptions(html));
                 if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                   this.close();
                 } else {
@@ -293,11 +294,11 @@ export class PolymorpherManager extends FormApplication {
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
-                info(`${this.actor.name} turns into a ${sourceActor.name}`);
+                info(`${this.actor.name} turns into a ${actorToTransform.name}`);
                 // TODO show on chat ?
-                //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+                //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                await this.actor.transformInto(sourceActor, {
+                await this.actor.transformInto(actorToTransform, {
                   keepBio: true,
                   keepClass: true,
                   keepMental: true,
@@ -327,11 +328,11 @@ export class PolymorpherManager extends FormApplication {
                   }
                   await this.wait(ANIMATIONS.animationFunctions[animation].time);
                 }
-                info(`${this.actor.name} turns into a ${sourceActor.name}`);
+                info(`${this.actor.name} turns into a ${actorToTransform.name}`);
                 // TODO show on chat ?
-                //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+                //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
                 //@ts-ignore
-                await this.actor.transformInto(sourceActor, {
+                await this.actor.transformInto(actorToTransform, {
                   transformTokens: rememberOptions(html).transformTokens,
                 });
                 if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
@@ -353,10 +354,32 @@ export class PolymorpherManager extends FormApplication {
           template: 'systems/dnd5e/templates/apps/polymorph-prompt.html',
         },
       ).render(true);
-    } else {
-      // ===========================================
-      // If system is not dnd5e we can use warpgate
-      // ===========================================
+    */
+    if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
+      // Prepare flag for revert ???
+      let updatesForRevert: any = {};
+      if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
+        updatesForRevert = {
+          tokenData: this.token.data,
+          actorData: this.actor.data,
+        };
+      } else {
+        updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+      }
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+      const dialog = await API.renderDialogTransformOptions(
+        tokenFromTransform,
+        this.actor,
+        actorToTransform,
+        animation,
+      );
+      dialog.render(true);
+    }
+    // ===========================================
+    // If system is not dnd5e we can use warpgate
+    // ===========================================
+    else {
+      const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
       if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
         game.macros
           ?.getName(ANIMATIONS.animationFunctions[animation].fn)
@@ -432,9 +455,9 @@ export class PolymorpherManager extends FormApplication {
       const mutationNameOriginalToken = tokenFromTransform.id + randomID();
       arrayMutationNames.push(mutationNameOriginalToken);
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
-      info(`${this.actor.name} mutate into a ${sourceActor.name}`);
+      info(`${this.actor.name} mutate into a ${actorToTransform.name}`);
       // TODO show on chat ?
-      //await ChatMessage.create({content: `${this.actor.name} mutate into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+      //await ChatMessage.create({content: `${this.actor.name} mutate into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
       //@ts-ignore
       await warpgate.mutate(
         tokenFromTransform.document,
@@ -545,22 +568,22 @@ export class PolymorpherManager extends FormApplication {
     const restricted = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOwned');
     if (restricted && !actorToTransformLi.isOwner) return '';
     const $li = $(`
-	    <li id="polymorpher" 
-        class="polymorpher-item" 
-        data-aid="${actorToTransformLi.id}" 
-        data-aname="${actorToTransformLi.name}" 
-        data-acompendiumid="${data.compendiumid}" 
-        data-elid="${actorToTransformLi.id}" 
+	    <li id="polymorpher"
+        class="polymorpher-item"
+        data-aid="${actorToTransformLi.id}"
+        data-aname="${actorToTransformLi.name}"
+        data-acompendiumid="${data.compendiumid}"
+        data-elid="${actorToTransformLi.id}"
         draggable="true">
 
         <div class="summon-btn">
-          <img 
-            class="actor-image" 
+          <img
+            class="actor-image"
             src="${actorToTransformLi.data.img}" alt="">
-          <div 
-            class="warpgate-btn" 
-            id="summon-polymorpher" 
-            data-aid="${actorToTransformLi.id}" 
+          <div
+            class="warpgate-btn"
+            id="summon-polymorpher"
+            data-aid="${actorToTransformLi.id}"
             data-aname="${actorToTransformLi.name}"
             data-acompendiumid="${data.compendiumid}"
             data-elid="${actorToTransformLi.id}">
@@ -572,10 +595,10 @@ export class PolymorpherManager extends FormApplication {
         </select>
         ${
           isDnd5e
-            ? `<select 
-              id="automated-polymorpher.defaultSummonType" 
-              class="defaultSummonType" name="defaultSummonType" 
-              data-dtype="String" 
+            ? `<select
+              id="automated-polymorpher.defaultSummonType"
+              class="defaultSummonType" name="defaultSummonType"
+              data-dtype="String"
               is="ms-dropdown-ap">
               ${this.getDefaultSummonTypes(data.defaultsummontype, data)}
             </select>`
@@ -720,8 +743,7 @@ export class PolymorpherManager extends FormApplication {
       tokenFromTransform = this.token;
     }
     // Get the target actor
-    const sourceActor = actorToTransform;
-    if (!sourceActor) {
+    if (!actorToTransform) {
       return;
     }
     if (game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
@@ -772,14 +794,13 @@ export class PolymorpherManager extends FormApplication {
             await wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
-        info(`${this.actor.name} turns into a ${sourceActor.name}`);
+        info(`${this.actor.name} turns into a ${actorToTransform.name}`);
         // TODO show on chat ?
-        //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-        //@ts-ignore
-        await this.actor.transformInto(
-          sourceActor,
-          // rememberOptions(html),
-          {
+        //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+        await API.transformInto(
+          this.actor,
+          actorToTransform,
+          <any>{
             keepPhysical: false,
             keepMental: false,
             keepSaves: false,
@@ -794,6 +815,7 @@ export class PolymorpherManager extends FormApplication {
             keepVision: true,
             transformTokens: true,
           },
+          false
         );
       } else if (polymorpherData.defaultsummontype === 'DND5E.PolymorphWildShape') {
         if (tokenFromTransform) {
@@ -814,18 +836,21 @@ export class PolymorpherManager extends FormApplication {
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
-        info(`${this.actor.name} turns into a ${sourceActor.name}`);
+        info(`${this.actor.name} turns into a ${actorToTransform.name}`);
         // TODO show on chat ?
-        //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-        //@ts-ignore
-        await this.actor.transformInto(sourceActor, {
-          keepBio: true,
-          keepClass: true,
-          keepMental: true,
-          mergeSaves: true,
-          mergeSkills: true,
-          transformTokens: true,
-        });
+        //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+        await API.transformInto(
+          this.actor,
+          actorToTransform,
+          <any>{
+            keepBio: true,
+            keepClass: true,
+            keepMental: true,
+            mergeSaves: true,
+            mergeSkills: true,
+            transformTokens: true,
+          },
+          false);
       } else if (polymorpherData.defaultsummontype === 'DND5E.Polymorph') {
         if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
@@ -845,25 +870,28 @@ export class PolymorpherManager extends FormApplication {
             await this.wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
-        info(`${this.actor.name} turns into a ${sourceActor.name}`);
+        info(`${this.actor.name} turns into a ${actorToTransform.name}`);
         // TODO show on chat ?
-        //await ChatMessage.create({content: `${this.actor.name} turns into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-        //@ts-ignore
-        await this.actor.transformInto(sourceActor, {
-          keepPhysical: false,
-          keepMental: false,
-          keepSaves: false,
-          keepSkills: false,
-          mergeSaves: false,
-          mergeSkills: false,
-          keepClass: false,
-          keepFeats: false,
-          keepSpells: false,
-          keepItems: false,
-          keepBio: false,
-          keepVision: true,
-          transformTokens: true,
-        });
+        //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+        await API.transformInto(
+          this.actor,
+          actorToTransform,
+          <any>{
+            keepPhysical: false,
+            keepMental: false,
+            keepSaves: false,
+            keepSkills: false,
+            mergeSaves: false,
+            mergeSkills: false,
+            keepClass: false,
+            keepFeats: false,
+            keepSpells: false,
+            keepItems: false,
+            keepBio: false,
+            keepVision: true,
+            transformTokens: true,
+          },
+          false);
       } else {
         warn(
           `No default summon type is setted for any polymorphing actor on the list associated to this actor ${actorToTransform.name}`,
@@ -936,9 +964,9 @@ export class PolymorpherManager extends FormApplication {
       const mutationNameOriginalToken = tokenFromTransform.id + randomID();
       arrayMutationNames.push(mutationNameOriginalToken);
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
-      info(`${this.actor.name} mutate into a ${sourceActor.name}`);
+      info(`${this.actor.name} mutate into a ${actorToTransform.name}`);
       // TODO show on chat ?
-      //await ChatMessage.create({content: `${this.actor.name} mutate into a ${sourceActor.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+      //await ChatMessage.create({content: `${this.actor.name} mutate into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
       //@ts-ignore
       await warpgate.mutate(
         tokenFromTransform.document,

@@ -37,7 +37,7 @@ export enum PolymorpherFlags {
   // ORIGINAL FLAG DND5E
   IS_POLYMORPHED = 'isPolymorphed',
   ORIGINAL_ACTOR = 'originalActor',
-  PREVIOUS_ORIGINAL_ACTOR = 'previousOriginalActor'
+  PREVIOUS_ORIGINAL_ACTOR = 'previousOriginalActor',
 }
 
 export class PolymorpherData {
@@ -55,8 +55,29 @@ export class PolymorpherCompendiumData {
   selected: boolean;
 }
 
-export class PolymorpherRevertData {
-  id: string;
-  name: string;
-  compendiumid: string;
+export class TransformOptions {
+  keepVision = false;
+  keepSelf = false;
+  removeAE = false;
+  keepAEOnlyOriginNotEquipment = false;
+  transformTokens = true;
+}
+
+export class TransformOptionsDnd5e extends TransformOptions {
+  keepPhysical = false;
+  keepMental = false;
+  keepSaves = false;
+  keepSkills = false;
+  mergeSaves = false;
+  mergeSkills = false;
+  keepClass = false;
+  keepFeats = false;
+  keepSpells = false;
+  keepItems = false;
+  keepBio = false;
+  // keepVision=false;
+  // keepSelf=false;
+  // removeAE=false;
+  // keepAEOnlyOriginNotEquipment=false;
+  // transformTokens=true;
 }
