@@ -34,9 +34,10 @@ export enum PolymorpherFlags {
   UPDATES_FOR_REVERT = 'updatesforrevert',
   MUTATION_NAMES_FOR_REVERT = 'mutationNamesForRevert',
   TRANSFORMER_OPTIONS = 'transformOptions',
+  // ORIGINAL FLAG DND5E
   IS_POLYMORPHED = 'isPolymorphed',
   ORIGINAL_ACTOR = 'originalActor',
-  PREVIOUS_ACTOR = 'previousActor'
+  PREVIOUS_ORIGINAL_ACTOR = 'previousOriginalActor'
 }
 
 export class PolymorpherData {

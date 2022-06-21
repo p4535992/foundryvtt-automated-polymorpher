@@ -1,5 +1,5 @@
 
-import type { ActorData, PrototypeTokenData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
+import type { ActorData, PrototypeTokenData, TokenData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import { PolymorpherFlags } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
 import { warn } from "../lib/lib";
@@ -54,6 +54,9 @@ export default {
     // MOD 4535992
     //o.flags.dnd5e = o.flags.dnd5e || {};
     //o.flags.dnd5e.transformOptions = {mergeSkills, mergeSaves};
+    if(getProperty(o.flags, `${CONSTANTS.MODULE_NAME}`)){
+      setProperty(o.flags, `${CONSTANTS.MODULE_NAME}`,{});
+    }
     setProperty(o.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`, {mergeSkills, mergeSaves});
     const source = <any>target.toJSON();
 
@@ -181,10 +184,11 @@ export default {
     // if ( !actorThis.isPolymorphed || !d.flags.dnd5e.originalActor ) d.flags.dnd5e.originalActor = actorThis.id;
     // d.flags.dnd5e.isPolymorphed = true;
     if ( !actorThis.getFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.IS_POLYMORPHED) ||
-      !getProperty(d.flags,`${PolymorpherFlags.IS_POLYMORPHED}.${PolymorpherFlags.ORIGINAL_ACTOR}` )) {
-        setProperty(d.flags,`${PolymorpherFlags.IS_POLYMORPHED}.${PolymorpherFlags.ORIGINAL_ACTOR}`,actorThis.id);
+      !getProperty(d.flags,`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}` )) {
+        setProperty(d.flags,`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,actorThis.id);
     }
-    setProperty(d.flags,`${PolymorpherFlags.IS_POLYMORPHED}`,true);
+    setProperty(d.flags,`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`,true);
+    setProperty(d.flags,`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR}`,source.getTokenData());
 
     // Update unlinked Tokens in place since they can simply be re-dropped from the base actor
     if ( actorThis.isToken ) {
@@ -260,10 +264,24 @@ export default {
      */
     Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, actorThis, renderSheet);
 
+    const previousOriginalActorTokenData = <TokenData>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
+    let isTheOriginalActor = false;
+    if(!previousOriginalActorTokenData){
+      isTheOriginalActor = true;
+    }
+
     // If we are reverting an unlinked token, simply replace it with the base actor prototype
     if ( actorThis.isToken ) {
+      // Obtain a reference to the base actor prototype
       const baseActor = <Actor>game.actors?.get(<string>actorThis.token?.data.actorId);
-      const prototypeTokenData = await baseActor.getTokenData();
+
+      if ( !baseActor ) {
+        if(!previousOriginalActorTokenData){
+          warn(game.i18n.format("DND5E.PolymorphRevertNoOriginalActorWarn", { reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR) }), true);
+          return;
+        }
+      }
+      const prototypeTokenData = previousOriginalActorTokenData ? previousOriginalActorTokenData : await baseActor.getTokenData();
       const tokenUpdate = {actorData: {}};
       for ( const k of ["width", "height", "scale", "img", "mirrorX", "mirrorY", "tint", "alpha", "lockRotation", "name"] ) {
         tokenUpdate[k] = prototypeTokenData[k];
@@ -271,6 +289,12 @@ export default {
       await actorThis.token?.update(tokenUpdate, {recursive: false});
       await actorThis.sheet?.close();
       const actor = <Actor>actorThis.token?.getActor();
+
+      if(isTheOriginalActor){
+        await actorThis.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.IS_POLYMORPHED);
+      }
+      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
+
       if ( renderSheet ) {
         actor.sheet?.render(true);
       }
@@ -280,13 +304,15 @@ export default {
     // Obtain a reference to the original actor
     const original = <Actor>game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR));
     if ( !original ) {
-      warn(game.i18n.format("DND5E.PolymorphRevertNoOriginalActorWarn", { reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR) }), true);
-      return;
+      if(!previousOriginalActorTokenData){
+        warn(game.i18n.format("DND5E.PolymorphRevertNoOriginalActorWarn", { reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR) }), true);
+        return;
+      }
     }
     // Get the Tokens which represent this actor
     if ( canvas.ready ) {
       const tokens = actorThis.getActiveTokens(true);
-      const tokenData = await original.getTokenData();
+      const tokenData = previousOriginalActorTokenData ? previousOriginalActorTokenData : await original.getTokenData();
       const tokenUpdates = tokens.map(t => {
       const update = duplicate(tokenData);
         update._id = t.id;
@@ -296,8 +322,21 @@ export default {
         delete update.y;
         return update;
       });
-      canvas.scene?.updateEmbeddedDocuments("Token", tokenUpdates);
+      await canvas.scene?.updateEmbeddedDocuments("Token", tokenUpdates);
+    } else if(previousOriginalActorTokenData) {
+      const tokenData = previousOriginalActorTokenData;
+      const update = duplicate(tokenData);
+      //@ts-ignore
+      delete update.x;
+      //@ts-ignore
+      delete update.y;
+      await canvas.scene?.updateEmbeddedDocuments("Token", [update]);
     }
+
+    if(isTheOriginalActor){
+      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.IS_POLYMORPHED);
+    }
+    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
 
     // Delete the polymorphed version of the actor, if possible
     const isRendered = actorThis.sheet?.rendered;
