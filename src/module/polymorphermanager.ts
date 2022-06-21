@@ -265,7 +265,7 @@ export class PolymorpherManager extends FormApplication {
                   } else {
                     ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                   }
-                  await this.wait(ANIMATIONS.animationFunctions[animation].time);
+                  await wait(ANIMATIONS.animationFunctions[animation].time);
                 }
                 info(`${this.actor.name} turns into a ${actorToTransform.name}`);
                 // TODO show on chat ?
@@ -292,7 +292,7 @@ export class PolymorpherManager extends FormApplication {
                   } else {
                     ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                   }
-                  await this.wait(ANIMATIONS.animationFunctions[animation].time);
+                  await wait(ANIMATIONS.animationFunctions[animation].time);
                 }
                 info(`${this.actor.name} turns into a ${actorToTransform.name}`);
                 // TODO show on chat ?
@@ -326,7 +326,7 @@ export class PolymorpherManager extends FormApplication {
                   } else {
                     ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                   }
-                  await this.wait(ANIMATIONS.animationFunctions[animation].time);
+                  await wait(ANIMATIONS.animationFunctions[animation].time);
                 }
                 info(`${this.actor.name} turns into a ${actorToTransform.name}`);
                 // TODO show on chat ?
@@ -373,6 +373,11 @@ export class PolymorpherManager extends FormApplication {
         actorToTransform,
         animation,
       );
+      if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
+        this.close();
+      } else {
+        this.maximize();
+      }
       dialog.render(true);
     }
     // ===========================================
@@ -388,7 +393,7 @@ export class PolymorpherManager extends FormApplication {
       } else {
         ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
       }
-      await this.wait(ANIMATIONS.animationFunctions[animation].time);
+      await wait(ANIMATIONS.animationFunctions[animation].time);
 
       //get custom data macro
       /* DO NOT NEED THESE
@@ -468,8 +473,11 @@ export class PolymorpherManager extends FormApplication {
         },
       );
 
-      if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) this.close();
-      else this.maximize();
+      if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
+        this.close();
+      } else {
+        this.maximize();
+      }
     }
   }
 
@@ -833,7 +841,7 @@ export class PolymorpherManager extends FormApplication {
             } else {
               ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
             }
-            await this.wait(ANIMATIONS.animationFunctions[animation].time);
+            await wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
         info(`${this.actor.name} turns into a ${actorToTransform.name}`);
@@ -868,7 +876,7 @@ export class PolymorpherManager extends FormApplication {
             } else {
               ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
             }
-            await this.wait(ANIMATIONS.animationFunctions[animation].time);
+            await wait(ANIMATIONS.animationFunctions[animation].time);
           }
         }
         info(`${this.actor.name} turns into a ${actorToTransform.name}`);
@@ -918,7 +926,7 @@ export class PolymorpherManager extends FormApplication {
         } else {
           ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
         }
-        await this.wait(ANIMATIONS.animationFunctions[animation].time);
+        await wait(ANIMATIONS.animationFunctions[animation].time);
       }
 
       // Prepare flag for revert ???

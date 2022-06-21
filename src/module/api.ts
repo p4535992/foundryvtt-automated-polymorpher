@@ -305,15 +305,15 @@ const API = {
   },
 
   async transformInto(
-    actorThis: Actor,
-    target: Actor,
+    actorFromTransform: Actor,
+    actorToTransform: Actor,
     transformOptions: TransformOptions | TransformOptionsDnd5e,
     renderSheet: boolean,
   ): Promise<any> {
     if (game.system.id === 'dnd5e') {
-      return dnd5e.transformInto(actorThis, target, <TransformOptionsDnd5e>transformOptions, renderSheet);
+      return dnd5e.transformInto(actorFromTransform, actorToTransform, <TransformOptionsDnd5e>transformOptions, renderSheet);
     } else {
-      return generic.transformInto(actorThis, target, transformOptions, renderSheet);
+      return generic.transformInto(actorFromTransform, actorToTransform, transformOptions, renderSheet);
     }
   },
 

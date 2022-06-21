@@ -7,7 +7,7 @@ import type {
 import { ANIMATIONS } from '../animations';
 import { PolymorpherFlags, TransformOptionsDnd5e } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
-import { i18n, info, warn } from '../lib/lib';
+import { i18n, info, wait, warn } from '../lib/lib';
 
 export default {
   /**
@@ -102,7 +102,7 @@ export default {
     const keepSelf = transformOptions?.keepSelf || false;
     const removeAE = transformOptions?.removeAE || false;
     const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
-    const transformTokens = transformOptions?.transformTokens || false;
+    const transformTokens = transformOptions?.transformTokens || true;
 
     // Ensure the player is allowed to polymorph
     // const allowed = game.settings.get("dnd5e", "allowPolymorphing");
@@ -254,7 +254,7 @@ export default {
       setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, actorThis.id);
     }
     setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR}`, source.getTokenData());
+    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR}`, actorThis.getTokenData());
 
     // Update unlinked Tokens in place since they can simply be re-dropped from the base actor
     if (actorThis.isToken) {
@@ -477,17 +477,17 @@ export default {
                 } else {
                   ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                 }
-                await this.wait(ANIMATIONS.animationFunctions[animation].time);
+                await wait(ANIMATIONS.animationFunctions[animation].time);
               }
               info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
               // TODO show on chat ?
               //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
               await this.transformInto(actorFromTransform, actorToTransform, rememberOptions(html), false);
-              if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
-                this.close();
-              } else {
-                this.maximize();
-              }
+              // if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
+              //   this.close();
+              // } else {
+              //   this.maximize();
+              // }
             },
           },
           wildshape: {
@@ -503,7 +503,7 @@ export default {
                 } else {
                   ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                 }
-                await this.wait(ANIMATIONS.animationFunctions[animation].time);
+                await wait(ANIMATIONS.animationFunctions[animation].time);
               }
               info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
               // TODO show on chat ?
@@ -522,11 +522,11 @@ export default {
                 },
                 false,
               );
-              if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
-                this.close();
-              } else {
-                this.maximize();
-              }
+              // if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
+              //   this.close();
+              // } else {
+              //   this.maximize();
+              // }
             },
           },
           polymorph: {
@@ -542,7 +542,7 @@ export default {
                 } else {
                   ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
                 }
-                await this.wait(ANIMATIONS.animationFunctions[animation].time);
+                await wait(ANIMATIONS.animationFunctions[animation].time);
               }
               info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
               // TODO show on chat ?
@@ -556,11 +556,11 @@ export default {
                 },
                 false,
               );
-              if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
-                this.close();
-              } else {
-                this.maximize();
-              }
+              // if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
+              //   this.close();
+              // } else {
+              //   this.maximize();
+              // }
             },
           },
           cancel: {
