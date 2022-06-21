@@ -33,6 +33,10 @@ export enum PolymorpherFlags {
   COMPENDIUM = 'compendium',
   UPDATES_FOR_REVERT = 'updatesforrevert',
   MUTATION_NAMES_FOR_REVERT = 'mutationNamesForRevert',
+  TRANSFORMER_OPTIONS = 'transformOptions',
+  IS_POLYMORPHED = 'isPolymorphed',
+  ORIGINAL_ACTOR = 'originalActor',
+  PREVIOUS_ACTOR = 'previousActor'
 }
 
 export class PolymorpherData {
@@ -48,4 +52,10 @@ export class PolymorpherCompendiumData {
   id: string;
   name: string;
   selected: boolean;
+}
+
+export class PolymorpherRevertData {
+  id: string;
+  name: string;
+  compendiumid: string;
 }
