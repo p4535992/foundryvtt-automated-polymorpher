@@ -201,7 +201,7 @@ const API = {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //actor?.revertOriginalForm();
-        API.revertOriginalForm(actor,false);
+        API.revertOriginalForm(actor, false);
       } else {
         if (arrayMutationNames.length > 0) {
           for (const revertName of arrayMutationNames) {

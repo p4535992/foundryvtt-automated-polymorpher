@@ -405,11 +405,7 @@ export default {
               info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
               // TODO show on chat ?
               //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-              await this.transformInto(
-                actorFromTransform,
-                actorToTransform,
-                rememberOptions(html),
-                false);
+              await this.transformInto(actorFromTransform, actorToTransform, rememberOptions(html), false);
               if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                 this.close();
               } else {
@@ -446,7 +442,8 @@ export default {
                   mergeSkills: true,
                   transformTokens: rememberOptions(html).transformTokens,
                 },
-                false);
+                false,
+              );
               if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                 this.close();
               } else {
@@ -478,7 +475,8 @@ export default {
                 {
                   transformTokens: rememberOptions(html).transformTokens,
                 },
-                false);
+                false,
+              );
               if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
                 this.close();
               } else {

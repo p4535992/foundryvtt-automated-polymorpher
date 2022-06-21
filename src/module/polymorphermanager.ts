@@ -815,7 +815,7 @@ export class PolymorpherManager extends FormApplication {
             keepVision: true,
             transformTokens: true,
           },
-          false
+          false,
         );
       } else if (polymorpherData.defaultsummontype === 'DND5E.PolymorphWildShape') {
         if (tokenFromTransform) {
@@ -850,7 +850,8 @@ export class PolymorpherManager extends FormApplication {
             mergeSkills: true,
             transformTokens: true,
           },
-          false);
+          false,
+        );
       } else if (polymorpherData.defaultsummontype === 'DND5E.Polymorph') {
         if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
@@ -891,7 +892,8 @@ export class PolymorpherManager extends FormApplication {
             keepVision: true,
             transformTokens: true,
           },
-          false);
+          false,
+        );
       } else {
         warn(
           `No default summon type is setted for any polymorphing actor on the list associated to this actor ${actorToTransform.name}`,
