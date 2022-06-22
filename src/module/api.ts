@@ -128,19 +128,19 @@ const API = {
 
     // TODO find a better method than this
     let lastElement = '';
-    let specialCaseEndWith1 = false;
-    if (sourceToken.name.endsWith(')')) {
-      specialCaseEndWith1 = true;
-    }
+    // let specialCaseEndWith1 = false;
+    // if (sourceToken.name.endsWith(')')) {
+    //   specialCaseEndWith1 = true;
+    // }
     const matches = <any[]>sourceToken.name.match(/(?<=\().+?(?=\))/g);
     if (matches && matches.length > 0) {
       lastElement = matches[matches.length - 1];
     } else {
       lastElement = sourceToken.name;
     }
-    if (specialCaseEndWith1) {
-      lastElement = lastElement + ')';
-    }
+    // if (specialCaseEndWith1) {
+    //   lastElement = lastElement + ')';
+    // }
 
     // let tokenDataToTransform = <TokenData>await actor.getTokenData();
     // let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
@@ -166,14 +166,7 @@ const API = {
         return;
       }
       */
-      let arrayMutationNames: string[] = <string[]>(
-        actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
-      );
-      if (!arrayMutationNames || arrayMutationNames.length == 0) {
-        arrayMutationNames = [];
-        warn(`Array mutation names for the revert is null or empty`);
-      }
-      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+      // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
       // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       //await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
 
@@ -222,6 +215,13 @@ const API = {
         //actor?.revertOriginalForm();
         API.revertOriginalForm(actor, false);
       } else {
+        let arrayMutationNames: string[] = <string[]>(
+          actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
+        );
+        if (!arrayMutationNames || arrayMutationNames.length == 0) {
+          arrayMutationNames = [];
+          warn(`Array mutation names for the revert is null or empty`);
+        }
         if (arrayMutationNames.length > 0) {
           for (const revertName of arrayMutationNames) {
             info(`${actor.name} reverts to their original form`);
@@ -235,6 +235,8 @@ const API = {
           await warpgate.revert(sourceToken.document, '');
         }
       }
+      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR); 
     } else {
       if (isRandom && isOrdered) {
         warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
