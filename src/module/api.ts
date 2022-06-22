@@ -142,14 +142,14 @@ const API = {
       lastElement = lastElement + ')';
     }
 
-    let tokenDataToTransform = <TokenData>await actor.getTokenData();
-    let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
-        return t.actor?.id === actor.id;
-      }) || undefined;
+    // let tokenDataToTransform = <TokenData>await actor.getTokenData();
+    // let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
+    //     return t.actor?.id === actor.id;
+    //   }) || undefined;
 
     if (removePolymorpher) {
-      const updatesForRevert = <TokenData>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
-      if (!updatesForRevert) {
+      const updatesForRevert = <TokenData[]>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      if (!updatesForRevert || updatesForRevert.length <= 0) {
         await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
         await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
         warn(`Can't revert this token without the flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}'`, true);
@@ -173,7 +173,7 @@ const API = {
       }
       await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
       // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
-      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      //await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
 
       const polyData = listPolymorphers.find((a) => {
         return lastElement.toLowerCase().includes(a.name.toLowerCase());
@@ -184,10 +184,12 @@ const API = {
 
       const animation = polyData?.animation;
       //tokenDataToTransform = updatesForRevert.tokenData || tokenDataToTransform;
-      tokenDataToTransform = updatesForRevert || tokenDataToTransform;
-      tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
-          return t.id === tokenDataToTransform._id;
-        }) || tokenDataToTransform;
+      const tokenDataToTransform = updatesForRevert.pop() || <TokenData>await actor.getTokenData();
+      const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
+        return t.actor?.id === actor.id;
+      }) || tokenDataToTransform;
+
+      await actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
 
       if (animationExternal && animationExternal.sequence) {
         //@ts-ignore

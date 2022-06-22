@@ -17,7 +17,7 @@ export const setupHooks = () => {
 
 export const readyHooks = async () => {
   // setup all the hooks
-
+  //@ts-ignore
   ANIMATIONS.animationFunctions = mergeObject(
     ANIMATIONS.animationFunctions,
     <any>game.settings?.get(CONSTANTS.MODULE_NAME, 'customanimations'),

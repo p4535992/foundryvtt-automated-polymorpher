@@ -246,18 +246,23 @@ export default {
     // Set new data flags
     // if ( !actorThis.isPolymorphed || !d.flags.dnd5e.originalActor ) d.flags.dnd5e.originalActor = actorThis.id;
     // d.flags.dnd5e.isPolymorphed = true;
+
+    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`,
+      getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
+
     if (
       !actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
       !getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
     ) {
       setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, actorThis.id);
     }
-
-    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`, 
-      getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
-
     setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`, actorThis.getTokenData());
+
+    // MOD 4535992
+    const previousTokenData = <TokenData[]>actorThis.getFlag(CONSTANTS.MODULE_NAME,PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) || [];
+    previousTokenData.push(await actorThis.getTokenData());
+    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`, previousTokenData);
+    // END MOD 4535992
 
     // Update unlinked Tokens in place since they can simply be re-dropped from the base actor
     if (actorThis.isToken) {
@@ -266,24 +271,6 @@ export default {
       setProperty(tokenData, `actorData`, d);
       //@ts-ignore
       delete tokenData.actorData.token;
-
-      setProperty(tokenData.flags, `${CONSTANTS.MODULE_NAME}`, 
-        getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
-
-      setProperty(tokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-      setProperty(tokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`, actorThis.getTokenData());
-    
-      if(!tokenData.actorData){
-        tokenData.actorData = {};
-      }
-      if(!tokenData.actorData.flags){
-        tokenData.actorData.flags = {};
-      }
-      if(!tokenData.actorData.flags[CONSTANTS.MODULE_NAME]){
-        tokenData.actorData.flags = {};
-      }
-      setProperty(<any>tokenData.actorData.flags, `${CONSTANTS.MODULE_NAME}`, 
-        getProperty(tokenData.flags, `${CONSTANTS.MODULE_NAME}`));
 
       return actorThis.token?.update(tokenData);
     }
@@ -316,15 +303,13 @@ export default {
     const updates = tokens.map((t) => {
       const newTokenData = <TokenData>foundry.utils.deepClone(d.token);
       newTokenData._id = t.data._id;
-      //@ts-ignore
       newTokenData.actorId = <string>newActor.id;
       newTokenData.actorLink = true;
 
-      setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}`, 
-        getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
-
-      setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-      setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`, actorThis.getTokenData());
+      // MOD 4535992
+      setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}`,
+        getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`));
+      // MOD 4535992
 
       if(!newTokenData.actorData){
         newTokenData.actorData = {};
@@ -335,7 +320,7 @@ export default {
       if(!newTokenData.actorData.flags[CONSTANTS.MODULE_NAME]){
         newTokenData.actorData.flags = {};
       }
-      setProperty(<any>newTokenData.actorData.flags, `${CONSTANTS.MODULE_NAME}`, 
+      setProperty(<any>newTokenData.actorData.flags, `${CONSTANTS.MODULE_NAME}`,
         getProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}`));
 
       return newTokenData;
@@ -366,11 +351,11 @@ export default {
      */
     Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, actorThis, renderSheet);
 
-    const previousOriginalActorTokenData = <TokenData>(
+    const previousOriginalActorTokenData = <TokenData[]>(
       actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
     );
     let isTheOriginalActor = false;
-    if (!previousOriginalActorTokenData) {
+    if (!previousOriginalActorTokenData || previousOriginalActorTokenData.length <= 0) {
       isTheOriginalActor = true;
     }
 
@@ -416,8 +401,11 @@ export default {
 
       if (isTheOriginalActor) {
         await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+        await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      } else{
+        const pre = duplicate(previousOriginalActorTokenData).pop();
+        await actorThis.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, pre);
       }
-      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
 
       if (renderSheet) {
         actor.sheet?.render(true);
@@ -429,6 +417,7 @@ export default {
     let original = <Actor>(
       game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
     );
+    // MOD 4535992
     if (!original) {
       original = <Actor>game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR));
     }
@@ -443,10 +432,13 @@ export default {
         return;
       }
     }
+    // END MOD 4535992
     // Get the Tokens which represent this actor
     if (canvas.ready) {
       const tokens = actorThis.getActiveTokens(true);
-      const tokenData = previousOriginalActorTokenData ? previousOriginalActorTokenData : await original.getTokenData();
+      const tokenData = previousOriginalActorTokenData && previousOriginalActorTokenData.length > 0
+        ? <TokenData>previousOriginalActorTokenData[previousOriginalActorTokenData.length - 1]
+        : <TokenData>await original.getTokenData();
       const tokenUpdates = tokens.map((t) => {
         const update = duplicate(tokenData);
         update._id = t.id;
@@ -459,7 +451,7 @@ export default {
       await canvas.scene?.updateEmbeddedDocuments('Token', tokenUpdates);
     } else if (previousOriginalActorTokenData) {
       const tokenData = previousOriginalActorTokenData;
-      const update = duplicate(tokenData);
+      const update = <any>duplicate(tokenData);
       //@ts-ignore
       delete update.x;
       //@ts-ignore
@@ -467,10 +459,15 @@ export default {
       await canvas.scene?.updateEmbeddedDocuments('Token', [update]);
     }
 
+    // MOD 4535992
     if (isTheOriginalActor) {
       await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+    }else{
+      const pre = duplicate(previousOriginalActorTokenData).pop();
+      await actorThis.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, pre);
     }
-    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+    // END MOD 4535992
 
     // Delete the polymorphed version of the actor, if possible
     const isRendered = actorThis.sheet?.rendered;
