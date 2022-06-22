@@ -4,8 +4,8 @@ import { SYSTEMS } from './systems';
 
 export const registerSettings = function () {
   game.settings.registerMenu(CONSTANTS.MODULE_NAME, 'resetAllSettings', {
-    name: `${CONSTANTS.MODULE_NAME}.setting.reset.name`,
-    hint: `${CONSTANTS.MODULE_NAME}.setting.reset.hint`,
+    name: `${CONSTANTS.MODULE_NAME}.settings.reset.name`,
+    hint: `${CONSTANTS.MODULE_NAME}.settings.reset.hint`,
     icon: 'fas fa-coins',
     type: ResetSettingsDialog,
     restricted: true,
@@ -152,8 +152,8 @@ export const registerSettings = function () {
   // ========================================================================
 
   game.settings.register(CONSTANTS.MODULE_NAME, 'debug', {
-    name: `${CONSTANTS.MODULE_NAME}.setting.debug.name`,
-    hint: `${CONSTANTS.MODULE_NAME}.setting.debug.hint`,
+    name: `${CONSTANTS.MODULE_NAME}.settings.debug.name`,
+    hint: `${CONSTANTS.MODULE_NAME}.settings.debug.hint`,
     scope: 'client',
     config: true,
     default: false,
@@ -182,8 +182,8 @@ export const registerSettings = function () {
   });
 
   game.settings.register(CONSTANTS.MODULE_NAME, 'preconfiguredSystem', {
-    name: `${CONSTANTS.MODULE_NAME}.setting.preconfiguredSystem.name`,
-    hint: `${CONSTANTS.MODULE_NAME}.setting.preconfiguredSystem.hint`,
+    name: `${CONSTANTS.MODULE_NAME}.settings.preconfiguredSystem.name`,
+    hint: `${CONSTANTS.MODULE_NAME}.settings.preconfiguredSystem.hint`,
     scope: 'world',
     config: false,
     default: false,
@@ -249,8 +249,8 @@ async function applyDefaultSettings() {
 function defaultSettings(apply = false) {
   return {
     senses: {
-      name: `${CONSTANTS.MODULE_NAME}.setting.polymorphSettings.name`,
-      hint: `${CONSTANTS.MODULE_NAME}.setting.polymorphSettings.hint`,
+      name: `${CONSTANTS.MODULE_NAME}.settings.polymorphSettings.name`,
+      hint: `${CONSTANTS.MODULE_NAME}.settings.polymorphSettings.hint`,
       scope: 'world',
       config: false,
       default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.polymorphSettings : [],
@@ -262,8 +262,8 @@ function defaultSettings(apply = false) {
 function otherSettings(apply = false) {
   return {
     debug: {
-      name: `${CONSTANTS.MODULE_NAME}.setting.debug.name`,
-      hint: `${CONSTANTS.MODULE_NAME}.setting.debug.hint`,
+      name: `${CONSTANTS.MODULE_NAME}.settings.debug.name`,
+      hint: `${CONSTANTS.MODULE_NAME}.settings.debug.hint`,
       scope: 'client',
       config: true,
       default: false,
@@ -271,8 +271,8 @@ function otherSettings(apply = false) {
     },
 
     // debugHooks: {
-    //   name: `${CONSTANTS.MODULE_NAME}.setting.debugHooks.name`,
-    //   hint: `${CONSTANTS.MODULE_NAME}.setting.debugHooks.hint`,
+    //   name: `${CONSTANTS.MODULE_NAME}.settings.debugHooks.name`,
+    //   hint: `${CONSTANTS.MODULE_NAME}.settings.debugHooks.hint`,
     //   scope: 'world',
     //   config: false,
     //   default: false,
@@ -280,8 +280,8 @@ function otherSettings(apply = false) {
     // },
 
     systemFound: {
-      name: `${CONSTANTS.MODULE_NAME}.setting.systemFound.name`,
-      hint: `${CONSTANTS.MODULE_NAME}.setting.systemFound.hint`,
+      name: `${CONSTANTS.MODULE_NAME}.settings.systemFound.name`,
+      hint: `${CONSTANTS.MODULE_NAME}.settings.systemFound.hint`,
       scope: 'world',
       config: false,
       default: false,
@@ -289,8 +289,8 @@ function otherSettings(apply = false) {
     },
 
     systemNotFoundWarningShown: {
-      name: `${CONSTANTS.MODULE_NAME}.setting.systemNotFoundWarningShown.name`,
-      hint: `${CONSTANTS.MODULE_NAME}.setting.systemNotFoundWarningShown.hint`,
+      name: `${CONSTANTS.MODULE_NAME}.settings.systemNotFoundWarningShown.name`,
+      hint: `${CONSTANTS.MODULE_NAME}.settings.systemNotFoundWarningShown.hint`,
       scope: 'world',
       config: false,
       default: false,
@@ -298,8 +298,8 @@ function otherSettings(apply = false) {
     },
 
     preconfiguredSystem: {
-      name: `${CONSTANTS.MODULE_NAME}.setting.preconfiguredSystem.name`,
-      hint: `${CONSTANTS.MODULE_NAME}.setting.preconfiguredSystem.hint`,
+      name: `${CONSTANTS.MODULE_NAME}.settings.preconfiguredSystem.name`,
+      hint: `${CONSTANTS.MODULE_NAME}.settings.preconfiguredSystem.hint`,
       scope: 'world',
       config: false,
       default: false,

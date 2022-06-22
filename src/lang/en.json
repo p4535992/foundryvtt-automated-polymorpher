@@ -15,7 +15,13 @@
       "deleteall": "Delete All",
       "storeonactor": "Store Polymorphers on Actor",
       "none": "None",
-      "nonenodelete": "None but not delete the loaded actors"
+      "nonenodelete": "None but not delete the loaded actors",
+      "resetsettings":{
+        "title": "Reset Module Settings",
+        "content": "Are you sure you want to reset all of the module settings to the current system's defaults? <strong>THIS CANNOT BE UNDONE!</strong>",
+        "confirm": "Reset Module Settings",
+        "cancel": "Cancel"
+      }
     },
     "actorSheetBtn": "Polymorphers",
     "animations": {
@@ -87,6 +93,16 @@
       "forceUseOfWarpgate": {
         "title": "Force use of Warpgate",
         "hint": "If enabled it will use the warpgate mutate function instead the system default mechanism if present, e.g. DnD5e has is own Polymorpher mechanism"
+      },
+      "reset":{
+        "name": "Reset settings to default",
+        "label": "Reset Settings To Default",
+        "hint": "This will reset all of the settings of back to the active game system's default."
+      },
+      "debug":{
+        "name": "Enable debugging",
+        "label": "Prints debug messages to the console",
+        "hint": " "
       }
     }
   }

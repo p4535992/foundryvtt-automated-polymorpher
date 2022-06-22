@@ -309,7 +309,9 @@ export default {
     mergeObject(d.token, tokenBackup);
 
     // Update placed Token instances
-    if (!transformTokens) return;
+    if (!transformTokens) {
+      return;
+    }
     const tokens = actorThis.getActiveTokens(true);
     const updates = tokens.map((t) => {
       const newTokenData = <TokenData>foundry.utils.deepClone(d.token);
@@ -329,9 +331,7 @@ export default {
       return newTokenData;
     });
     //@ts-ignore
-    const token = await canvas.scene?.updateEmbeddedDocuments('Token', updates);
-    return token;
-
+    return canvas.scene?.updateEmbeddedDocuments('Token', updates);
   },
 
   /**

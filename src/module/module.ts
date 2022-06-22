@@ -38,22 +38,6 @@ export const readyHooks = async () => {
       obj[key] = ANIMATIONS.animations[key];
       return obj;
     }, {});
-  //new PolymorpherManager().render(true)
-  /*
-  if (!automatedpolymorphers) {
-    automatedpolymorphers = {};
-  }
-  if (game.system.id == 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
-    automatedpolymorphers['dnd5e'] = {
-      // TODO PREPARE SOME PRESET
-    };
-  }
-
-  automatedpolymorphers[game.system.id] = mergeObject(
-    automatedpolymorphers[game.system.id],
-    <any>game.settings.get(CONSTANTS.MODULE_NAME, 'customautospells'),
-  );
-  */
 
   Hooks.on('getActorSheetHeaderButtons', (app, buttons) => {
     if (game.settings.get(CONSTANTS.MODULE_NAME, 'hidebutton')) return;

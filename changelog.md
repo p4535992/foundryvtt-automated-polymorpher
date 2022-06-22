@@ -1,3 +1,7 @@
+### 1.0.33
+
+- Preparation for new customization alghortim for polymorph
+
 ### 1.0.32
 
 - Little bug fix on api methods
