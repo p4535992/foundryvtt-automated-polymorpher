@@ -38,6 +38,7 @@ export enum PolymorpherFlags {
   IS_POLYMORPHED = 'isPolymorphed',
   ORIGINAL_ACTOR = 'originalActor',
   PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR = 'previousOriginalActor',
+  // NEW_CREATED_ACTOR_TO_DELETE = 'newCreatedActorToDelete',
 }
 
 export class PolymorpherData {

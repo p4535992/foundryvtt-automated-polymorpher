@@ -179,16 +179,17 @@ const API = {
 
       const animation = polyData?.animation;
       //tokenDataToTransform = updatesForRevert.tokenData || tokenDataToTransform;
-      const tokenDataToTransform = updatesForRevert.pop() || <TokenData>await actor.getTokenData();
+      // const tokenDataToTransform = updatesForRevert.pop() || <TokenData>await actor.getTokenData();
+      const tokenDataToTransform = <TokenData>await actor.getTokenData();
       const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
           return t.actor?.id === actor.id;
         }) || tokenDataToTransform;
 
-      await actor?.setFlag(
-        CONSTANTS.MODULE_NAME,
-        PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
-        updatesForRevert,
-      );
+      // await actor?.setFlag(
+      //   CONSTANTS.MODULE_NAME,
+      //   PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+      //   updatesForRevert,
+      // );
 
       if (animationExternal && animationExternal.sequence) {
         //@ts-ignore
@@ -213,7 +214,7 @@ const API = {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //actor?.revertOriginalForm();
-        API.revertOriginalForm(actor, false);
+        this.revertOriginalForm(actor, false);
       } else {
         let arrayMutationNames: string[] = <string[]>(
           actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
@@ -236,7 +237,7 @@ const API = {
         }
       }
       await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR); 
+      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
     } else {
       if (isRandom && isOrdered) {
         warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);

@@ -111,7 +111,6 @@ export default {
 
     // Get the original Actor data and the new source data
     const o = <any>actorThis.toJSON();
-    // MOD 4535992
     //o.flags.dnd5e = o.flags.dnd5e || {};
     //o.flags.dnd5e.transformOptions = {mergeSkills, mergeSaves};
     if (getProperty(o.flags, `${CONSTANTS.MODULE_NAME}`)) {
@@ -257,16 +256,24 @@ export default {
     }
     setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 
-    // MOD 4535992
-    const previousTokenData =
+    let previousTokenData =
       <TokenData[]>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) || [];
-    previousTokenData.push(await actorThis.getTokenData());
+    const currentTokenData = await actorThis.getTokenData();
+    if(currentTokenData._id && 
+      previousTokenData.filter((z) => z._id === currentTokenData._id).length <= 0){
+      
+      previousTokenData.push(currentTokenData);
+      previousTokenData = previousTokenData.filter((value, index, self) =>
+        index === self.findIndex((t) => (
+          t._id === null || t._id === value._id
+        ))
+      );
+    }
     setProperty(
       d.flags,
       `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`,
       previousTokenData,
     );
-    // END MOD 4535992
 
     // Update unlinked Tokens in place since they can simply be re-dropped from the base actor
     if (actorThis.isToken) {
@@ -307,30 +314,24 @@ export default {
     const updates = tokens.map((t) => {
       const newTokenData = <TokenData>foundry.utils.deepClone(d.token);
       newTokenData._id = t.data._id;
-      // MOD 4535992 COMMENTED
       newTokenData.actorId = <string>newActor.id;
-      // newTokenData.actorId = <string>target.id;
       newTokenData.actorLink = true;
-      if(!newTokenData.flags){
-        setProperty(newTokenData,`flags`,{});
+      if (!newTokenData.flags) {
+        setProperty(newTokenData, `flags`, {});
       }
-
-      // MOD 4535992
       setProperty(
         newTokenData.flags,
         `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
         getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
       );
-      setProperty(
-        newTokenData.flags,
-        `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`,
-        true,
-      );
-      // END MOD 4535992
+      setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+
       return newTokenData;
     });
     //@ts-ignore
-    return canvas.scene?.updateEmbeddedDocuments('Token', updates);
+    const token = await canvas.scene?.updateEmbeddedDocuments('Token', updates);
+    return token;
+
   },
 
   /**
@@ -406,25 +407,8 @@ export default {
       const actor = <Actor>actorThis.token?.getActor();
 
       if (isTheOriginalActor) {
-        // MOD 4535992
-        // DELETE CREATED ACTOR
-        // const actorIds = <string[]>[];
-        // for(const td of previousOriginalActorTokenData){
-        //   if(td.actorId){
-        //     actorIds.push(td.actorId);
-        //   }
-        // }
-        // for(const actor of <Actor[]>game.actors?.contents){
-        //   if(actor.id && actorIds.includes(actor.id)){
-        //     actor.delete();
-        //   }
-        //}
-        // END MOD 4535992
         await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
         await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
-      } else {
-        const pre = duplicate(previousOriginalActorTokenData).pop();
-        await actorThis.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, pre);
       }
 
       if (renderSheet) {
@@ -448,7 +432,6 @@ export default {
         return;
       }
     }
-    // END MOD 4535992
     // Get the Tokens which represent this actor
     if (canvas.ready) {
       const tokens = actorThis.getActiveTokens(true);
@@ -473,34 +456,38 @@ export default {
       await canvas.scene?.updateEmbeddedDocuments('Token', [update]);
     }
 
-    // MOD 4535992
-    // DELETE CREATED ACTOR
-    // const actorIds = <string[]>[];
-    // for(const td of previousOriginalActorTokenData){
-    //   if(td.actorId){
-    //     actorIds.push(td.actorId);
-    //   }
-    // }
-    // for(const actor of <Actor[]>game.actors?.contents){
-    //   if(actor.id && actorIds.includes(actor.id)){
-    //     actor.delete();
-    //   }
-    // }
-    // END MOD 4535992
     if (isTheOriginalActor) {
       await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
       await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
-    } else {
-      const pre = duplicate(previousOriginalActorTokenData).pop();
-      await actorThis.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, pre);
     }
-
-    // END MOD 4535992
 
     // Delete the polymorphed version of the actor, if possible
     const isRendered = actorThis.sheet?.rendered;
-    if (game.user?.isGM) await actorThis.delete();
-    else if (isRendered) actorThis.sheet?.close();
+    if (game.user?.isGM) {
+      const idsToDelete = <string[]>[];
+      idsToDelete.push(<string>actorThis.id);
+      const othersActorsToDelete = <TokenData[]>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      othersActorsToDelete.reverse();
+      for(const td of othersActorsToDelete){
+        if(td.actorId && 
+          !idsToDelete.includes(td.actorId) &&
+          td.actorId != original.id &&
+          game.actors?.get(td.actorId)){
+            idsToDelete.push(td.actorId);
+        }
+      }
+      for(const id of idsToDelete){
+        const actorToDelete = game.actors?.get(id);
+        if(actorToDelete){
+          info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
+          await actorToDelete.delete();
+        }
+      }
+      // await actorThis.delete();
+    }
+    else if (isRendered) {
+      actorThis.sheet?.close();
+    }
     if (isRendered && renderSheet) {
       original.sheet?.render(isRendered);
     }
