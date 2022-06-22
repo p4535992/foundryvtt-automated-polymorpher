@@ -369,11 +369,17 @@ export class PolymorpherManager extends FormApplication {
       }
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
       */
-      const updatesForRevert = <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      const updatesForRevert = <TokenData[]>(
+        this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      )
         ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
         : <TokenData[]>[];
       updatesForRevert.push(this.token.data);
-      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
+      await this.actor?.setFlag(
+        CONSTANTS.MODULE_NAME,
+        PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+        updatesForRevert,
+      );
       const dialog = await API.renderDialogTransformOptions(
         tokenFromTransform,
         this.actor,
@@ -444,7 +450,9 @@ export class PolymorpherManager extends FormApplication {
       */
 
       const actorDataTmp = duplicate(actorToTransform.data);
-      const updatesForRevert = <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      const updatesForRevert = <TokenData[]>(
+        this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      )
         ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
         : <TokenData[]>[];
       updatesForRevert.push(this.token.data);
@@ -453,7 +461,11 @@ export class PolymorpherManager extends FormApplication {
         `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`,
         updatesForRevert,
       );
-      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
+      await this.actor?.setFlag(
+        CONSTANTS.MODULE_NAME,
+        PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+        updatesForRevert,
+      );
 
       const updates = {
         token: {
@@ -807,11 +819,17 @@ export class PolymorpherManager extends FormApplication {
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
       */
 
-      const updatesForRevert = <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      const updatesForRevert = <TokenData[]>(
+        this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      )
         ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
         : <TokenData[]>[];
       updatesForRevert.push(this.token.data);
-      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
+      await this.actor?.setFlag(
+        CONSTANTS.MODULE_NAME,
+        PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+        updatesForRevert,
+      );
 
       if (polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings') {
         if (tokenFromTransform) {
@@ -980,7 +998,9 @@ export class PolymorpherManager extends FormApplication {
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
       */
 
-      const updatesForRevert = <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      const updatesForRevert = <TokenData[]>(
+        this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      )
         ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
         : <TokenData[]>[];
       updatesForRevert.push(this.token.data);
@@ -991,7 +1011,11 @@ export class PolymorpherManager extends FormApplication {
         `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`,
         updatesForRevert,
       );
-      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
+      await this.actor?.setFlag(
+        CONSTANTS.MODULE_NAME,
+        PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+        updatesForRevert,
+      );
 
       const updates = {
         token: {

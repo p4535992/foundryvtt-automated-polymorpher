@@ -148,7 +148,9 @@ const API = {
     //   }) || undefined;
 
     if (removePolymorpher) {
-      const updatesForRevert = <TokenData[]>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      const updatesForRevert = <TokenData[]>(
+        actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      );
       if (!updatesForRevert || updatesForRevert.length <= 0) {
         await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
         await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
@@ -186,10 +188,14 @@ const API = {
       //tokenDataToTransform = updatesForRevert.tokenData || tokenDataToTransform;
       const tokenDataToTransform = updatesForRevert.pop() || <TokenData>await actor.getTokenData();
       const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
-        return t.actor?.id === actor.id;
-      }) || tokenDataToTransform;
+          return t.actor?.id === actor.id;
+        }) || tokenDataToTransform;
 
-      await actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
+      await actor?.setFlag(
+        CONSTANTS.MODULE_NAME,
+        PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+        updatesForRevert,
+      );
 
       if (animationExternal && animationExternal.sequence) {
         //@ts-ignore
@@ -324,7 +330,12 @@ const API = {
     renderSheet: boolean,
   ): Promise<any> {
     if (game.system.id === 'dnd5e') {
-      return dnd5e.transformInto(actorFromTransform, actorToTransform, <TransformOptionsDnd5e>transformOptions, renderSheet);
+      return dnd5e.transformInto(
+        actorFromTransform,
+        actorToTransform,
+        <TransformOptionsDnd5e>transformOptions,
+        renderSheet,
+      );
     } else {
       return generic.transformInto(actorFromTransform, actorToTransform, transformOptions, renderSheet);
     }
