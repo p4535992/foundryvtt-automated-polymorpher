@@ -4,7 +4,7 @@ import type {
   TokenData,
 } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
 import { ANIMATIONS } from '../animations';
-import { PolymorpherFlags, TransformOptions } from '../automatedPolymorpherModels';
+import { PolymorpherData, PolymorpherFlags, TransformOptions } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
 import { i18n, info, wait, warn } from '../lib/lib';
 
@@ -175,8 +175,10 @@ export default {
       setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, actorThis.id);
     }
     setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR}`, actorThis.getTokenData());
+    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`, actorThis.getTokenData());
 
+    const dd = <PolymorpherData[]>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.POLYMORPHERS}`, dd);
     // Update unlinked Tokens in place since they can simply be re-dropped from the base actor
     if (actorThis.isToken) {
       const tokenData = d.token;
@@ -249,7 +251,7 @@ export default {
     Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, actorThis, renderSheet);
 
     const previousOriginalActorTokenData = <TokenData>(
-      actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR)
+      actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
     );
     let isTheOriginalActor = false;
     if (!previousOriginalActorTokenData) {
@@ -259,8 +261,10 @@ export default {
     // If we are reverting an unlinked token, simply replace it with the base actor prototype
     if (actorThis.isToken) {
       // Obtain a reference to the base actor prototype
-      const baseActor = <Actor>game.actors?.get(<string>actorThis.token?.data.actorId);
-
+      let baseActor = <Actor>game.actors?.get(<string>actorThis.token?.data.actorId);
+      if (!baseActor) {
+        baseActor = <Actor>game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR));
+      }
       if (!baseActor) {
         if (!previousOriginalActorTokenData) {
           warn(
@@ -297,7 +301,7 @@ export default {
       if (isTheOriginalActor) {
         await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
       }
-      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
+      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
 
       if (renderSheet) {
         actor.sheet?.render(true);
@@ -306,9 +310,12 @@ export default {
     }
 
     // Obtain a reference to the original actor
-    const original = <Actor>(
+    let original = <Actor>(
       game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
     );
+    if (!original) {
+      original = <Actor>game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR));
+    }
     if (!original) {
       if (!previousOriginalActorTokenData) {
         warn(
@@ -347,7 +354,7 @@ export default {
     if (isTheOriginalActor) {
       await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
     }
-    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_ORIGINAL_ACTOR);
+    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
 
     // Delete the polymorphed version of the actor, if possible
     const isRendered = actorThis.sheet?.rendered;

@@ -148,6 +148,14 @@ const API = {
       }) || undefined;
 
     if (removePolymorpher) {
+      const updatesForRevert = <TokenData>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      if (!updatesForRevert) {
+        await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+        await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+        warn(`Can't revert this token without the flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}'`, true);
+        return;
+      }
+      /*
       const updatesForRevert: any = actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       if (!updatesForRevert) {
         await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
@@ -155,6 +163,7 @@ const API = {
         warn(`Can't revert this token without the flag '${PolymorpherFlags.UPDATES_FOR_REVERT}'`, true);
         return;
       }
+      */
       let arrayMutationNames: string[] = <string[]>(
         actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
       );
@@ -163,7 +172,8 @@ const API = {
         warn(`Array mutation names for the revert is null or empty`);
       }
       await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+      // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
+      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
 
       const polyData = listPolymorphers.find((a) => {
         return lastElement.toLowerCase().includes(a.name.toLowerCase());
@@ -173,7 +183,8 @@ const API = {
       });
 
       const animation = polyData?.animation;
-      tokenDataToTransform = updatesForRevert.tokenData || tokenDataToTransform;
+      //tokenDataToTransform = updatesForRevert.tokenData || tokenDataToTransform;
+      tokenDataToTransform = updatesForRevert || tokenDataToTransform;
       tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
           return t.id === tokenDataToTransform._id;
         }) || tokenDataToTransform;

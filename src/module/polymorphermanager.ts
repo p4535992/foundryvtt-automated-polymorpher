@@ -357,6 +357,7 @@ export class PolymorpherManager extends FormApplication {
     */
     if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
       // Prepare flag for revert ???
+      /*
       let updatesForRevert: any = {};
       if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
         updatesForRevert = {
@@ -367,6 +368,11 @@ export class PolymorpherManager extends FormApplication {
         updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       }
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+      */
+      const updatesForRevert = <TokenData>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        ? <TokenData>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        : this.token.data;
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
       const dialog = await API.renderDialogTransformOptions(
         tokenFromTransform,
         this.actor,
@@ -416,6 +422,7 @@ export class PolymorpherManager extends FormApplication {
       // })
 
       // Prepare flag for revert ???
+      /*
       let updatesForRevert: any = {};
       if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
         updatesForRevert = {
@@ -430,6 +437,16 @@ export class PolymorpherManager extends FormApplication {
       setProperty(
         actorDataTmp,
         `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.UPDATES_FOR_REVERT}`,
+        updatesForRevert,
+      );
+      */
+      const actorDataTmp = duplicate(actorToTransform.data);
+      const updatesForRevert = <TokenData>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        ? <TokenData>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        : this.token.data;
+      setProperty(
+        actorDataTmp,
+        `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`,
         updatesForRevert,
       );
 
@@ -454,7 +471,9 @@ export class PolymorpherManager extends FormApplication {
         },
         actor: actorToTransform,
       };
-      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+      // await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
+      
       const arrayMutationNames: string[] =
         <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
       const mutationNameOriginalToken = tokenFromTransform.id + randomID();
@@ -772,6 +791,7 @@ export class PolymorpherManager extends FormApplication {
       // };
 
       // Prepare flag for revert ???
+      /*
       let updatesForRevert: any = {};
       if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
         updatesForRevert = {
@@ -782,7 +802,11 @@ export class PolymorpherManager extends FormApplication {
         updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
       }
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
-
+      */
+      const updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        ? this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        : this.token.data
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
       if (polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings') {
         if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
@@ -930,6 +954,7 @@ export class PolymorpherManager extends FormApplication {
       }
 
       // Prepare flag for revert ???
+      /*
       let updatesForRevert: any = {};
       if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
         updatesForRevert = {
@@ -944,6 +969,17 @@ export class PolymorpherManager extends FormApplication {
       setProperty(
         actorDataTmp,
         `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.UPDATES_FOR_REVERT}`,
+        updatesForRevert,
+      );
+      */
+
+      const updatesForRevert = <TokenData>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        ? <TokenData>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        : this.token.data;
+      const actorDataTmp = duplicate(actorToTransform.data);
+      setProperty(
+        actorDataTmp,
+        `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`,
         updatesForRevert,
       );
 
@@ -968,7 +1004,8 @@ export class PolymorpherManager extends FormApplication {
         },
         actor: actorToTransform,
       };
-      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+      // await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
+      await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, updatesForRevert);
       const arrayMutationNames: string[] =
         <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
       const mutationNameOriginalToken = tokenFromTransform.id + randomID();

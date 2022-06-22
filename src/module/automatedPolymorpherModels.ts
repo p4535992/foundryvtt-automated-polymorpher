@@ -31,13 +31,13 @@ export enum PolymorpherFlags {
   RANDOM = 'random',
   ORDERED = 'ordered',
   COMPENDIUM = 'compendium',
-  UPDATES_FOR_REVERT = 'updatesforrevert',
+  // UPDATES_FOR_REVERT = 'updatesforrevert',
   MUTATION_NAMES_FOR_REVERT = 'mutationNamesForRevert',
   TRANSFORMER_OPTIONS = 'transformOptions',
   // ORIGINAL FLAG DND5E
   IS_POLYMORPHED = 'isPolymorphed',
   ORIGINAL_ACTOR = 'originalActor',
-  PREVIOUS_ORIGINAL_ACTOR = 'previousOriginalActor',
+  PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR = 'previousOriginalActor',
 }
 
 export class PolymorpherData {
