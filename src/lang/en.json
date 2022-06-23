@@ -92,7 +92,7 @@
       },
       "forceUseOfWarpgate": {
         "title": "Force use of Warpgate",
-        "hint": "If enabled it will use the warpgate mutate function instead the system default mechanism if present, e.g. DnD5e has is own Polymorpher mechanism"
+        "hint": "If enabled it will use the warpgate mutate function instead the system default mechanism."
       },
       "reset":{
         "name": "Reset settings to default",
