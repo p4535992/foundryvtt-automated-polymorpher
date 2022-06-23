@@ -488,7 +488,12 @@ export class PolymorpherManager extends FormApplication {
 
   getDefaultSummonTypes(defaultsummontype: string, a: PolymorpherData) {
     let animList = '';
-    const typesArray = ['', `${CONSTANTS.MODULE_NAME}.polymorphWildShape`, `${CONSTANTS.MODULE_NAME}.polymorph`, `${CONSTANTS.MODULE_NAME}.polymorphSelf`];
+    const typesArray = [
+      '',
+      `${CONSTANTS.MODULE_NAME}.polymorphWildShape`,
+      `${CONSTANTS.MODULE_NAME}.polymorph`,
+      `${CONSTANTS.MODULE_NAME}.polymorphSelf`,
+    ];
     for (const [index, type] of Object.entries(typesArray)) {
       animList += `<option value="${type}" ${a.defaultsummontype === type ? 'selected' : ''}>${i18n(type)}</option>`;
     }

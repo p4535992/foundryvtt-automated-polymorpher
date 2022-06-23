@@ -13,7 +13,6 @@ import dnd5e from './systems/dnd5e';
 import generic from './systems/generic';
 
 const API = {
-
   async invokePolymorpherManagerArr(...inAttributes: any[]) {
     if (!Array.isArray(inAttributes)) {
       throw error('invokePolymorpherManager | inAttributes must be of type array');
@@ -324,7 +323,9 @@ const API = {
   },
 
   get polymorphSetting(): TransformOptionsGeneric | TransformOptionsDnd5e {
-    return <TransformOptionsGeneric | TransformOptionsDnd5e>game.settings.get(CONSTANTS.MODULE_NAME, 'polymorphSetting');
+    return <TransformOptionsGeneric | TransformOptionsDnd5e>(
+      game.settings.get(CONSTANTS.MODULE_NAME, 'polymorphSetting')
+    );
   },
 
   async transformInto(

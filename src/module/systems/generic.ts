@@ -83,7 +83,7 @@ export default {
     const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
     const transformTokens = transformOptions?.transformTokens || true;
 
-// Ensure the player is allowed to polymorph
+    // Ensure the player is allowed to polymorph
     // const allowed = game.settings.get("dnd5e", "allowPolymorphing");
     // if ( !allowed && !game.user?.isGM ) {
     //   return ui.notifications.warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphWarn`));
@@ -239,14 +239,10 @@ export default {
     let previousTokenData =
       <TokenData[]>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) || [];
     const currentTokenData = await actorThis.getTokenData();
-    if(currentTokenData._id &&
-      previousTokenData.filter((z) => z._id === currentTokenData._id).length <= 0){
-
+    if (currentTokenData._id && previousTokenData.filter((z) => z._id === currentTokenData._id).length <= 0) {
       previousTokenData.push(currentTokenData);
-      previousTokenData = previousTokenData.filter((value, index, self) =>
-        index === self.findIndex((t) => (
-          t._id === null || t._id === value._id
-        ))
+      previousTokenData = previousTokenData.filter(
+        (value, index, self) => index === self.findIndex((t) => t._id === null || t._id === value._id),
       );
     }
     setProperty(
@@ -448,26 +444,29 @@ export default {
     if (game.user?.isGM) {
       const idsToDelete = <string[]>[];
       idsToDelete.push(<string>actorThis.id);
-      const othersActorsToDelete = <TokenData[]>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      const othersActorsToDelete = <TokenData[]>(
+        actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      );
       othersActorsToDelete.reverse();
-      for(const td of othersActorsToDelete){
-        if(td.actorId &&
+      for (const td of othersActorsToDelete) {
+        if (
+          td.actorId &&
           !idsToDelete.includes(td.actorId) &&
           td.actorId != original.id &&
-          game.actors?.get(td.actorId)){
-            idsToDelete.push(td.actorId);
+          game.actors?.get(td.actorId)
+        ) {
+          idsToDelete.push(td.actorId);
         }
       }
-      for(const id of idsToDelete){
+      for (const id of idsToDelete) {
         const actorToDelete = game.actors?.get(id);
-        if(actorToDelete){
+        if (actorToDelete) {
           info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
           await actorToDelete.delete();
         }
       }
       // await actorThis.delete();
-    }
-    else if (isRendered) {
+    } else if (isRendered) {
       actorThis.sheet?.close();
     }
     if (isRendered && renderSheet) {
@@ -593,15 +592,16 @@ export default {
           self: {
             icon: '<i class="fas fa-eye"></i>',
             label: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphSelf`),
-            callback: html => this.transformInto(
-              actorFromTransform,
-              actorToTransform,
-              {
-                keepSelf: true,
-                transformTokens: rememberOptions(html).transformTokens
-              },
-              false
-            )
+            callback: (html) =>
+              this.transformInto(
+                actorFromTransform,
+                actorToTransform,
+                {
+                  keepSelf: true,
+                  transformTokens: rememberOptions(html).transformTokens,
+                },
+                false,
+              ),
           },
           cancel: {
             icon: '<i class="fas fa-times"></i>',

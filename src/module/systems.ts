@@ -5,7 +5,6 @@ import generic from './systems/generic';
 import pf1 from './systems/pf1';
 import pf2e from './systems/pf2e';
 
-
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
