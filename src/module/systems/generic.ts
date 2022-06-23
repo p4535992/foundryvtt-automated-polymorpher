@@ -493,6 +493,12 @@ export default {
       return settings;
     };
 
+    const i18nPolymorphSettingsTmp:any = {};
+    for(const key in this.i18nPolymorphSettings){
+        const value = i18n(this.i18nPolymorphSettings[key]);
+        i18nPolymorphSettingsTmp[key] = value;
+    }
+
     // Create and render the Dialog
     return new Dialog(
       {
@@ -500,7 +506,7 @@ export default {
         //@ts-ignore
         content: {
           options: this.polymorphSettings,
-          i18n: this.i18nPolymorphSettings,
+          i18n: i18nPolymorphSettingsTmp,
           isToken: actorFromTransform.isToken,
         },
         default: 'accept',

@@ -511,6 +511,12 @@ export default {
       return settings;
     };
 
+    const i18nPolymorphSettingsTmp:any = {};
+    for(const key in this.i18nPolymorphSettings){
+        const value = i18n(this.i18nPolymorphSettings[key]);
+        i18nPolymorphSettingsTmp[key] = value;
+    }
+
     // Create and render the Dialog
     return new Dialog(
       {
@@ -518,7 +524,7 @@ export default {
         //@ts-ignore
         content: {
           options: this.polymorphSettings,
-          i18n: this.i18nPolymorphSettings,
+          i18n: i18nPolymorphSettingsTmp,
           isToken: actorFromTransform.isToken,
         },
         default: 'accept',
@@ -542,11 +548,6 @@ export default {
               // TODO show on chat ?
               //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
               await this.transformInto(actorFromTransform, actorToTransform, rememberOptions(html), false);
-              // if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
-              //   this.close();
-              // } else {
-              //   this.maximize();
-              // }
             },
           },
           wildshape: {
@@ -581,11 +582,6 @@ export default {
                 },
                 false,
               );
-              // if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
-              //   this.close();
-              // } else {
-              //   this.maximize();
-              // }
             },
           },
           polymorph: {
@@ -615,11 +611,6 @@ export default {
                 },
                 false,
               );
-              // if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
-              //   this.close();
-              // } else {
-              //   this.maximize();
-              // }
             },
           },
           self: {
