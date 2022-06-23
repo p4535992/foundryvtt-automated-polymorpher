@@ -3,7 +3,7 @@ import { ANIMATIONS } from './animations';
 import {
   PolymorpherData,
   PolymorpherFlags,
-  TransformOptions,
+  TransformOptionsGeneric,
   TransformOptionsDnd5e,
 } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
@@ -13,6 +13,7 @@ import dnd5e from './systems/dnd5e';
 import generic from './systems/generic';
 
 const API = {
+
   async invokePolymorpherManagerArr(...inAttributes: any[]) {
     if (!Array.isArray(inAttributes)) {
       throw error('invokePolymorpherManager | inAttributes must be of type array');
@@ -209,7 +210,7 @@ const API = {
       }
 
       // Do something with left click
-      if (game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
+      if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
         info(`${actor.name} reverts to their original form`);
         // TODO show on chat ?
         //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
@@ -322,14 +323,14 @@ const API = {
     }
   },
 
-  get polymorphSetting(): TransformOptions | TransformOptionsDnd5e {
-    return <TransformOptions | TransformOptionsDnd5e>game.settings.get(CONSTANTS.MODULE_NAME, 'polymorphSetting');
+  get polymorphSetting(): TransformOptionsGeneric | TransformOptionsDnd5e {
+    return <TransformOptionsGeneric | TransformOptionsDnd5e>game.settings.get(CONSTANTS.MODULE_NAME, 'polymorphSetting');
   },
 
   async transformInto(
     actorFromTransform: Actor,
     actorToTransform: Actor,
-    transformOptions: TransformOptions | TransformOptionsDnd5e,
+    transformOptions: TransformOptionsGeneric | TransformOptionsDnd5e,
     renderSheet: boolean,
   ): Promise<any> {
     if (game.system.id === 'dnd5e') {

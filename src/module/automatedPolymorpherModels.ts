@@ -56,7 +56,7 @@ export class PolymorpherCompendiumData {
   selected: boolean;
 }
 
-export class TransformOptions {
+export class TransformOptionsGeneric {
   keepVision = false;
   keepSelf = false;
   removeAE = false;
@@ -64,7 +64,7 @@ export class TransformOptions {
   transformTokens = true;
 }
 
-export class TransformOptionsDnd5e extends TransformOptions {
+export class TransformOptionsDnd5e extends TransformOptionsGeneric {
   keepPhysical = false;
   keepMental = false;
   keepSaves = false;

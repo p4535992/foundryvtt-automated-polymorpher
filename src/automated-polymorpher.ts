@@ -60,14 +60,13 @@ Hooks.once('ready', () => {
     );
     return;
   }
-  if (game.system.id != 'dnd5e') {
-    if (!game.modules.get('warpgate')?.active && game.user?.isGM) {
-      ui.notifications?.error(
-        `The '${CONSTANTS.MODULE_NAME}' module requires to install and activate the 'warpgate' module.`,
-      );
-      return;
-    }
+  if (!game.modules.get('warpgate')?.active && game.user?.isGM) {
+    ui.notifications?.error(
+      `The '${CONSTANTS.MODULE_NAME}' module requires to install and activate the 'warpgate' module.`,
+    );
+    return;
   }
+
   readyHooks();
 });
 

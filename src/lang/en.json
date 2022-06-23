@@ -104,6 +104,32 @@
         "label": "Prints debug messages to the console",
         "hint": " "
       }
-    }
+    },
+    "polymorph": "Polymorph",
+    "polymorphAcceptSettings": "Custom Settings",
+    "polymorphKeepBio": "Keep biography",
+    "polymorphKeepClass": "Keep proficiency bonus (leaves class items in sheet)",
+    "polymorphKeepFeats": "Keep features",
+    "polymorphKeepItems": "Keep equipment",
+    "polymorphKeepMental": "Keep mental ability scores (Int, Wis, Cha)",
+    "polymorphKeepPhysical": "Keep physical ability scores (Str, Dex, Con)",
+    "polymorphKeepSaves": "Keep saving throw proficiencies",
+    "polymorphKeepSkills": "Keep skill proficiencies",
+    "polymorphKeepSpells": "Keep spells",
+    "polymorphKeepVision": "Keep vision (character and token)",
+    "polymorphKeepSelf": "Keep self (just changing image and size for emulate spell like Alter Self and Disguise Self)",
+    "polymorphRemoveAE": "Remove Active effects",
+    "polymorphKeepAEOnlyOriginNotEquipment": "Keep only Active effects which origin is not equipment (override the 'Not Keep Active effects' if checked)",
+    "polymorphMergeSaves": "Merge saving throw proficiencies (take the highest)",
+    "polymorphMergeSkills": "Merge skill proficiencies (take the highest)",
+    "polymorphPromptTitle": "Transforming Actor",
+    "polymorphRestoreTransformation": "Restore Transformation",
+    "polymorphRevertWarn": "You do not have permission to revert this Actor's polymorphed state.",
+    "polymorphRevertNoOriginalActorWarn": "No original actor is founded with reference '{reference}'",
+    "polymorphTmpClass": "Temporary Class",
+    "polymorphTokens": "Transform all linked tokens?",
+    "polymorphWarn": "You are not allowed to polymorph this actor!",
+    "polymorphWildShape": "Wild Shape",
+    "polymorphSelf": "Alter/Disguise Self"
   }
 }

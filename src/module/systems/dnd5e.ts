@@ -55,21 +55,21 @@ export default {
    * @enum {string}
    */
   i18nPolymorphSettings: {
-    keepPhysical: 'DND5E.PolymorphKeepPhysical',
-    keepMental: 'DND5E.PolymorphKeepMental',
-    keepSaves: 'DND5E.PolymorphKeepSaves',
-    keepSkills: 'DND5E.PolymorphKeepSkills',
-    mergeSaves: 'DND5E.PolymorphMergeSaves',
-    mergeSkills: 'DND5E.PolymorphMergeSkills',
-    keepClass: 'DND5E.PolymorphKeepClass',
-    keepFeats: 'DND5E.PolymorphKeepFeats',
-    keepSpells: 'DND5E.PolymorphKeepSpells',
-    keepItems: 'DND5E.PolymorphKeepItems',
-    keepBio: 'DND5E.PolymorphKeepBio',
-    keepVision: 'DND5E.PolymorphKeepVision',
-    keepSelf: 'DND5E.PolymorphKeepSelf',
-    removeAE: 'DND5E.PolymorphRemoveAE',
-    keepAEOnlyOriginNotEquipment: 'DND5E.PolymorphKeepAEOnlyOriginNotEquipment',
+    keepPhysical: `${CONSTANTS.MODULE_NAME}.polymorphKeepPhysical`,
+    keepMental: `${CONSTANTS.MODULE_NAME}.polymorphKeepMental`,
+    keepSaves: `${CONSTANTS.MODULE_NAME}.polymorphKeepSaves`,
+    keepSkills: `${CONSTANTS.MODULE_NAME}.polymorphKeepSkills`,
+    mergeSaves: `${CONSTANTS.MODULE_NAME}.polymorphMergeSaves`,
+    mergeSkills: `${CONSTANTS.MODULE_NAME}.polymorphMergeSkills`,
+    keepClass: `${CONSTANTS.MODULE_NAME}.polymorphKeepClass`,
+    keepFeats: `${CONSTANTS.MODULE_NAME}.polymorphKeepFeats`,
+    keepSpells: `${CONSTANTS.MODULE_NAME}.polymorphKeepSpells`,
+    keepItems: `${CONSTANTS.MODULE_NAME}.polymorphKeepItems`,
+    keepBio: `${CONSTANTS.MODULE_NAME}.polymorphKeepBio`,
+    keepVision: `${CONSTANTS.MODULE_NAME}.polymorphKeepVision`,
+    keepSelf: `${CONSTANTS.MODULE_NAME}.pPolymorphKeepSelf`,
+    removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
+    keepAEOnlyOriginNotEquipment: `${CONSTANTS.MODULE_NAME}.polymorphKeepAEOnlyOriginNotEquipment`,
   },
 
   /**
@@ -106,7 +106,7 @@ export default {
     // Ensure the player is allowed to polymorph
     // const allowed = game.settings.get("dnd5e", "allowPolymorphing");
     // if ( !allowed && !game.user?.isGM ) {
-    //   return ui.notifications.warn(game.i18n.localize("DND5E.PolymorphWarn"));
+    //   return ui.notifications.warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphWarn`));
     // }
 
     // Get the original Actor data and the new source data
@@ -214,7 +214,7 @@ export default {
       if (!keepClass && d.data.details.cr) {
         d.items.push({
           type: 'class',
-          name: game.i18n.localize('DND5E.PolymorphTmpClass'),
+          name: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphTmpClass`),
           data: { levels: d.data.details.cr },
         });
       }
@@ -259,9 +259,9 @@ export default {
     let previousTokenData =
       <TokenData[]>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) || [];
     const currentTokenData = await actorThis.getTokenData();
-    if(currentTokenData._id && 
+    if(currentTokenData._id &&
       previousTokenData.filter((z) => z._id === currentTokenData._id).length <= 0){
-      
+
       previousTokenData.push(currentTokenData);
       previousTokenData = previousTokenData.filter((value, index, self) =>
         index === self.findIndex((t) => (
@@ -346,7 +346,7 @@ export default {
       return;
     }
     if (!actorThis.isOwner) {
-      return warn(game.i18n.localize('DND5E.PolymorphRevertWarn'), true);
+      return warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`), true);
     }
 
     /**
@@ -378,7 +378,7 @@ export default {
       if (!baseActor) {
         if (!previousOriginalActorTokenData) {
           warn(
-            game.i18n.format('DND5E.PolymorphRevertNoOriginalActorWarn', {
+            game.i18n.format(`${CONSTANTS.MODULE_NAME}.polymorphRevertNoOriginalActorWarn`, {
               reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
             }),
             true,
@@ -424,7 +424,7 @@ export default {
     if (!original) {
       if (!previousOriginalActorTokenData) {
         warn(
-          game.i18n.format('DND5E.PolymorphRevertNoOriginalActorWarn', {
+          game.i18n.format(`${CONSTANTS.MODULE_NAME}.polymorphRevertNoOriginalActorWarn`, {
             reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
           }),
           true,
@@ -469,7 +469,7 @@ export default {
       const othersActorsToDelete = <TokenData[]>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
       othersActorsToDelete.reverse();
       for(const td of othersActorsToDelete){
-        if(td.actorId && 
+        if(td.actorId &&
           !idsToDelete.includes(td.actorId) &&
           td.actorId != original.id &&
           game.actors?.get(td.actorId)){
@@ -505,18 +505,20 @@ export default {
       html.find('input').each((i, el) => {
         options[el.name] = el.checked;
       });
-      const settings = mergeObject(this.transformOptions || {}, options);
-      //game.settings.set('dnd5e', 'polymorphSettings', settings);
+      //const settings = mergeObject(<TransformOptionsDnd5e>game.settings.get(CONSTANTS.MODULE_NAME, "polymorphSettings") || {}, options);
+      //game.settings.set(CONSTANTS.MODULE_NAME, 'polymorphSettings', settings);
+      // TODO findd a way to sav the custom settings on client side
+      const settings = mergeObject(this.polymorphSettings || {}, options);
       return settings;
     };
 
     // Create and render the Dialog
     return new Dialog(
       {
-        title: i18n('DND5E.PolymorphPromptTitle'),
+        title: i18n(`${CONSTANTS.MODULE_NAME}.polymorphPromptTitle`),
         //@ts-ignore
         content: {
-          options: this.polymorphSetting,
+          options: this.polymorphSettings,
           i18n: this.i18nPolymorphSettings,
           isToken: actorFromTransform.isToken,
         },
@@ -524,7 +526,7 @@ export default {
         buttons: {
           accept: {
             icon: '<i class="fas fa-check"></i>',
-            label: i18n('DND5E.PolymorphAcceptSettings'),
+            label: i18n(`${CONSTANTS.MODULE_NAME}.polymorphAcceptSettings`),
             callback: async (html) => {
               if (tokenFromTransform) {
                 if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
@@ -550,7 +552,7 @@ export default {
           },
           wildshape: {
             icon: '<i class="fas fa-paw"></i>',
-            label: i18n('DND5E.PolymorphWildShape'),
+            label: i18n(`${CONSTANTS.MODULE_NAME}.polymorphWildShape`),
             callback: async (html) => {
               if (tokenFromTransform) {
                 if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
@@ -589,7 +591,7 @@ export default {
           },
           polymorph: {
             icon: '<i class="fas fa-pastafarianism"></i>',
-            label: i18n('DND5E.Polymorph'),
+            label: i18n(`${CONSTANTS.MODULE_NAME}.polymorph`),
             callback: async (html) => {
               if (tokenFromTransform) {
                 if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
@@ -621,6 +623,19 @@ export default {
               // }
             },
           },
+          self: {
+            icon: '<i class="fas fa-eye"></i>',
+            label: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphSelf`),
+            callback: html => this.transformInto(
+              actorFromTransform,
+              actorToTransform,
+              {
+                keepSelf: true,
+                transformTokens: rememberOptions(html).transformTokens
+              },
+              false
+            )
+          },
           cancel: {
             icon: '<i class="fas fa-times"></i>',
             label: i18n('Cancel'),
@@ -628,7 +643,7 @@ export default {
         },
       },
       {
-        classes: ['dialog', 'dnd5e'],
+        classes: ['dialog', `${CONSTANTS.MODULE_NAME}`],
         width: 600,
         template: `modules/${CONSTANTS.MODULE_NAME}/templates/polymorph-prompt.hbs`,
       },

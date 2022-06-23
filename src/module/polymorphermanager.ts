@@ -208,8 +208,8 @@ export class PolymorpherManager extends FormApplication {
     if (!actorToTransform) {
       return;
     }
-    
-    if (game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
+
+    if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
       // Prepare flag for revert ???
       const updatesForRevert = <TokenData[]>(
         this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
@@ -426,7 +426,7 @@ export class PolymorpherManager extends FormApplication {
       return '';
     }
 
-    const isDnd5e = game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate');
+    // const isDnd5e = game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate');
 
     const restricted = game.settings.get(CONSTANTS.MODULE_NAME, 'restrictOwned');
     if (restricted && !actorToTransformLi.isOwner) return '';
@@ -457,7 +457,7 @@ export class PolymorpherManager extends FormApplication {
             ${this.getAnimations(data.animation)}
         </select>
         ${
-          isDnd5e
+          !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')
             ? `<select
               id="automated-polymorpher.defaultSummonType"
               class="defaultSummonType" name="defaultSummonType"
@@ -488,7 +488,7 @@ export class PolymorpherManager extends FormApplication {
 
   getDefaultSummonTypes(defaultsummontype: string, a: PolymorpherData) {
     let animList = '';
-    const typesArray = ['', 'DND5E.PolymorphWildShape', 'DND5E.Polymorph'];
+    const typesArray = ['', `${CONSTANTS.MODULE_NAME}.polymorphWildShape`, `${CONSTANTS.MODULE_NAME}.polymorph`, `${CONSTANTS.MODULE_NAME}.polymorphSelf`];
     for (const [index, type] of Object.entries(typesArray)) {
       animList += `<option value="${type}" ${a.defaultsummontype === type ? 'selected' : ''}>${i18n(type)}</option>`;
     }
@@ -609,20 +609,20 @@ export class PolymorpherManager extends FormApplication {
     if (!actorToTransform) {
       return;
     }
-    if (game.system.id === 'dnd5e' && !game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
-      const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
-      if (!canPolymorph) {
-        warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
-        return false;
-      }
+    if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
+      // const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
+      // if (!canPolymorph) {
+      //   warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
+      //   return false;
+      // }
       // // Define a function to record polymorph settings for future use
       // const rememberOptions = (html) => {
       //   const options = {};
       //   html.find('input').each((i, el) => {
       //     options[el.name] = el.checked;
       //   });
-      //   const settings = mergeObject(<any>game.settings.get('dnd5e', 'polymorphSettings') || {}, options);
-      //   game.settings.set('dnd5e', 'polymorphSettings', settings);
+      //   const settings = mergeObject(game.settings.set(CONSTANTS.MODULE_NAME, 'polymorphSettings', settings) || {}, options);
+      //   game.settings.set(CONSTANTS.MODULE_NAME, 'polymorphSettings', settings);
       //   return settings;
       // };
 
@@ -652,7 +652,7 @@ export class PolymorpherManager extends FormApplication {
         updatesForRevert,
       );
 
-      if (polymorpherData.defaultsummontype === 'DND5E.PolymorphAcceptSettings') {
+      if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphAcceptSettings`) {
         if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
             //@ts-ignore
@@ -694,7 +694,7 @@ export class PolymorpherManager extends FormApplication {
           },
           false,
         );
-      } else if (polymorpherData.defaultsummontype === 'DND5E.PolymorphWildShape') {
+      } else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphWildShape`) {
         if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
             //@ts-ignore
@@ -729,7 +729,7 @@ export class PolymorpherManager extends FormApplication {
           },
           false,
         );
-      } else if (polymorpherData.defaultsummontype === 'DND5E.Polymorph') {
+      } else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorph`) {
         if (tokenFromTransform) {
           if (animationExternal && animationExternal.sequence) {
             //@ts-ignore
@@ -767,6 +767,37 @@ export class PolymorpherManager extends FormApplication {
             keepItems: false,
             keepBio: false,
             keepVision: true,
+            transformTokens: true,
+          },
+          false,
+        );
+      } else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphSelf`) {
+        if (tokenFromTransform) {
+          if (animationExternal && animationExternal.sequence) {
+            //@ts-ignore
+            await animationExternal.sequence.play();
+            await wait(animationExternal.timeToWait);
+          } else if (animation) {
+            if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+              //@ts-ignore
+              game.macros
+                ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                //@ts-ignore
+                ?.execute(tokenFromTransform, tokenDataToTransform);
+            } else {
+              ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+            }
+            await wait(ANIMATIONS.animationFunctions[animation].time);
+          }
+        }
+        info(`${this.actor.name} turns into a ${actorToTransform.name}`);
+        // TODO show on chat ?
+        //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+        await API.transformInto(
+          this.actor,
+          actorToTransform,
+          <any>{
+            keepSelf: true,
             transformTokens: true,
           },
           false,
