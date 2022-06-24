@@ -1,6 +1,9 @@
 ### 1.0.33
 
+- [BREAKING CHANGES] Rewrite mostly of the code so do not update just before a session
 - Preparation for new customization alghortim for polymorph
+- Sadly warpgate seem to have some issue with the mutate function, i'll try to dig the problem for open a issue on the warpgate project, in the meanwhile i'm have tried to replicate the dnd5e polymorph mevchanism for other systems, yuo can still use warpgate by enabling the module setting.
+- Add new options "Alter/Disguise self" the custom preset options
 
 ### 1.0.32
 

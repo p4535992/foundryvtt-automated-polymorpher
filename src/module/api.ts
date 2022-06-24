@@ -1,16 +1,14 @@
 import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
 import { ANIMATIONS } from './animations';
-import {
-  PolymorpherData,
-  PolymorpherFlags,
-  TransformOptionsGeneric,
-  TransformOptionsDnd5e,
-} from './automatedPolymorpherModels';
+import { PolymorpherData, PolymorpherFlags, TransformOptionsGeneric } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
 import { error, info, retrieveActorFromToken, wait, warn } from './lib/lib';
 import { PolymorpherManager } from './polymorphermanager';
+import D35E from './systems/D35E';
 import dnd5e from './systems/dnd5e';
 import generic from './systems/generic';
+import pf1 from './systems/pf1';
+import pf2e from './systems/pf2e';
 
 const API = {
   async invokePolymorpherManagerArr(...inAttributes: any[]) {
@@ -322,23 +320,42 @@ const API = {
     }
   },
 
-  get polymorphSetting(): TransformOptionsGeneric | TransformOptionsDnd5e {
-    return <TransformOptionsGeneric | TransformOptionsDnd5e>(
-      game.settings.get(CONSTANTS.MODULE_NAME, 'polymorphSetting')
-    );
+  get polymorphSetting(): TransformOptionsGeneric {
+    return <TransformOptionsGeneric>game.settings.get(CONSTANTS.MODULE_NAME, 'polymorphSetting');
   },
 
   async transformInto(
     actorFromTransform: Actor,
     actorToTransform: Actor,
-    transformOptions: TransformOptionsGeneric | TransformOptionsDnd5e,
+    transformOptions: TransformOptionsGeneric,
     renderSheet: boolean,
   ): Promise<any> {
-    if (game.system.id === 'dnd5e') {
+    if (game.system.id === 'D35E') {
+      return D35E.transformInto(
+        actorFromTransform,
+        actorToTransform,
+        <TransformOptionsGeneric>transformOptions,
+        renderSheet,
+      );
+    } else if (game.system.id === 'dnd5e') {
       return dnd5e.transformInto(
         actorFromTransform,
         actorToTransform,
-        <TransformOptionsDnd5e>transformOptions,
+        <TransformOptionsGeneric>transformOptions,
+        renderSheet,
+      );
+    } else if (game.system.id === 'pf1') {
+      return pf1.transformInto(
+        actorFromTransform,
+        actorToTransform,
+        <TransformOptionsGeneric>transformOptions,
+        renderSheet,
+      );
+    } else if (game.system.id === 'pf2e') {
+      return pf2e.transformInto(
+        actorFromTransform,
+        actorToTransform,
+        <TransformOptionsGeneric>transformOptions,
         renderSheet,
       );
     } else {
@@ -354,8 +371,14 @@ const API = {
    * @returns {Promise<Actor>|null}  Original actor if it was reverted.
    */
   async revertOriginalForm(actorThis: Actor, renderSheet: boolean) {
-    if (game.system.id === 'dnd5e') {
+    if (game.system.id === 'D35E') {
+      return D35E.revertOriginalForm(actorThis, renderSheet);
+    } else if (game.system.id === 'dnd5e') {
       return dnd5e.revertOriginalForm(actorThis, renderSheet);
+    } else if (game.system.id === 'pf1') {
+      return pf1.revertOriginalForm(actorThis, renderSheet);
+    } else if (game.system.id === 'pf2e') {
+      return pf2e.revertOriginalForm(actorThis, renderSheet);
     } else {
       return generic.revertOriginalForm(actorThis, renderSheet);
     }
@@ -367,8 +390,14 @@ const API = {
     actorToTransform: Actor,
     animation: string,
   ): Promise<Dialog<DialogOptions>> {
-    if (game.system.id === 'dnd5e') {
+    if (game.system.id === 'D35E') {
+      return D35E.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
+    } else if (game.system.id === 'dnd5e') {
       return dnd5e.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
+    } else if (game.system.id === 'pf1') {
+      return pf1.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
+    } else if (game.system.id === 'pf2e') {
+      return pf2e.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
     } else {
       return generic.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
     }

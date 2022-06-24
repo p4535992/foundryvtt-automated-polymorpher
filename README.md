@@ -30,6 +30,10 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 
 ## Known issue/Limitation
 
+- Sadly i have to create a temprary actor for save the data of the polymorphed acotr (just like dnd5e do now), but everythin is going by the plan you didn't notice because i automatically delete the actor when you revert the polymorphing
+- Sadly warpgate seem to have some issue with the mutate function, i'll try to dig the problem for open a issue on the warpgate porject, in the meanwhile i'm trying to replicate the dnd5e polymorph mevchanism for other systems, yuo can still use warpgate by enabling the module setting.
+
+
 ## Installation
 
 It's always easiest to install modules from the in game add-on browser.

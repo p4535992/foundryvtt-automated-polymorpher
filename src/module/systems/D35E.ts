@@ -4,7 +4,7 @@ import type {
   TokenData,
 } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
 import { ANIMATIONS } from '../animations';
-import { PolymorpherData, PolymorpherFlags, TransformOptionsDnd5e } from '../automatedPolymorpherModels';
+import { PolymorpherData, PolymorpherFlags, TransformOptionsGeneric } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
 import { i18n, info, wait, warn } from '../lib/lib';
 
@@ -83,7 +83,7 @@ export default {
   async transformInto(
     actorThis: Actor,
     target: Actor,
-    transformOptions: TransformOptionsDnd5e | undefined = undefined,
+    transformOptions: TransformOptionsGeneric | undefined = undefined,
     renderSheet = true,
   ) {
     const keepPhysical = transformOptions?.keepPhysical || false;
@@ -310,9 +310,9 @@ export default {
     // }
     let tokens = actorThis.getActiveTokens(true);
     if (!transformTokens) {
-        tokens = tokens.filter((t) => {
-            return source.token.id === t.data._id;
-        });
+      tokens = tokens.filter((t) => {
+        return source.token.id === t.data._id;
+      });
     }
     const updates = tokens.map((t) => {
       const newTokenData = <TokenData>foundry.utils.deepClone(d.token);
@@ -516,10 +516,10 @@ export default {
       return settings;
     };
 
-    const i18nPolymorphSettingsTmp:any = {};
-    for(const key in this.i18nPolymorphSettings){
-        const value = i18n(this.i18nPolymorphSettings[key]);
-        i18nPolymorphSettingsTmp[key] = value;
+    const i18nPolymorphSettingsTmp: any = {};
+    for (const key in this.i18nPolymorphSettings) {
+      const value = i18n(this.i18nPolymorphSettings[key]);
+      i18nPolymorphSettingsTmp[key] = value;
     }
 
     // Create and render the Dialog

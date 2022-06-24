@@ -57,14 +57,6 @@ export class PolymorpherCompendiumData {
 }
 
 export class TransformOptionsGeneric {
-  keepVision = false;
-  keepSelf = false;
-  removeAE = false;
-  keepAEOnlyOriginNotEquipment = false;
-  transformTokens = true;
-}
-
-export class TransformOptionsDnd5e extends TransformOptionsGeneric {
   keepPhysical = false;
   keepMental = false;
   keepSaves = false;
@@ -76,9 +68,9 @@ export class TransformOptionsDnd5e extends TransformOptionsGeneric {
   keepSpells = false;
   keepItems = false;
   keepBio = false;
-  // keepVision=false;
-  // keepSelf=false;
-  // removeAE=false;
-  // keepAEOnlyOriginNotEquipment=false;
-  // transformTokens=true;
+  keepVision = false;
+  keepSelf = false;
+  removeAE = false;
+  keepAEOnlyOriginNotEquipment = false;
+  transformTokens = true;
 }
