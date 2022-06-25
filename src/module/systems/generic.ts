@@ -72,6 +72,7 @@ export default {
    * @returns {Promise<Array<Token>>|null}        Updated token if the transformation was performed.
    */
   async transformInto(
+    tokenFromTransform: Token,
     actorThis: Actor,
     target: Actor,
     transformOptions: TransformOptionsGeneric | undefined = undefined,
@@ -475,11 +476,16 @@ export default {
     return original;
   },
 
-  async renderDialogTransformOptions(actorFromTransform: Actor, actorToTransform: Actor, animation: string) {
+  async renderDialogTransformOptions(
+    actorFromTransform: Actor,
+    actorToTransform: Actor,
+    animation: string,
+    tokenFromTransform: Token,
+  ) {
     const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
-    const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
-        return t.actor?.id === actorFromTransform.id;
-      }) || undefined;
+    // const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
+    //     return t.actor?.id === actorFromTransform.id;
+    //   }) || undefined;
     // Define a function to record polymorph settings for future use
     const rememberOptions = (html) => {
       const options = {};

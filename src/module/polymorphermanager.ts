@@ -313,7 +313,9 @@ export class PolymorpherManager extends FormApplication {
       const arrayMutationNames: string[] =
         <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
       const mutationNameOriginalToken = tokenFromTransform.id + randomID();
-      arrayMutationNames.push(mutationNameOriginalToken);
+      if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
+        arrayMutationNames.push(mutationNameOriginalToken);
+      }
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
       info(`${this.actor.name} mutate into a ${actorToTransform.name}`);
       // TODO show on chat ?
@@ -680,6 +682,7 @@ export class PolymorpherManager extends FormApplication {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         await API.transformInto(
+          tokenFromTransform,
           this.actor,
           actorToTransform,
           <any>{
@@ -722,6 +725,7 @@ export class PolymorpherManager extends FormApplication {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         await API.transformInto(
+          tokenFromTransform,
           this.actor,
           actorToTransform,
           <any>{
@@ -757,6 +761,7 @@ export class PolymorpherManager extends FormApplication {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         await API.transformInto(
+          tokenFromTransform,
           this.actor,
           actorToTransform,
           <any>{
@@ -799,6 +804,7 @@ export class PolymorpherManager extends FormApplication {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         await API.transformInto(
+          tokenFromTransform,
           this.actor,
           actorToTransform,
           <any>{

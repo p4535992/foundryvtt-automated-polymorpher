@@ -212,7 +212,7 @@ const API = {
         // TODO show on chat ?
         //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //actor?.revertOriginalForm();
-        this.revertOriginalForm(actor, false);
+        this.revertOriginalForm(sourceToken, actor, false);
       } else {
         let arrayMutationNames: string[] = <string[]>(
           actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
@@ -325,6 +325,7 @@ const API = {
   },
 
   async transformInto(
+    tokenFromTransform: Token,
     actorFromTransform: Actor,
     actorToTransform: Actor,
     transformOptions: TransformOptionsGeneric,
@@ -332,34 +333,38 @@ const API = {
   ): Promise<any> {
     if (game.system.id === 'D35E') {
       return D35E.transformInto(
+        tokenFromTransform,
         actorFromTransform,
         actorToTransform,
-        <TransformOptionsGeneric>transformOptions,
+        transformOptions,
         renderSheet,
       );
     } else if (game.system.id === 'dnd5e') {
       return dnd5e.transformInto(
+        tokenFromTransform,
         actorFromTransform,
         actorToTransform,
-        <TransformOptionsGeneric>transformOptions,
+        transformOptions,
         renderSheet,
       );
     } else if (game.system.id === 'pf1') {
-      return pf1.transformInto(
-        actorFromTransform,
-        actorToTransform,
-        <TransformOptionsGeneric>transformOptions,
-        renderSheet,
-      );
+      return pf1.transformInto(tokenFromTransform, actorFromTransform, actorToTransform, transformOptions, renderSheet);
     } else if (game.system.id === 'pf2e') {
       return pf2e.transformInto(
+        tokenFromTransform,
         actorFromTransform,
         actorToTransform,
-        <TransformOptionsGeneric>transformOptions,
+        transformOptions,
         renderSheet,
       );
     } else {
-      return generic.transformInto(actorFromTransform, actorToTransform, transformOptions, renderSheet);
+      return generic.transformInto(
+        tokenFromTransform,
+        actorFromTransform,
+        actorToTransform,
+        transformOptions,
+        renderSheet,
+      );
     }
   },
 
@@ -370,17 +375,17 @@ const API = {
    * @param {boolean} [renderSheet] Render Sheet after revert the transformation.
    * @returns {Promise<Actor>|null}  Original actor if it was reverted.
    */
-  async revertOriginalForm(actorThis: Actor, renderSheet: boolean) {
+  async revertOriginalForm(sourceToken: Token, actorThis: Actor, renderSheet: boolean) {
     if (game.system.id === 'D35E') {
-      return D35E.revertOriginalForm(actorThis, renderSheet);
+      return await D35E.revertOriginalForm(sourceToken, actorThis, renderSheet);
     } else if (game.system.id === 'dnd5e') {
-      return dnd5e.revertOriginalForm(actorThis, renderSheet);
+      return await dnd5e.revertOriginalForm(actorThis, renderSheet);
     } else if (game.system.id === 'pf1') {
-      return pf1.revertOriginalForm(actorThis, renderSheet);
+      return await pf1.revertOriginalForm(actorThis, renderSheet);
     } else if (game.system.id === 'pf2e') {
-      return pf2e.revertOriginalForm(actorThis, renderSheet);
+      return await pf2e.revertOriginalForm(actorThis, renderSheet);
     } else {
-      return generic.revertOriginalForm(actorThis, renderSheet);
+      return await generic.revertOriginalForm(actorThis, renderSheet);
     }
   },
 
@@ -391,15 +396,15 @@ const API = {
     animation: string,
   ): Promise<Dialog<DialogOptions>> {
     if (game.system.id === 'D35E') {
-      return D35E.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
+      return await D35E.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
     } else if (game.system.id === 'dnd5e') {
-      return dnd5e.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
+      return await dnd5e.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
     } else if (game.system.id === 'pf1') {
-      return pf1.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
+      return await pf1.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
     } else if (game.system.id === 'pf2e') {
-      return pf2e.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
+      return await pf2e.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
     } else {
-      return generic.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation);
+      return await generic.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
     }
   },
 };
