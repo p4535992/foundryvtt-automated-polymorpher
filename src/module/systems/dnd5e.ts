@@ -245,7 +245,6 @@ export default {
     );
     //setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`, getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
     mergeObject(d.flags, actorThis.data.flags);
-
     if (
       //!actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
       !tokenFromTransform.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
@@ -255,6 +254,11 @@ export default {
     }
     setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 
+    if(!d.token.flags){
+      d.token.flags = {};
+    }
+    mergeObject(d.token.flags, d.flags);
+    /*
     let previousTokenData = <TokenData[]>(
       tokenFromTransform.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
     );
@@ -275,7 +279,7 @@ export default {
       `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`,
       previousTokenData,
     );
-
+    */
     /**
      * A hook event that fires just before the actor is transformed.
      * @function dnd5e.transformActor
@@ -309,13 +313,18 @@ export default {
       if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
         arrayMutationNames.push(mutationNameOriginalToken);
       }
+      setProperty(
+        d.token.flags,
+        `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+        arrayMutationNames,
+      );
+      /*
       await actorThis?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
       await tokenFromTransform.document.setFlag(
         CONSTANTS.MODULE_NAME,
         PolymorpherFlags.MUTATION_NAMES_FOR_REVERT,
         arrayMutationNames,
       );
-
       setProperty(
         d.token.flags,
         `${CONSTANTS.MODULE_NAME}`,
@@ -327,6 +336,7 @@ export default {
         getProperty(d.token.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
       );
       setProperty(d.token.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+      */
 
       info(`${tokenFromTransform.name} mutate into a ${target.name}`);
       // TODO show on chat ?
@@ -360,13 +370,14 @@ export default {
       if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
         arrayMutationNames.push(mutationNameOriginalToken);
       }
+      /*
       await actorThis?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
       await tokenFromTransform.document.setFlag(
         CONSTANTS.MODULE_NAME,
         PolymorpherFlags.MUTATION_NAMES_FOR_REVERT,
         arrayMutationNames,
       );
-
+      */
       // Set the flags again before the transformation
       if (!newTokenData.token.flags) {
         setProperty(newTokenData.token, `flags`, {});
@@ -379,9 +390,15 @@ export default {
       setProperty(
         newTokenData.token.flags,
         `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-        getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
+        actorThis.id,
       );
+
       setProperty(newTokenData.token.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+      setProperty(
+        newTokenData.token.flags,
+        `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+        arrayMutationNames,
+      );
 
       info(`${t.name} mutate into a ${newTokenData.token.name}`);
 
