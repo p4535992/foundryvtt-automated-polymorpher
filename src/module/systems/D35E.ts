@@ -352,7 +352,11 @@ export default {
       if (!newTokenData.flags) {
         setProperty(newTokenData, `flags`, {});
       }
-      setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}`, getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
+      setProperty(
+        newTokenData.flags,
+        `${CONSTANTS.MODULE_NAME}`,
+        getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`),
+      );
       setProperty(
         newTokenData.flags,
         `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,

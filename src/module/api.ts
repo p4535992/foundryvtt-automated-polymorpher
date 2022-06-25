@@ -379,7 +379,7 @@ const API = {
     if (game.system.id === 'D35E') {
       return await D35E.revertOriginalForm(sourceToken, actorThis, renderSheet);
     } else if (game.system.id === 'dnd5e') {
-      return await dnd5e.revertOriginalForm(actorThis, renderSheet);
+      return await dnd5e.revertOriginalForm(sourceToken, actorThis, renderSheet);
     } else if (game.system.id === 'pf1') {
       return await pf1.revertOriginalForm(actorThis, renderSheet);
     } else if (game.system.id === 'pf2e') {
@@ -396,15 +396,40 @@ const API = {
     animation: string,
   ): Promise<Dialog<DialogOptions>> {
     if (game.system.id === 'D35E') {
-      return await D35E.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
+      return await D35E.renderDialogTransformOptions(
+        actorFromTransform,
+        actorToTransform,
+        animation,
+        tokenFromTransform,
+      );
     } else if (game.system.id === 'dnd5e') {
-      return await dnd5e.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
+      return await dnd5e.renderDialogTransformOptions(
+        actorFromTransform,
+        actorToTransform,
+        animation,
+        tokenFromTransform,
+      );
     } else if (game.system.id === 'pf1') {
-      return await pf1.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
+      return await pf1.renderDialogTransformOptions(
+        actorFromTransform,
+        actorToTransform,
+        animation,
+        tokenFromTransform,
+      );
     } else if (game.system.id === 'pf2e') {
-      return await pf2e.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
+      return await pf2e.renderDialogTransformOptions(
+        actorFromTransform,
+        actorToTransform,
+        animation,
+        tokenFromTransform,
+      );
     } else {
-      return await generic.renderDialogTransformOptions(actorFromTransform, actorToTransform, animation, tokenFromTransform);
+      return await generic.renderDialogTransformOptions(
+        actorFromTransform,
+        actorToTransform,
+        animation,
+        tokenFromTransform,
+      );
     }
   },
 };
