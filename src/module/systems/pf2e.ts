@@ -35,7 +35,7 @@ export default {
     keepPhysical: false,
     keepMental: false,
     keepSaves: false,
-    keepSkills: false,
+    // keepSkills: false,
     mergeSaves: false,
     mergeSkills: false,
     keepClass: false,
@@ -58,7 +58,7 @@ export default {
     keepPhysical: `${CONSTANTS.MODULE_NAME}.polymorphKeepPhysical`,
     keepMental: `${CONSTANTS.MODULE_NAME}.polymorphKeepMental`,
     keepSaves: `${CONSTANTS.MODULE_NAME}.polymorphKeepSaves`,
-    keepSkills: `${CONSTANTS.MODULE_NAME}.polymorphKeepSkills`,
+    // keepSkills: `${CONSTANTS.MODULE_NAME}.polymorphKeepSkills`,
     mergeSaves: `${CONSTANTS.MODULE_NAME}.polymorphMergeSaves`,
     mergeSkills: `${CONSTANTS.MODULE_NAME}.polymorphMergeSkills`,
     keepClass: `${CONSTANTS.MODULE_NAME}.polymorphKeepClass`,
@@ -90,7 +90,7 @@ export default {
     const keepPhysical = transformOptions?.keepPhysical || false;
     const keepMental = transformOptions?.keepMental || false;
     const keepSaves = transformOptions?.keepSaves || false;
-    const keepSkills = transformOptions?.keepSkills || false;
+    // const keepSkills = transformOptions?.keepSkills || false;
     const mergeSaves = transformOptions?.mergeSaves || false;
     const mergeSkills = transformOptions?.mergeSkills || false;
     const keepClass = transformOptions?.keepClass || false;
@@ -186,14 +186,14 @@ export default {
       }
 
       // Transfer skills
-      if (keepSkills) d.data.skills = o.data.skills;
-      else if (mergeSkills) {
-        // eslint-disable-next-line prefer-const
-        for (let [k, s] of Object.entries(d.data.skills)) {
-          //@ts-ignore
-          s.value = Math.max(<number>(<any>s).value, o.data.skills[k].value);
-        }
-      }
+      // if (keepSkills) d.data.skills = o.data.skills;
+      // else if (mergeSkills) {
+      //   // eslint-disable-next-line prefer-const
+      //   for (let [k, s] of Object.entries(d.data.skills)) {
+      //     //@ts-ignore
+      //     s.value = Math.max(<number>(<any>s).value, o.data.skills[k].value);
+      //   }
+      // }
 
       // Keep specific items from the original data
       d.items = d.items.concat(
