@@ -381,11 +381,11 @@ const API = {
     } else if (game.system.id === 'dnd5e') {
       return await dnd5e.revertOriginalForm(sourceToken, actorThis, renderSheet);
     } else if (game.system.id === 'pf1') {
-      return await pf1.revertOriginalForm(actorThis, renderSheet);
+      return await pf1.revertOriginalForm(sourceToken, actorThis, renderSheet);
     } else if (game.system.id === 'pf2e') {
-      return await pf2e.revertOriginalForm(actorThis, renderSheet);
+      return await pf2e.revertOriginalForm(sourceToken, actorThis, renderSheet);
     } else {
-      return await generic.revertOriginalForm(actorThis, renderSheet);
+      return await generic.revertOriginalForm(sourceToken, actorThis, renderSheet);
     }
   },
 
