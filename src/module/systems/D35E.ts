@@ -104,6 +104,12 @@ export default {
     const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
     const transformTokens = transformOptions?.transformTokens || true;
 
+    // Ensure the player is allowed to polymorph
+    // const allowed = game.settings.get("dnd5e", "allowPolymorphing");
+    // if ( !allowed && !game.user?.isGM ) {
+    //   return ui.notifications.warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphWarn`));
+    // }
+
     // Get the original Actor data and the new source data
     const o = <any>actorThis.toJSON();
     //o.flags.dnd5e = o.flags.dnd5e || {};
@@ -238,134 +244,96 @@ export default {
     }
 
     // Set new data flags
-    setProperty(
-      d.flags,
-      `${CONSTANTS.MODULE_NAME}`,
-      getProperty(tokenFromTransform.document.data.flags, `${CONSTANTS.MODULE_NAME}`),
-    );
-    //setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`, getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
-    mergeObject(d.flags, actorThis.data.flags);
+    // if ( !actorThis.isPolymorphed || !d.flags.dnd5e.originalActor ) d.flags.dnd5e.originalActor = actorThis.id;
+    // d.flags.dnd5e.isPolymorphed = true;
+
+    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`, getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
+
     if (
-      //!actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
-      !tokenFromTransform.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
+      !actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
       !getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
     ) {
       setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, actorThis.id);
     }
     setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 
-    if (!d.token.flags) {
-      d.token.flags = {};
+    let previousTokenData =
+      <TokenData[]>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) || [];
+    const currentTokenData = await actorThis.getTokenData();
+    if (currentTokenData._id && previousTokenData.filter((z) => z._id === currentTokenData._id).length <= 0) {
+      previousTokenData.push(currentTokenData);
+      previousTokenData = previousTokenData.filter(
+        (value, index, self) => index === self.findIndex((t) => t._id === null || t._id === value._id),
+      );
     }
-    mergeObject(d.token.flags, d.flags);
+    setProperty(
+      d.flags,
+      `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`,
+      previousTokenData,
+    );
+
+    // Update unlinked Tokens in place since they can simply be re-dropped from the base actor
+    if (actorThis.isToken) {
+      const tokenData = d.token;
+      // tokenData.actorData = d;
+      setProperty(tokenData, `actorData`, d);
+      //@ts-ignore
+      delete tokenData.actorData.token;
+
+      return actorThis.token?.update(tokenData);
+    }
+
+    // Close sheet for non-transformed Actor
+    await actorThis.sheet?.close();
+
     /**
      * A hook event that fires just before the actor is transformed.
      * @function dnd5e.transformActor
      * @memberof hookEvents
-     * @param {Token} tokenFromTransform
      * @param {Actor} actorThis                 The original actor before transformation.
      * @param {Actor} target                 The target actor into which to transform.
      * @param {object} data                    The data that will be used to create the new transformed actor.
      * @param {TransformationOptions} options  Options that determine how the transformation is performed.
      */
-    Hooks.callAll(
-      `${CONSTANTS.MODULE_NAME}.transformActor`,
-      tokenFromTransform,
-      actorThis,
-      target,
-      d,
-      transformOptions,
-      renderSheet,
-    );
+    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.transformActor`, actorThis, target, d, transformOptions, renderSheet);
+
+    // Some info like height and weight of the token are reset to default
+    // after the constructor of the actor is invoked solved with a backup of the info of the token
+    const tokenBackup = duplicate(d.token);
+    // Create new Actor with transformed data
+    //@ts-ignore
+    const newActor = await actorThis.constructor.create(d, { renderSheet: renderSheet });
+    mergeObject(d.token, tokenBackup);
 
     // Update placed Token instances
+    // if (!transformTokens) {
+    //   return;
+    // }
+    let tokens = actorThis.getActiveTokens(true);
     if (!transformTokens) {
-      let arrayMutationNames: string[] = <string[]>(
-        tokenFromTransform.document?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
-      );
-      if (!arrayMutationNames || arrayMutationNames.length == 0) {
-        arrayMutationNames =
-          <string[]>actorThis?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
-      }
-      const mutationNameOriginalToken = tokenFromTransform.id + '_' + randomID();
-      if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
-        arrayMutationNames.push(mutationNameOriginalToken);
-      }
-      setProperty(
-        d.token.flags,
-        `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
-        arrayMutationNames,
-      );
-
-      info(`${tokenFromTransform.name} mutate into a ${target.name}`);
-      // TODO show on chat ?
-      //await ChatMessage.create({content: `${actorThis.name} mutate into a ${actorToTransform.name}`, speaker:{alias: actorThis.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-      //@ts-ignore
-      await warpgate.mutate(
-        tokenFromTransform.document,
-        d, // tokenDataToTransform, //{}, //customTokenData || {},
-        {},
-        {
-          name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
-        },
-      );
-      return;
+      tokens = tokens.filter((t) => {
+        return source.token.id === t.data._id;
+      });
     }
-
-    const tokens = actorThis.getActiveTokens(true);
-    const updates = tokens.map(async (t: Token) => {
-      const newTokenData = <any>foundry.utils.deepClone(d);
-      newTokenData.token._id = t.data._id;
-      //newTokenData.token.actorId = <string>newActor.id;
-      //newTokenData.token.actorLink = true;
-      let arrayMutationNames: string[] = <string[]>(
-        tokenFromTransform.document?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
-      );
-      if (!arrayMutationNames || arrayMutationNames.length == 0) {
-        arrayMutationNames =
-          <string[]>actorThis?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
-      }
-      const mutationNameOriginalToken = tokenFromTransform.id + '_' + randomID();
-      if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
-        arrayMutationNames.push(mutationNameOriginalToken);
-      }
-      // Set the flags again before the transformation
-      if (!newTokenData.token.flags) {
-        setProperty(newTokenData.token, `flags`, {});
+    const updates = tokens.map((t) => {
+      const newTokenData = <TokenData>foundry.utils.deepClone(d.token);
+      newTokenData._id = t.data._id;
+      newTokenData.actorId = <string>newActor.id;
+      newTokenData.actorLink = true;
+      if (!newTokenData.flags) {
+        setProperty(newTokenData, `flags`, {});
       }
       setProperty(
-        newTokenData.token.flags,
-        `${CONSTANTS.MODULE_NAME}`,
-        getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`),
-      );
-      setProperty(
-        newTokenData.token.flags,
+        newTokenData.flags,
         `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-        actorThis.id,
+        getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
       );
+      setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 
-      setProperty(newTokenData.token.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-      setProperty(
-        newTokenData.token.flags,
-        `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
-        arrayMutationNames,
-      );
-
-      info(`${t.name} mutate into a ${newTokenData.token.name}`);
-
-      // TODO show on chat ?
-      //await ChatMessage.create({content: `${actorThis.name} mutate into a ${actorToTransform.name}`, speaker:{alias: actorThis.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-      //@ts-ignore
-      await warpgate.mutate(
-        t.document,
-        newTokenData,
-        {},
-        {
-          name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
-        },
-      );
       return newTokenData;
     });
+    //@ts-ignore
+    return canvas.scene?.updateEmbeddedDocuments('Token', updates);
   },
 
   /**
@@ -395,41 +363,59 @@ export default {
      * A hook event that fires just before the actor is reverted to original form.
      * @function dnd5e.transformActor
      * @memberof hookEvents
-     * @param {Token} sourceToken
      * @param {Actor} actorThis                 The original actor before transformation.
      * @param {boolean} renderSheet             Render Sheet after revert the transformation.
      */
-    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, actorThis, renderSheet);
+    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, actorThis, renderSheet);
 
     const previousOriginalActorTokenData = <TokenData[]>(
-      sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
     );
     let isTheOriginalActor = false;
     if (!previousOriginalActorTokenData || previousOriginalActorTokenData.length <= 0) {
       isTheOriginalActor = true;
     }
 
-    let arrayMutationNames: string[] = <string[]>(
-      sourceToken.document?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
-    );
-    if (!arrayMutationNames || arrayMutationNames.length == 0) {
-      arrayMutationNames = [];
-      warn(`Array mutation names for the revert is null or empty`);
-    }
-    try {
-      if (arrayMutationNames.length > 0) {
-        for (const revertName of arrayMutationNames) {
-          info(`${sourceToken.document.name} reverts to their original form`);
-          // TODO show on chat ?
-          //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-          //@ts-ignore
-          await warpgate.revert(sourceToken.document, revertName);
-        }
-      } else {
-        //@ts-ignore
-        await warpgate.revert(sourceToken.document, '');
+    // If we are reverting an unlinked token, simply replace it with the base actor prototype
+    if (actorThis.isToken) {
+      // Obtain a reference to the base actor prototype
+      let baseActor = <Actor>(
+        game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
+      );
+      if (!baseActor) {
+        baseActor = <Actor>game.actors?.get(<string>actorThis.token?.data.actorId);
       }
-    } finally {
+      if (!baseActor) {
+        if (!previousOriginalActorTokenData) {
+          warn(
+            game.i18n.format(`${CONSTANTS.MODULE_NAME}.polymorphRevertNoOriginalActorWarn`, {
+              reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
+            }),
+            true,
+          );
+          return;
+        }
+      }
+      const prototypeTokenData = await baseActor.getTokenData();
+      const tokenUpdate = { actorData: {} };
+      for (const k of [
+        'width',
+        'height',
+        'scale',
+        'img',
+        'mirrorX',
+        'mirrorY',
+        'tint',
+        'alpha',
+        'lockRotation',
+        'name',
+      ]) {
+        tokenUpdate[k] = prototypeTokenData[k];
+      }
+      await actorThis.token?.update(tokenUpdate, { recursive: false });
+      await actorThis.sheet?.close();
+      const actor = <Actor>actorThis.token?.getActor();
+
       await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
       await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
       await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
@@ -439,23 +425,95 @@ export default {
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+
+      if (renderSheet) {
+        actor.sheet?.render(true);
+      }
+      return actor;
     }
+
     // Obtain a reference to the original actor
     const original = <Actor>(
-      game.actors?.get(<string>sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
+      game.actors?.get(<string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
     );
     if (!original) {
       if (!previousOriginalActorTokenData) {
         warn(
           game.i18n.format(`${CONSTANTS.MODULE_NAME}.polymorphRevertNoOriginalActorWarn`, {
-            reference: <string>sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
+            reference: <string>actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
           }),
           true,
         );
         return;
       }
     }
+    // Get the Tokens which represent this actor
+    if (canvas.ready) {
+      const tokens = actorThis.getActiveTokens(true);
+      const tokenData = <TokenData>await original.getTokenData();
+      const tokenUpdates = tokens.map((t) => {
+        const update = duplicate(tokenData);
+        update._id = t.id;
+        //@ts-ignore
+        delete update.x;
+        //@ts-ignore
+        delete update.y;
+        return update;
+      });
+      await canvas.scene?.updateEmbeddedDocuments('Token', tokenUpdates);
+    } else if (previousOriginalActorTokenData) {
+      const tokenData = previousOriginalActorTokenData;
+      const update = <any>duplicate(tokenData);
+      //@ts-ignore
+      delete update.x;
+      //@ts-ignore
+      delete update.y;
+      await canvas.scene?.updateEmbeddedDocuments('Token', [update]);
+    }
 
+    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+    await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+
+    await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+    await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+    await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+    await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+
+    // Delete the polymorphed version of the actor, if possible
+    const isRendered = actorThis.sheet?.rendered;
+    if (game.user?.isGM) {
+      const idsToDelete = <string[]>[];
+      idsToDelete.push(<string>actorThis.id);
+      const othersActorsToDelete = <TokenData[]>(
+        actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      );
+      othersActorsToDelete.reverse();
+      for (const td of othersActorsToDelete) {
+        if (
+          td.actorId &&
+          !idsToDelete.includes(td.actorId) &&
+          td.actorId != original.id &&
+          game.actors?.get(td.actorId)
+        ) {
+          idsToDelete.push(td.actorId);
+        }
+      }
+      for (const id of idsToDelete) {
+        const actorToDelete = game.actors?.get(id);
+        if (actorToDelete) {
+          info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
+          await actorToDelete.delete();
+        }
+      }
+      // await actorThis.delete();
+    } else if (isRendered) {
+      actorThis.sheet?.close();
+    }
+    if (isRendered && renderSheet) {
+      original.sheet?.render(isRendered);
+    }
     return original;
   },
 
@@ -609,6 +667,7 @@ export default {
         width: 600,
         template: `modules/${CONSTANTS.MODULE_NAME}/templates/polymorph-prompt.hbs`,
       },
+      // ).render(true);
     );
   },
 };

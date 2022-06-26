@@ -1,3 +1,7 @@
+### 1.0.34
+
+- ???
+
 ### 1.0.33
 
 - [BREAKING CHANGES] Rewrite mostly of the code so do not update just before a session
