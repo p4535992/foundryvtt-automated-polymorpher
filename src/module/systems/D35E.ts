@@ -76,14 +76,14 @@ export default {
    * Transform this Actor into another one.
    *
    * @param {Actor} actorThis                 The original actor before transformation.
-   * @param {Actor} target                      The target Actor.
+   * @param {Actor} targetActor                      The target Actor.
    * @param {TransformationOptions} [options={}]  Options that determine how the transformation is performed.
    * @returns {Promise<Array<Token>>|null}        Updated token if the transformation was performed.
    */
   async transformInto(
     tokenFromTransform: Token,
     actorThis: Actor,
-    target: Actor,
+    targetActor: Actor,
     transformOptions: TransformOptionsGeneric | undefined = undefined,
     renderSheet = true,
   ) {
@@ -121,7 +121,16 @@ export default {
       mergeSkills,
       mergeSaves,
     });
-    const source = <any>target.toJSON();
+    // const actorUpdates = <any>targetActor.toJSON();
+    /* get the full actor data */
+    const actorUpdates = targetActor.toObject();
+    /**
+     * dnd5e: npc and character are nearly interchangable.
+     * If we dont switch the type, we dont have to fool
+     * with the sheet app caching.
+     */
+    //@ts-ignore
+    delete actorUpdates.type;
 
     let d = <any>new Object();
     if (keepSelf) {
@@ -132,11 +141,11 @@ export default {
     // Prepare new data to merge from the source
     d = {
       type: o.type, // Remain the same actor type
-      name: `${o.name} (${source.name})`, // Append the new shape to your old name
-      data: source.data, // Get the data model of your new form
-      items: source.items, // Get the items of your new form
-      effects: o.effects.concat(source.effects), // Combine active effects from both forms
-      img: source.img, // New appearance
+      name: `${o.name} (${actorUpdates.name})`, // Append the new shape to your old name
+      data: actorUpdates.data, // Get the data model of your new form
+      items: actorUpdates.items, // Get the items of your new form
+      effects: o.effects.concat(actorUpdates.effects), // Combine active effects from both forms
+      img: actorUpdates.img, // New appearance
       permission: o.permission, // Use the original actor permissions
       folder: o.folder, // Be displayed in the same sidebar folder
       flags: o.flags, // Use the original actor flags
@@ -160,21 +169,21 @@ export default {
     //@ts-ignore
     d.data.spells = o.data.spells; // Keep spell slots
     //@ts-ignore
-    d.data.attributes.ac.flat = target.data.data.attributes.ac.value; // Override AC
+    d.data.attributes.ac.flat = targetActor.data.data.attributes.ac.value; // Override AC
 
     // Token appearance updates
     d.token = <PrototypeTokenData>{ name: d.name };
     for (const k of ['width', 'height', 'scale', 'img', 'mirrorX', 'mirrorY', 'tint', 'alpha', 'lockRotation']) {
-      d.token[k] = source.token[k];
+      d.token[k] = actorUpdates.token[k];
     }
 
-    if (source.token.randomImg) {
-      const images = await target.getTokenImages();
+    if (actorUpdates.token.randomImg) {
+      const images = await targetActor.getTokenImages();
       d.token.img = <string>images[Math.floor(Math.random() * images.length)];
     }
 
     if (!keepSelf) {
-      const vision = keepVision ? o.token : source.token;
+      const vision = keepVision ? o.token : actorUpdates.token;
       for (const k of ['dimSight', 'brightSight', 'dimLight', 'brightLight', 'vision', 'sightAngle']) {
         d.token[k] = vision[k];
       }
@@ -295,7 +304,7 @@ export default {
      * @param {object} data                    The data that will be used to create the new transformed actor.
      * @param {TransformationOptions} options  Options that determine how the transformation is performed.
      */
-    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.transformActor`, actorThis, target, d, transformOptions, renderSheet);
+    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.transformActor`, actorThis, targetActor, d, transformOptions, renderSheet);
 
     // Some info like height and weight of the token are reset to default
     // after the constructor of the actor is invoked solved with a backup of the info of the token
@@ -312,7 +321,8 @@ export default {
     let tokens = actorThis.getActiveTokens(true);
     if (!transformTokens) {
       tokens = tokens.filter((t) => {
-        return source.token.id === t.data._id;
+        //return actorUpdates.token.id === t.data._id;
+        return actorUpdates._id === t.actor?.id;
       });
     }
     const updates = tokens.map((t) => {
@@ -523,10 +533,8 @@ export default {
     animation: string,
     tokenFromTransform: Token,
   ) {
-    const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
-    // const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
-    //     return t.actor?.id === actorFromTransform.id;
-    //   }) || undefined;
+    const tokenUpdatesToTransform = <TokenData>await actorToTransform.getTokenData();
+
     // Define a function to record polymorph settings for future use
     const rememberOptions = (html) => {
       const options = {};
@@ -567,9 +575,9 @@ export default {
                   game.macros
                     ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                     //@ts-ignore
-                    ?.execute(tokenFromTransform, tokenDataToTransform);
+                    ?.execute(tokenFromTransform, tokenUpdatesToTransform);
                 } else {
-                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenUpdatesToTransform);
                 }
                 await wait(ANIMATIONS.animationFunctions[animation].time);
               }
@@ -588,9 +596,9 @@ export default {
                   game.macros
                     ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                     //@ts-ignore
-                    ?.execute(tokenFromTransform, tokenDataToTransform);
+                    ?.execute(tokenFromTransform, tokenUpdatesToTransform);
                 } else {
-                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenUpdatesToTransform);
                 }
                 await wait(ANIMATIONS.animationFunctions[animation].time);
               }
@@ -622,9 +630,9 @@ export default {
                   game.macros
                     ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                     //@ts-ignore
-                    ?.execute(tokenFromTransform, tokenDataToTransform);
+                    ?.execute(tokenFromTransform, tokenUpdatesToTransform);
                 } else {
-                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenUpdatesToTransform);
                 }
                 await wait(ANIMATIONS.animationFunctions[animation].time);
               }
@@ -670,4 +678,193 @@ export default {
       // ).render(true);
     );
   },
+
+  // =====================================================================
+
+  // async createWildShapeBuff(actorThis:Actor, itemData) {
+  //     const data = await this.toPolymorphBuff(itemData, "wildshape");
+
+  //     if (data._id) delete data._id;
+  //     //@ts-ignore
+  //     await actorThis.createEmbeddedEntity("Item", data);
+  // },
+
+  // async createPolymorphBuff(itemData, type) {
+  //     const data = await this.toPolymorphBuff(itemData, "polymorph");
+
+  //     if (data._id) delete data._id;
+  //     //@ts-ignore
+  //     await actorThis.createEmbeddedEntity("Item", data);
+  // },
+
+  // async createAlterSelfBuff(itemData, type) {
+  //     const data = await this.toPolymorphBuff(itemData, "alter-self");
+
+  //     if (data._id) delete data._id;
+  //     //@ts-ignore
+  //     await actorThis.createEmbeddedEntity("Item", data);
+  // },
+
+  // async createLycantrophyBuff(itemData, type) {
+  //     const data = await this.toPolymorphBuff(itemData, "lycantrophy");
+
+  //     if (data._id) delete data._id;
+  //     //@ts-ignore
+  //     await actorThis.createEmbeddedEntity("Item", data);
+  // },
+
+  // async toPolymorphBuff(origData:ActorData, polymorphdata:Actor, type:string) {
+  //     //@ts-ignore
+  //     /*
+  //     let data = duplicate(game.system.template.Item.buff);
+  //     for (const t of data.templates) {
+  //          //@ts-ignore
+  //         mergeObject(data, duplicate(game.system.template.Item.templates[t]));
+  //     }
+  //     delete data.templates;
+  //     data = await this.polymorphBuffFromActor(data, origData, type)
+  //     return data;
+  //     */
+  //     return await this.polymorphBuffFromActor(polymorphdata, origData, type);
+  // },
+
+  // async polymorphBuffFromActor(data:Actor, origData:Actor,type) {
+
+  //     data = {
+  //         type: "buff",
+  //         name: origData.name,
+  //         img: origData.img,
+  //         data: data,
+  //     };
+
+  //     data.data.shapechange = {source: origData, type:type}
+  //     data.data.buffType = "shapechange";
+  //     data.data.sizeOverride = origData.data.traits.size;
+
+
+  //     data.data.changes = []
+  //     data.data.changes.push(
+  //         ...(origData.items.find(i => i.type === "class")?.data?.changes || [])
+  //     )
+  //     if (type === "polymorph" || type === "wildshape") {
+  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.abilities.str.total")}`, "ability", "str", "replace", getProperty(origData, "data.abilities.str.total")]]) // Strength
+  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.abilities.dex.total")}`, "ability", "dex", "replace", getProperty(origData, "data.abilities.dex.total")]]) // Dexterity
+  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.abilities.con.total")}`, "ability", "con", "replace", getProperty(origData, "data.abilities.con.total")]]) // Constitution
+  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.land.total")}`, "speed", "landSpeed", "replace", getProperty(origData, "data.attributes.speed.land.total")]])
+  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.climb.total")}`, "speed", "climbSpeed", "replace", getProperty(origData, "data.attributes.speed.climb.total")]])
+  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.swim.total")}`, "speed", "swimSpeed", "replace", getProperty(origData, "data.attributes.speed.swim.total")]])
+  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.burrow.total")}`, "speed", "burrowSpeed", "replace", getProperty(origData, "data.attributes.speed.burrow.total")]])
+  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.fly.total")}`, "speed", "flySpeed", "replace", getProperty(origData, "data.attributes.speed.fly.total")]])
+  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.naturalACTotal")}`, "ac", "nac", "base", getProperty(origData, "data.attributes.naturalACTotal")]])
+  //     }
+
+  //     data.data.activateActions = []
+  //     if (type === "wildshape") {
+  //         data.data.activateActions = data.data.activateActions.concat([{
+  //             "name": "Activate Wildshape",
+  //             "action": "Condition set wildshaped to true on self",
+  //             "condition": "",
+  //             "img": ""
+  //         },{
+  //             "name": "Set Portrait",
+  //             "action": `Update set data.shapechangeImg to ${origData.data.tokenImg} on self`,
+  //             "condition": "",
+  //             "img": ""
+  //         },{
+  //             "name": "Meld weapons",
+  //             "action": "Set attack * field data.melded to true on self; Set weapon * field data.melded to true on self; Set equipment * field data.melded to true on self",
+  //             "condition": "",
+  //             "img": ""
+  //         }])
+  //     } else if (type === "polymorph") {
+  //         data.data.activateActions = data.data.activateActions.concat([ {
+  //             "name": "Activate Polymorph",
+  //             "action": "Condition set polymorph to true on self",
+  //             "condition": "",
+  //             "img": ""
+  //         },{
+  //             "name": "Set Portrait",
+  //             "action": `Update set data.shapechangeImg to ${origData.data.tokenImg} on self`,
+  //             "condition": "",
+  //             "img": ""
+  //         },{
+  //             "name": "Meld weapons",
+  //             "action": "Set attack:natural * field data.melded to true on self;",
+  //             "condition": "",
+  //             "img": ""
+  //         }])
+  //     } else if (type === "alter-self") {
+  //         data.data.activateActions = data.data.activateActions.concat([{
+  //             "name": "Set Portrait",
+  //             "action": `Update set data.shapechangeImg to ${origData.data.tokenImg} on self`,
+  //             "condition": "",
+  //             "img": ""
+  //         }])
+  //     }
+
+  //     data.data.deactivateActions = []
+
+  //     if (type === "wildshape") {
+  //         data.data.deactivateActions = data.data.deactivateActions.concat([{
+  //             "name": "Deactivate Wildshape",
+  //             "action": "Condition set wildshaped to false on self",
+  //             "condition": "",
+  //             "img": ""
+  //         },{
+  //             "name": "Unmeld weapons",
+  //             "action": "Set attack * field data.melded to false on self; Set weapon * field data.melded to false on self; Set equipment * field data.melded to false on self",
+  //             "condition": "",
+  //             "img": ""
+  //         },{
+  //             "name": "Set Portrait",
+  //             "action": `Update set data.shapechangeImg to icons/svg/mystery-man.svg on self`,
+  //             "condition": "",
+  //             "img": ""
+  //         }])
+  //     } else if (type === "polymorph") {
+  //         data.data.deactivateActions = data.data.deactivateActions.concat([ {
+  //             "name": "Deactivate Polymorph",
+  //             "action": "Condition set polymorph to false on self",
+  //             "condition": "",
+  //             "img": ""
+  //         },{
+  //             "name": "Unmeld weapons",
+  //             "action": "Set attack:natural * field data.melded to false on self;",
+  //             "condition": "",
+  //             "img": ""
+  //         },{
+  //             "name": "Set Portrait",
+  //             "action": `Update set data.shapechangeImg to icons/svg/mystery-man.svg on self`,
+  //             "condition": "",
+  //             "img": ""
+  //         }])
+  //     } else if (type === "alter-self") {
+  //         data.data.deactivateActions = data.data.deactivateActions.concat([{
+  //             "name": "Set Portrait",
+  //             "action": `Update set data.shapechangeImg to icons/svg/mystery-man.svg on self`,
+  //             "condition": "",
+  //             "img": ""
+  //         }])
+  //     }
+
+  //     // Speedlist
+  //     const speedDesc = []
+  //     for (const speedKey of Object.keys(origData.data.attributes.speed)) {
+  //         if (getProperty(origData, `data.attributes.speed.${speedKey}.total`) > 0) {
+  //             //@ts-ignore
+  //             speedDesc.push(speedKey.charAt(0).toUpperCase() + speedKey.slice(1) + " " + getProperty(origData, `data.attributes.speed.${speedKey}.total`) + " ft.")
+  //         }
+  //     }
+
+  //     // Set description
+  //     data.data.description.value = await renderTemplate("systems/D35E/templates/internal/shapechange-description.html", {
+  //         size: game.i18n.localize(CONFIG.D35E.actorSizes[origData.data.traits.size]),
+  //         type: origData.data.details.type,
+  //         speed: speedDesc.join(', '),
+  //         str: origData.data.abilities.str.total,
+  //         dex: origData.data.abilities.dex.total,
+  //         con: origData.data.abilities.con.total,
+  //     });
+  //     return data;
+  // }
 };

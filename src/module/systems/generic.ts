@@ -67,14 +67,14 @@ export default {
    * Transform this Actor into another one.
    *
    * @param {Actor} actorThis                 The original actor before transformation.
-   * @param {Actor} target                      The target Actor.
+   * @param {Actor} targetActor                      The target Actor.
    * @param {TransformationOptions} [options={}]  Options that determine how the transformation is performed.
    * @returns {Promise<Array<Token>>|null}        Updated token if the transformation was performed.
    */
   async transformInto(
     tokenFromTransform: Token,
     actorThis: Actor,
-    target: Actor,
+    targetActor: Actor,
     transformOptions: TransformOptionsGeneric | undefined = undefined,
     renderSheet = true,
   ) {
@@ -95,7 +95,16 @@ export default {
     //   mergeSkills,
     //   mergeSaves,
     // });
-    const source = <any>target.toJSON();
+    // const actorUpdates = <any>targetActor.toJSON();
+    /* get the full actor data */
+    const actorUpdates = targetActor.toObject();
+    /**
+     * dnd5e: npc and character are nearly interchangable.
+     * If we dont switch the type, we dont have to fool
+     * with the sheet app caching.
+     */
+    //@ts-ignore
+    delete actorUpdates.type;
 
     let d = <any>new Object();
     if (keepSelf) {
@@ -106,11 +115,11 @@ export default {
     // Prepare new data to merge from the source
     d = {
       type: o.type, // Remain the same actor type
-      name: `${o.name} (${source.name})`, // Append the new shape to your old name
-      data: source.data, // Get the data model of your new form
-      items: source.items, // Get the items of your new form
-      effects: o.effects.concat(source.effects), // Combine active effects from both forms
-      img: source.img, // New appearance
+      name: `${o.name} (${actorUpdates.name})`, // Append the new shape to your old name
+      data: actorUpdates.data, // Get the data model of your new form
+      items: actorUpdates.items, // Get the items of your new form
+      effects: o.effects.concat(actorUpdates.effects), // Combine active effects from both forms
+      img: actorUpdates.img, // New appearance
       permission: o.permission, // Use the original actor permissions
       folder: o.folder, // Be displayed in the same sidebar folder
       flags: o.flags, // Use the original actor flags
@@ -134,21 +143,21 @@ export default {
     //@ts-ignore
     d.data.spells = o.data.spells; // Keep spell slots
     //@ts-ignore
-    d.data.attributes.ac.flat = target.data.data.attributes.ac.value; // Override AC
+    d.data.attributes.ac.flat = targetActor.data.data.attributes.ac.value; // Override AC
 
     // Token appearance updates
     d.token = <PrototypeTokenData>{ name: d.name };
     for (const k of ['width', 'height', 'scale', 'img', 'mirrorX', 'mirrorY', 'tint', 'alpha', 'lockRotation']) {
-      d.token[k] = source.token[k];
+      d.token[k] = actorUpdates.token[k];
     }
 
-    if (source.token.randomImg) {
-      const images = await target.getTokenImages();
+    if (actorUpdates.token.randomImg) {
+      const images = await targetActor.getTokenImages();
       d.token.img = <string>images[Math.floor(Math.random() * images.length)];
     }
 
     if (!keepSelf) {
-      const vision = keepVision ? o.token : source.token;
+      const vision = keepVision ? o.token : actorUpdates.token;
       for (const k of ['dimSight', 'brightSight', 'dimLight', 'brightLight', 'vision', 'sightAngle']) {
         d.token[k] = vision[k];
       }
@@ -252,7 +261,7 @@ export default {
       `${CONSTANTS.MODULE_NAME}.transformActor`,
       tokenFromTransform,
       actorThis,
-      target,
+      targetActor,
       d,
       transformOptions,
       renderSheet,
@@ -277,7 +286,7 @@ export default {
         arrayMutationNames,
       );
 
-      info(`${tokenFromTransform.name} mutate into a ${target.name}`);
+      info(`${tokenFromTransform.name} mutate into a ${targetActor.name}`);
       // TODO show on chat ?
       //await ChatMessage.create({content: `${actorThis.name} mutate into a ${actorToTransform.name}`, speaker:{alias: actorThis.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
       //@ts-ignore
@@ -445,10 +454,8 @@ export default {
     animation: string,
     tokenFromTransform: Token,
   ) {
-    const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
-    // const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
-    //     return t.actor?.id === actorFromTransform.id;
-    //   }) || undefined;
+    const tokenUpdatesToTransform = <TokenData>await actorToTransform.getTokenData();
+
     // Define a function to record polymorph settings for future use
     const rememberOptions = (html) => {
       const options = {};
@@ -489,9 +496,9 @@ export default {
                   game.macros
                     ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                     //@ts-ignore
-                    ?.execute(tokenFromTransform, tokenDataToTransform);
+                    ?.execute(tokenFromTransform, tokenUpdatesToTransform);
                 } else {
-                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenUpdatesToTransform);
                 }
                 await wait(ANIMATIONS.animationFunctions[animation].time);
               }
@@ -510,9 +517,9 @@ export default {
                   game.macros
                     ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                     //@ts-ignore
-                    ?.execute(tokenFromTransform, tokenDataToTransform);
+                    ?.execute(tokenFromTransform, tokenUpdatesToTransform);
                 } else {
-                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenUpdatesToTransform);
                 }
                 await wait(ANIMATIONS.animationFunctions[animation].time);
               }
@@ -544,9 +551,9 @@ export default {
                   game.macros
                     ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                     //@ts-ignore
-                    ?.execute(tokenFromTransform, tokenDataToTransform);
+                    ?.execute(tokenFromTransform, tokenUpdatesToTransform);
                 } else {
-                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenUpdatesToTransform);
                 }
                 await wait(ANIMATIONS.animationFunctions[animation].time);
               }
