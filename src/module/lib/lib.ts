@@ -3,6 +3,7 @@ import API from '../api';
 import { PolymorpherFlags } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
 import { PolymorpherManager } from '../polymorphermanager';
+import type { ActorData } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
 
 // =============================
 // Module Generic function
@@ -321,4 +322,20 @@ export async function retrieveActorFromData(
     });
   }
   return actorToTransformLi;
+}
+
+/* returns the actor data sans ALL embedded collections */
+export function _getRootActorData(actorDoc:Actor) {
+  const actorData = actorDoc.data.toObject();
+  
+  /* get the key NAME of the embedded document type.
+   * ex. not 'ActiveEffect' (the class name), 'effect' the collection's field name
+   */
+  //@ts-ignore
+  const embeddedFields = Object.values(Actor.implementation.metadata.embedded).map( thisClass => thisClass.metadata.collection );
+  
+  /* delete any embedded fields from the actor data */
+  embeddedFields.forEach( field => { delete actorData[field] } )
+  
+  return actorData;
 }

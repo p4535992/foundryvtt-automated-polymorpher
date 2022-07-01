@@ -75,18 +75,21 @@ export default {
   /**
    * Transform this Actor into another one.
    *
-   * @param {Actor} actorThis                 The original actor before transformation.
+   * @param {Token} sourceToken                 The original token before transformation.
+   * @param {Actor} sourceActor                 The original actor before transformation.
    * @param {Actor} targetActor                      The target Actor.
    * @param {TransformationOptions} [options={}]  Options that determine how the transformation is performed.
+   * @param {boolean}                           Render the sheet after transformation
    * @returns {Promise<Array<Token>>|null}        Updated token if the transformation was performed.
    */
   async transformInto(
-    tokenFromTransform: Token,
-    actorThis: Actor,
+    sourceToken: Token,
+    sourceActor: Actor,
     targetActor: Actor,
     transformOptions: TransformOptionsGeneric | undefined = undefined,
     renderSheet = true,
   ) {
+
     const keepPhysical = transformOptions?.keepPhysical || false;
     const keepMental = transformOptions?.keepMental || false;
     const keepSaves = transformOptions?.keepSaves || false;
@@ -104,47 +107,66 @@ export default {
     const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
     const transformTokens = transformOptions?.transformTokens || true;
 
+    /*
     // Get the original Actor data and the new source data
-    const o = <any>actorThis.toJSON();
-    //o.flags.dnd5e = o.flags.dnd5e || {};
-    //o.flags.dnd5e.transformOptions = {mergeSkills, mergeSaves};
-    if (getProperty(o.flags, `${CONSTANTS.MODULE_NAME}`)) {
-      setProperty(o.flags, `${CONSTANTS.MODULE_NAME}`, {});
+    const originalActorData = <any>sourceActor.toJSON();
+    //originalActorData.flags.dnd5e = o.flags.dnd5e || {};
+    //originalActorData.flags.dnd5e.transformOptions = {mergeSkills, mergeSaves};
+    if (!getProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`)) {
+      setProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
     }
-    setProperty(o.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`, {
-      mergeSkills,
+    setProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`, {
+      keepPhysical,
+      keepMental,
+      keepSaves,
+      keepSkills,
       mergeSaves,
+      mergeSkills,
+      keepClass,
+      keepFeats,
+      keepSpells,
+      keepItems,
+      keepBio,
+      keepVision,
+      keepSelf,
+      removeAE,
+      keepAEOnlyOriginNotEquipment,
+      transformTokens 
     });
-    // const actorUpdates = <any>targetActor.toJSON();
-    /* get the full actor data */
-    const actorUpdates = targetActor.toObject();
-    /**
-     * dnd5e: npc and character are nearly interchangable.
-     * If we dont switch the type, we dont have to fool
-     * with the sheet app caching.
-     */
-    //@ts-ignore
-    delete actorUpdates.type;
+
+    // get the full actor data
+    const targetActorData = <any>targetActor.toJSON(); // TODO is better targetActor.toObject() ???
+
+    // dnd5e: npc and character are nearly interchangable.
+    // If we dont switch the type, we dont have to fool
+    // with the sheet app caching, but for other system can be useful...
+    
+    // delete targetActorData.type;
+
+    // =====================================
+    // START SPECIFIC MANAGEMENT FOR SYSTEM
+    // =====================================
 
     let d = <any>new Object();
     if (keepSelf) {
       // Keep Self
-      mergeObject(d, o);
+      mergeObject(d, originalActorData);
     }
 
     // Prepare new data to merge from the source
     d = {
-      type: o.type, // Remain the same actor type
-      name: `${o.name} (${actorUpdates.name})`, // Append the new shape to your old name
-      data: actorUpdates.data, // Get the data model of your new form
-      items: actorUpdates.items, // Get the items of your new form
-      effects: o.effects.concat(actorUpdates.effects), // Combine active effects from both forms
-      img: actorUpdates.img, // New appearance
-      permission: o.permission, // Use the original actor permissions
-      folder: o.folder, // Be displayed in the same sidebar folder
-      flags: o.flags, // Use the original actor flags
-      x: tokenFromTransform.x,
-      y: tokenFromTransform.y
+      type: originalActorData.type, // Remain the same actor type
+      name: `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
+      data: targetActorData.data, // Get the data model of your new form
+      items: targetActorData.items, // Get the items of your new form
+      effects: originalActorData.effects.concat(targetActorData.effects), // Combine active effects from both forms
+      img: targetActorData.img, // New appearance
+      permission: originalActorData.permission, // Use the original actor permissions
+      folder: originalActorData.folder, // Be displayed in the same sidebar folder
+      flags: originalActorData.flags, // Use the original actor flags
+      x: sourceToken.x,
+      y: sourceToken.y,
+      // token: sourceToken.data.toObject()
     };
 
     // Specifically delete some data attributes
@@ -157,30 +179,30 @@ export default {
 
     // Specific additional adjustments
     //@ts-ignore
-    d.data.details.alignment = o.data.details.alignment; // Don't change alignment
+    d.data.details.alignment = originalActorData.data.details.alignment; // Don't change alignment
     //@ts-ignore
-    d.data.attributes.exhaustion = o.data.attributes.exhaustion; // Keep your prior exhaustion level
+    d.data.attributes.exhaustion = originalActorData.data.attributes.exhaustion; // Keep your prior exhaustion level
     //@ts-ignore
-    d.data.attributes.inspiration = o.data.attributes.inspiration; // Keep inspiration
+    d.data.attributes.inspiration = originalActorData.data.attributes.inspiration; // Keep inspiration
     //@ts-ignore
-    d.data.spells = o.data.spells; // Keep spell slots
+    d.data.spells = originalActorData.data.spells; // Keep spell slots
     //@ts-ignore
     d.data.attributes.ac.flat = targetActor.data.data.attributes.ac.value; // Override AC
 
     // Token appearance updates
     d.token = <PrototypeTokenData>{ name: d.name };
     for (const k of ['width', 'height', 'scale', 'img', 'mirrorX', 'mirrorY', 'tint', 'alpha', 'lockRotation']) {
-      d.token[k] = actorUpdates.token[k];
+      d.token[k] = targetActorData.token[k];
     }
 
-    if (actorUpdates.token.randomImg) {
+    if (targetActorData.token.randomImg) {
       const images = await targetActor.getTokenImages();
       d.token.img = <string>images[Math.floor(Math.random() * images.length)];
     }
 
     if (!keepSelf) {
 
-      const vision = keepVision ? o.token : actorUpdates.token;
+      const vision = keepVision ? originalActorData.token : targetActorData.token;
       for (const k of ['dimSight', 'brightSight', 'dimLight', 'brightLight', 'vision', 'sightAngle']) {
         d.token[k] = vision[k];
       }
@@ -189,7 +211,7 @@ export default {
       //@ts-ignore
       const abilities = d.data.abilities;
       for (const k of Object.keys(abilities)) {
-        const oa = o.data.abilities[k];
+        const oa = originalActorData.data.abilities[k];
         const prof = abilities[k].proficient;
         if (keepPhysical && ['str', 'dex', 'con'].includes(k)) abilities[k] = oa;
         else if (keepMental && ['int', 'wis', 'cha'].includes(k)) abilities[k] = oa;
@@ -198,18 +220,18 @@ export default {
       }
 
       // Transfer skills
-      if (keepSkills) d.data.skills = o.data.skills;
+      if (keepSkills) d.data.skills = originalActorData.data.skills;
       else if (mergeSkills) {
         // eslint-disable-next-line prefer-const
         for (let [k, s] of Object.entries(d.data.skills)) {
           //@ts-ignore
-          s.value = Math.max(<number>(<any>s).value, o.data.skills[k].value);
+          s.value = Math.max(<number>(<any>s).value, originalActorData.data.skills[k].value);
         }
       }
 
       // Keep specific items from the original data
       d.items = d.items.concat(
-        o.items.filter((i) => {
+        originalActorData.items.filter((i) => {
           if (['class', 'subclass'].includes(i.type)) return keepClass;
           else if (i.type === 'feat') return keepFeats;
           else if (i.type === 'spell') return keepSpells;
@@ -227,10 +249,10 @@ export default {
       }
 
       // Keep biography
-      if (keepBio) d.data.details.biography = o.data.details.biography;
+      if (keepBio) d.data.details.biography = originalActorData.data.details.biography;
 
       // Keep senses
-      if (keepVision) d.data.traits.senses = o.data.traits.senses;
+      if (keepVision) d.data.traits.senses = originalActorData.data.traits.senses;
 
       // Not keep active effects
       if (removeAE && !keepAEOnlyOriginNotEquipment) d.effects = [];
@@ -248,46 +270,60 @@ export default {
         d.effects = tokenEffectsNotEquipment;
       }
     }
-
-    const tokenUpdatesToTransform = await targetActor.getTokenData();
-
-    /* Protects the actor a bit more, but requires you
-    *  to close and repon the sheet after reverting.
     */
-    //tokenUpdatesToTransform.actorLink = false; //protects the actor a bit more,
-                                      //but requires you to close/reopon
-                                      //the sheet after revert
 
-    /* leave the actor link unchanged for a more seamless mutation */
-    //@ts-ignore
-    delete tokenUpdatesToTransform.actorLink;
+    // Get the original Actor data and the new source data
+    const originalActorData = <any>sourceActor.toJSON();
+    /* get the full actor data */
+    const targetActorData = <any>targetActor.toJSON(); // TODO is better targetActor.toObject() ???
+    const targetActorImages = await targetActor.getTokenImages();
+    const sourceEffects = sourceToken.actor ? sourceToken.actor.effects : sourceToken.data.effects;
 
-    /* we want to keep our source actor, not swap to a new one entirely */
-     //@ts-ignore
-    delete tokenUpdatesToTransform.actorId;
+    const d = await this.prepareDataFromTransformOptions(
+      originalActorData,
+      targetActorData, 
+      sourceEffects,
+      targetActorImages,
+      transformOptions);
 
-    /* default is 0,0 -- let's stay where we are */
-    //@ts-ignore
-    delete tokenUpdatesToTransform.x;
-    //@ts-ignore
-    delete tokenUpdatesToTransform.y;
+    /**
+     * A hook event that fires just before the actor is transformed.
+     * @function dnd5e.transformActor
+     * @memberof hookEvents
+     * @param {Token} sourceToken
+     * @param {Actor} sourceActor                       The original actor before transformation.
+     * @param {Actor} targetActor                       The target actor into which to transform.
+     * @param {object} d                                The data that will be used to create the new transformed actor.
+     * @param {TransformationOptions} transformOptions  Options that determine how the transformation is performed.
+     */
+    Hooks.callAll(
+      `${CONSTANTS.MODULE_NAME}.transformActor`,
+      sourceToken,
+      sourceActor,
+      targetActor,
+      d,
+      transformOptions,
+      renderSheet,
+    );
 
-    d = mergeObject(tokenUpdatesToTransform, d);
+    // =====================================
+    // END SPECIFIC MANAGEMENT FOR SYSTEM
+    // =====================================
 
-    // Set new data flags
+    // Set new data flags (TODO FIND A BTTER CODE FOR THIS)
     setProperty(
       d.flags,
       `${CONSTANTS.MODULE_NAME}`,
-      getProperty(tokenFromTransform.document.data.flags, `${CONSTANTS.MODULE_NAME}`),
+      getProperty(sourceToken.document.data.flags, `${CONSTANTS.MODULE_NAME}`),
     );
     //setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`, getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
-    mergeObject(d.flags, actorThis.data.flags);
+    mergeObject(d.flags, sourceActor.data.flags);
     if (
       //!actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
-      !tokenFromTransform.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
+      !sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
       !getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
     ) {
-      setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, actorThis.id);
+      setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, sourceActor.id);
     }
     setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 
@@ -296,36 +332,15 @@ export default {
     }
     mergeObject(d.token.flags, d.flags);
 
-    debug({token: d, actor: actorUpdates});
-
-    /**
-     * A hook event that fires just before the actor is transformed.
-     * @function dnd5e.transformActor
-     * @memberof hookEvents
-     * @param {Token} tokenFromTransform
-     * @param {Actor} actorThis                 The original actor before transformation.
-     * @param {Actor} target                 The target actor into which to transform.
-     * @param {object} data                    The data that will be used to create the new transformed actor.
-     * @param {TransformationOptions} options  Options that determine how the transformation is performed.
-     */
-    Hooks.callAll(
-      `${CONSTANTS.MODULE_NAME}.transformActor`,
-      tokenFromTransform,
-      actorThis,
-      targetActor,
-      d,
-      transformOptions,
-      renderSheet,
-    );
-
+    // Step up the array of mutation names
     let arrayMutationNames: string[] = <string[]>(
-      tokenFromTransform.document?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
+      sourceToken.document?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
     );
     if (!arrayMutationNames || arrayMutationNames.length == 0) {
       arrayMutationNames =
-        <string[]>actorThis?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
+        <string[]>sourceActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
     }
-    const mutationNameOriginalToken = tokenFromTransform.id + '_' + randomID();
+    const mutationNameOriginalToken = sourceToken.id + '_' + randomID();
     if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
       arrayMutationNames.push(mutationNameOriginalToken);
     }
@@ -335,32 +350,141 @@ export default {
       arrayMutationNames,
     );
 
+    // if (!getProperty(d, `actor`)) {
+    //   setProperty(d, `actor`, {});
+    // }
+    // if (!getProperty(d.actor, `flags`)) {
+    //   setProperty(d.actor, `flags`, {});
+    // }
+    // if (!getProperty(d.actor.flags, `${CONSTANTS.MODULE_NAME}`)) {
+    //   setProperty(d.actor.flags, `${CONSTANTS.MODULE_NAME}`, {});
+    // }
+    // mergeObject(d.actor.flags[CONSTANTS.MODULE_NAME],d.token.flags[CONSTANTS.MODULE_NAME]);
+
+    /* get the new protodata and remove its null x/y */
+    const newActor = targetActor; 
+
+    // const newActor =
+    // <Actor>game.actors?.get(<string>targetActor.id) ||
+    // <Actor>game.actors?.getName(<string>targetActor.name);
+
+    let proto = <TokenData>(await newActor.getTokenData()).toObject();
+    //@ts-ignore
+    delete proto.x;
+    //@ts-ignore
+    delete proto.y;
+
+    /* overwrite any fields of the original with fields from the new proto */
+    // proto = mergeObject(sourceToken.data.toObject(), proto, {inplace:false});
+    //@ts-ignore
+    proto = mergeObject(proto, d, {inplace:false});
+    //proto = mergeObject(d, proto, {inplace:false});
+
+    /* remove erroneous fields */
+    //@ts-ignore
+    delete proto.actorData;
+    //@ts-ignore
+    delete proto._id;
+
+    /* get the root actor data (i.e. no embedded collections) */
+    //const actorData = _getRootActorData(newActor)
+
+    // START _getRootActorData
+
+    /* returns the actor data sans ALL embedded collections */
+    let newActorData = newActor.data.toObject();
+
+    // Transfer flags module from token to actor
+    if (!getProperty(newActorData, `flags`)) {
+      setProperty(newActorData, `flags`, {});
+    }
+    if (!getProperty(newActorData.flags, `${CONSTANTS.MODULE_NAME}`)) {
+      setProperty(newActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
+    }
+    //@ts-ignore
+    mergeObject(newActorData.flags[CONSTANTS.MODULE_NAME],d.token.flags[CONSTANTS.MODULE_NAME]);
+  
+    /* get the key NAME of the embedded document type.
+     * ex. not 'ActiveEffect' (the class name), 'effect' the collection's field name
+     */
+    //@ts-ignore
+    const embeddedFields = Object.values(Actor.implementation.metadata.embedded).map( thisClass => thisClass.metadata.collection );
+    
+    /* delete any embedded fields from the actor data */
+    embeddedFields.forEach( field => { delete newActorData[field] } )
+
+    // END _getRootActorData
+
+    /* for some strange reason for pass the elemnt to the actor i nedd to reset everything for the actor */
+    /* for things like effects ecc... */
+    newActorData = await this.prepareDataFromTransformOptions(
+      newActorData,
+      targetActorData,
+      proto.effects,
+      targetActorImages,
+      transformOptions);
+    //@ts-ignore
+    // newActorData.effects = proto.effects;
+
+    //@ts-ignore
+    delete newActorData._id;
+
+    /* form the update */
+    const updates = <any>{
+      token: proto, 
+      actor: newActorData
+    }
+
+    /* 
+    * Protects the actor a bit more, but requires you
+    * to close and repon the sheet after reverting.
+    */
+    //updates.actorLink = false;
+
+    /* leave the actor link unchanged for a more seamless mutation */
+    // delete updates.actorLink;
+
+    /* we want to keep our source actor, not swap to a new one entirely */
+    // delete updates.actorId;
+
+    /* default is 0,0 -- let's stay where we are */
+    // delete updates.x;
+    // delete updates.y;
+
+    /* delete the cached sheet to furce a full re-render */
+    /*
+    const sheet = <any>sourceToken.actor?.sheet;
+    await sourceToken.actor?.sheet?.close();
+    //@ts-ignore
+    sourceToken.actor?._sheet = null;
+    delete sourceToken.actor?.apps[sheet.appId];
+    */
+
+    /* run mutation and label it 'powermorph' */
+    info(`${sourceToken.name} mutate into a ${targetActor.name}`);
+
     // Update placed Token instances
     if (!transformTokens) {
-      info(`${tokenFromTransform.name} mutate into a ${targetActor.name}`);
+
       // TODO show on chat ?
       //await ChatMessage.create({content: `${actorThis.name} mutate into a ${actorToTransform.name}`, speaker:{alias: actorThis.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
       //@ts-ignore
       await warpgate.mutate(
-        tokenFromTransform.document,
-        d, // tokenDataToTransform, //{}, //customTokenData || {},
+        sourceToken.document,
+        updates,
         {},
         {
           name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+          //comparisonKeys:{ ActiveEffect: 'label'}
         },
       );
       return;
     }
 
-    const tokens = actorThis.getActiveTokens(true);
-    const updates = tokens.map(async (t: Token) => {
-      const newTokenData = <any>foundry.utils.deepClone(d);
-      newTokenData.token._id = t.data._id;
-      //newTokenData.token.actorId = <string>newActor.id;
-      //newTokenData.token.actorLink = true;
-
-      info(`${t.name} mutate into a ${newTokenData.token.name}`);
-
+    const tokens = sourceActor.getActiveTokens(true);
+    tokens.map(async (t: Token) => {
+      const newTokenData = <any>foundry.utils.deepClone(updates);
+      //newTokenData.token._id = t.data._id;
       // TODO show on chat ?
       //await ChatMessage.create({content: `${actorThis.name} mutate into a ${actorToTransform.name}`, speaker:{alias: actorThis.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
       //@ts-ignore
@@ -370,6 +494,7 @@ export default {
         {},
         {
           name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
+          //comparisonKeys:{ ActiveEffect: 'label'}
         },
       );
       return newTokenData;
@@ -617,4 +742,268 @@ export default {
       },
     );
   },
+
+  async prepareDataFromTransformOptions(
+    originalActorData:ActorData, 
+    targetActorData:ActorData, 
+    sourceEffects:any[], 
+    targetActorImages:string[],
+    transformOptions:TransformOptionsGeneric){
+
+    const keepPhysical = transformOptions?.keepPhysical || false;
+    const keepMental = transformOptions?.keepMental || false;
+    const keepSaves = transformOptions?.keepSaves || false;
+    const keepSkills = transformOptions?.keepSkills || false;
+    const mergeSaves = transformOptions?.mergeSaves || false;
+    const mergeSkills = transformOptions?.mergeSkills || false;
+    const keepClass = transformOptions?.keepClass || false;
+    const keepFeats = transformOptions?.keepFeats || false;
+    const keepSpells = transformOptions?.keepSpells || false;
+    const keepItems = transformOptions?.keepItems || false;
+    const keepBio = transformOptions?.keepBio || false;
+    const keepVision = transformOptions?.keepVision || false;
+    const keepSelf = transformOptions?.keepSelf || false;
+    const removeAE = transformOptions?.removeAE || false;
+    const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
+    const transformTokens = transformOptions?.transformTokens || true;
+
+    // Get the original Actor data and the new source data
+    // const originalActorData = <any>sourceActor.toJSON();
+    //originalActorData.flags.dnd5e = o.flags.dnd5e || {};
+    //originalActorData.flags.dnd5e.transformOptions = {mergeSkills, mergeSaves};
+    if (!getProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`)) {
+      setProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
+    }
+    setProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`, {
+      keepPhysical,
+      keepMental,
+      keepSaves,
+      keepSkills,
+      mergeSaves,
+      mergeSkills,
+      keepClass,
+      keepFeats,
+      keepSpells,
+      keepItems,
+      keepBio,
+      keepVision,
+      keepSelf,
+      removeAE,
+      keepAEOnlyOriginNotEquipment,
+      transformTokens 
+    });
+
+    /* get the full actor data */
+    // const targetActorData = <any>targetActor.toJSON(); // TODO is better targetActor.toObject() ???
+    /**
+     * dnd5e: npc and character are nearly interchangable.
+     * If we dont switch the type, we dont have to fool
+     * with the sheet app caching, but for other system can be useful...
+     */
+    // delete targetActorData.type;
+
+    // =====================================
+    // START SPECIFIC MANAGEMENT FOR SYSTEM
+    // ===================================== 
+
+    let d = <any>new Object();
+    if (keepSelf) {
+      // Keep Self
+      mergeObject(d, originalActorData);
+    }
+
+    // Prepare data effect
+    const newEffectsOri = (sourceEffects ? <any[]>sourceEffects : <any[]><unknown>originalActorData.effects) || <any[]>[];
+    const newEffects = <any[]>[];
+    for (const effect of newEffectsOri) {
+      let originS = '';
+      let effectS = undefined;
+      if(effect.value?.data && Object.prototype.hasOwnProperty.call(effect.value?.data,'origin')){
+        originS = effect.value.data.origin;
+        effectS = effect.value.data;
+      }else if(effect.data && Object.prototype.hasOwnProperty.call(effect.data,'origin')){
+        originS = effect.data.origin;
+        effectS = effect.data;
+      }else if(effect.origin && Object.prototype.hasOwnProperty.call(effect,'origin')){
+        originS = effect.origin;
+        effectS = effect;
+      }
+      if(effectS){
+        newEffects.push(effectS);
+      }
+    }
+
+
+    // Prepare new data to merge from the source
+    d = {
+      type: originalActorData.type, // Remain the same actor type
+      name: `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
+      data: targetActorData.data, // Get the data model of your new form
+      items: targetActorData.items, // Get the items of your new form
+      effects: targetActorData.effects ? newEffects.concat(targetActorData.effects) : newEffects, // Combine active effects from both forms
+      img: targetActorData.img, // New appearance
+      permission: originalActorData.permission, // Use the original actor permissions
+      folder: originalActorData.folder, // Be displayed in the same sidebar folder
+      flags: originalActorData.flags, // Use the original actor flags
+      // x: sourceToken.x,
+      // y: sourceToken.y,
+      // token: sourceToken.data.toObject()
+    };
+
+    // Specifically delete some data attributes
+    //@ts-ignore
+    delete d.data.resources; // Don't change your resource pools
+    //@ts-ignore
+    delete d.data.currency; // Don't lose currency
+    //@ts-ignore
+    delete d.data.bonuses; // Don't lose global bonuses
+
+    // Specific additional adjustments
+    //@ts-ignore
+    d.data.details.alignment = originalActorData.data.details.alignment; // Don't change alignment
+    //@ts-ignore
+    d.data.attributes.exhaustion = originalActorData.data.attributes.exhaustion; // Keep your prior exhaustion level
+    //@ts-ignore
+    d.data.attributes.inspiration = originalActorData.data.attributes.inspiration; // Keep inspiration
+    //@ts-ignore
+    d.data.spells = originalActorData.data.spells; // Keep spell slots
+    //@ts-ignore
+    d.data.attributes.ac.flat = targetActorData.data.attributes.ac.value; // Override AC
+
+    // Token appearance updates
+    d.token = <PrototypeTokenData>{ name: d.name };
+    for (const k of ['width', 'height', 'scale', 'img', 'mirrorX', 'mirrorY', 'tint', 'alpha', 'lockRotation']) {
+      d.token[k] = targetActorData.token[k];
+    }
+
+    if (targetActorData.token.randomImg) {
+      const images = targetActorImages; // await targetActor.getTokenImages();
+      d.token.img = <string>images[Math.floor(Math.random() * images.length)];
+    }
+
+    if (!keepSelf) {
+
+      const vision = keepVision ? originalActorData.token : targetActorData.token;
+      for (const k of ['dimSight', 'brightSight', 'dimLight', 'brightLight', 'vision', 'sightAngle']) {
+        d.token[k] = vision[k];
+      }
+
+      // Transfer ability scores
+      //@ts-ignore
+      if(originalActorData.data.abilities){
+        //@ts-ignore
+        const abilities = d.data.abilities;
+        for (const k of Object.keys(abilities)) {
+          //@ts-ignore
+          const oa = originalActorData.data.abilities[k];
+          const prof = abilities[k].proficient;
+          if (keepPhysical && ['str', 'dex', 'con'].includes(k)) abilities[k] = oa;
+          else if (keepMental && ['int', 'wis', 'cha'].includes(k)) abilities[k] = oa;
+          if (keepSaves) abilities[k].proficient = oa.proficient;
+          else if (mergeSaves) abilities[k].proficient = Math.max(prof, oa.proficient);
+        }
+      }
+
+      // Transfer skills
+      //@ts-ignore
+      if(originalActorData.data.skills){
+        if (keepSkills) {
+          //@ts-ignore
+          d.data.skills = originalActorData.data.skills;
+        }
+        else if (mergeSkills) {
+          // eslint-disable-next-line prefer-const
+          for (let [k, s] of Object.entries(d.data.skills)) {
+            //@ts-ignore
+            s.value = Math.max(<number>(<any>s).value, originalActorData.data.skills[k].value);
+          }
+        }
+      }
+      // Keep specific items from the original data
+      d.items = d.items ? d.items : [];
+      if(originalActorData.items){
+        d.items = d.items.concat(
+          originalActorData.items.filter((i) => {
+            if (['class', 'subclass'].includes(i.type)) {
+              return keepClass;
+            }
+            else if (i.type === 'feat') {
+              return keepFeats;
+            }
+            else if (i.type === 'spell') {
+              return keepSpells;
+            }
+            else {
+              return keepItems;
+            }
+          }),
+        );
+      }
+      // Transfer classes for NPCs
+      if (!keepClass && d.data.details.cr) {
+        d.items.push({
+          type: 'class',
+          name: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphTmpClass`),
+          data: { levels: d.data.details.cr },
+        });
+      }
+
+      // Keep biography
+      //@ts-ignore
+      if(originalActorData.data.details.biography){
+        if (keepBio) {
+          //@ts-ignore
+          d.data.details.biography = originalActorData.data.details.biography;
+        }
+      }
+
+      // Keep senses
+      //@ts-ignore
+      if(originalActorData.data.traits.senses){
+        if (keepVision) {
+          //@ts-ignore
+          d.data.traits.senses = originalActorData.data.traits.senses;
+        }
+      }
+
+      // Not keep active effects
+      if (removeAE && !keepAEOnlyOriginNotEquipment) {
+        d.effects = [];
+      }
+      if(d.effects && (d.effects.length > 0 || d.effects.size > 0)){
+        // Keep active effects only origin not equipment
+        if (keepAEOnlyOriginNotEquipment) {
+          const tokenEffects = foundry.utils.deepClone(newEffects) || [];
+          const notEquipItems = ['feat', 'spell', 'class', 'subclass'];
+          const tokenEffectsNotEquipment: any[] = [];
+          for (const effect of tokenEffects) {
+            let originS = '';
+            let effectS = undefined;
+            if(effect.value?.data && Object.prototype.hasOwnProperty.call(effect.value?.data,'origin')){
+              originS = effect.value.data.origin;
+              effectS = effect.value.data;
+            }else if(effect.data && Object.prototype.hasOwnProperty.call(effect.data,'origin')){
+              originS = effect.data.origin;
+              effectS = effect.data;
+            }else if(effect.origin && Object.prototype.hasOwnProperty.call(effect,'origin')){
+              originS = effect.origin;
+              effectS = effect;
+            }
+            //@ts-ignore
+            if (effectS && originS && !originS.toLowerCase().startsWith('item')) {
+              tokenEffectsNotEquipment.push(effectS);
+            }
+          }
+          d.effects = tokenEffectsNotEquipment;
+        }
+      }
+      
+    }
+
+    // =====================================
+    // END SPECIFIC MANAGEMENT FOR SYSTEM
+    // =====================================
+
+    return d;
+  }
 };
