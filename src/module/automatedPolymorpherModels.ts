@@ -74,3 +74,32 @@ export class TransformOptionsGeneric {
   keepAEOnlyOriginNotEquipment = false;
   transformTokens = true;
 }
+
+/* pf2e */
+
+// interface SenseDataPf2e {
+//   type: SenseTypePf2e;
+//   acuity?: SenseAcuityPf2e;
+//   value: string;
+//   source?: string;
+// }
+
+// export type SenseAcuityPf2e = typeof SENSE_ACUITIES_Pf2e[number];
+// export type SenseTypePf2e = typeof SENSE_TYPES_Pf2e[number];
+
+// export const BASIC_SENSE_TYPES_Pf2e = [
+//   "darkvision",
+//   "echolocation",
+//   "greaterDarkvision",
+//   "lifesense",
+//   "lowLightVision",
+//   "motionsense",
+//   "scent",
+//   "tremorsense",
+//   "wavesense",
+// ] as const;
+
+// export const SENSE_TYPES_Pf2e = [...BASIC_SENSE_TYPES_Pf2e] as const;
+
+// // "darkvision, scent (imprecise) 60 feet"
+// export const SENSE_ACUITIES_Pf2e = ["precise", "imprecise", "vague"];

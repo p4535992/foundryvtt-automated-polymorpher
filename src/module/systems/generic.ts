@@ -910,6 +910,9 @@ export default {
       // x: sourceToken.x,
       // y: sourceToken.y,
       // token: sourceToken.data.toObject()
+      width: targetActorData.token.width,
+      height: targetActorData.token.height,
+      scale: targetActorData.token.scale,
     };
 
     // Specifically delete some data attributes
@@ -950,8 +953,12 @@ export default {
       }
 
       // Transfer ability scores
-      //@ts-ignore
-      if (originalActorData.data.abilities) {
+      if (
+        //@ts-ignore
+        originalActorData.data.abilities &&
+        //@ts-ignore
+        (originalActorData.data.abilities.length > 0 || originalActorData.data.abilities.size > 0)
+      ) {
         //@ts-ignore
         const abilities = d.data.abilities;
         for (const k of Object.keys(abilities)) {
@@ -966,22 +973,28 @@ export default {
       }
 
       // Transfer skills
-      //@ts-ignore
-      if (originalActorData.data.skills) {
+      if (
+        //@ts-ignore
+        originalActorData.data.skills &&
+        //@ts-ignore
+        (originalActorData.data.skills.length > 0 || originalActorData.data.skills.size > 0)
+      ) {
         if (keepSkills) {
           //@ts-ignore
           d.data.skills = originalActorData.data.skills;
         } else if (mergeSkills) {
-          // eslint-disable-next-line prefer-const
-          for (let [k, s] of Object.entries(d.data.skills)) {
-            //@ts-ignore
-            s.value = Math.max(<number>(<any>s).value, originalActorData.data.skills[k].value);
+          if (d.data.skills && (d.data.skills.length > 0 || d.data.skills.size > 0)) {
+            // eslint-disable-next-line prefer-const
+            for (let [k, s] of Object.entries(d.data.skills)) {
+              //@ts-ignore
+              s.value = Math.max(<number>(<any>s).value, originalActorData.data.skills[k].value);
+            }
           }
         }
       }
       // Keep specific items from the original data
       d.items = d.items ? d.items : [];
-      if (originalActorData.items) {
+      if (originalActorData.items && originalActorData.items.size > 0) {
         d.items = d.items.concat(
           originalActorData.items.filter((i) => {
             if (['class', 'subclass'].includes(i.type)) {
@@ -1015,8 +1028,28 @@ export default {
       }
 
       // Keep senses
-      //@ts-ignore
-      if (originalActorData.data.traits.senses) {
+      if (!d.data.traits.senses) {
+        d.data.traits.senses = [];
+      } else if (typeof d.data.traits.senses === 'string' || d.data.traits.senses instanceof String) {
+        d.data.traits.senses = [
+          {
+            value: d.data.traits.senses,
+          },
+        ];
+      } else if (
+        typeof d.data.traits.senses === 'object' &&
+        !Array.isArray(d.data.traits.senses) &&
+        d.data.traits.senses !== null
+      ) {
+        d.data.traits.senses = [d.data.traits.senses];
+      }
+
+      if (
+        //@ts-ignore
+        originalActorData.data.traits.senses &&
+        //@ts-ignore
+        (originalActorData.data.traits.senses.length > 0 || originalActorData.data.traits.senses.size > 0)
+      ) {
         if (keepVision) {
           //@ts-ignore
           d.data.traits.senses = originalActorData.data.traits.senses;
