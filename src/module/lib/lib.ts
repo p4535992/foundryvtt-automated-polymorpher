@@ -325,17 +325,22 @@ export async function retrieveActorFromData(
 }
 
 /* returns the actor data sans ALL embedded collections */
-export function _getRootActorData(actorDoc:Actor) {
+export function _getRootActorData(actorDoc: Actor) {
   const actorData = actorDoc.data.toObject();
-  
+
   /* get the key NAME of the embedded document type.
    * ex. not 'ActiveEffect' (the class name), 'effect' the collection's field name
    */
   //@ts-ignore
-  const embeddedFields = Object.values(Actor.implementation.metadata.embedded).map( thisClass => thisClass.metadata.collection );
-  
+  const embeddedFields = Object.values(Actor.implementation.metadata.embedded).map(
+    //@ts-ignore
+    (thisClass) => thisClass.metadata.collection,
+  );
+
   /* delete any embedded fields from the actor data */
-  embeddedFields.forEach( field => { delete actorData[field] } )
-  
+  embeddedFields.forEach((field) => {
+    delete actorData[field];
+  });
+
   return actorData;
 }

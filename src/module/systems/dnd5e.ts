@@ -103,10 +103,11 @@ export default {
 
     const d = await this.prepareDataFromTransformOptions(
       originalActorData,
-      targetActorData, 
+      targetActorData,
       sourceEffects,
       targetActorImages,
-      transformOptions);
+      transformOptions,
+    );
 
     /**
      * A hook event that fires just before the actor is transformed.
@@ -150,7 +151,8 @@ export default {
     setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 
     let previousTokenData =
-      <TokenData[]>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) || [];
+      <TokenData[]>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) ||
+      [];
     const currentTokenData = await sourceActor.getTokenData();
     if (currentTokenData._id && previousTokenData.filter((z) => z._id === currentTokenData._id).length <= 0) {
       previousTokenData.push(currentTokenData);
@@ -198,18 +200,16 @@ export default {
     // }
     // mergeObject(d.actor.flags[CONSTANTS.MODULE_NAME],d.token.flags[CONSTANTS.MODULE_NAME]);
 
-    
     // Close sheet for non-transformed Actor
     await sourceActor.sheet?.close();
 
-    if(useWarpGate){
-
+    if (useWarpGate) {
       // =============================================
       // THIS IS THE SOLUTION WITH WARP GATE (AVOID THE CREATION OF ACTOR)
       // ===========================================
 
       /* get the new protodata and remove its null x/y */
-      const newActor = targetActor; 
+      const newActor = targetActor;
 
       let proto = <TokenData>(await newActor.getTokenData()).toObject();
       //@ts-ignore
@@ -220,7 +220,7 @@ export default {
       /* overwrite any fields of the original with fields from the new proto */
       // proto = mergeObject(sourceToken.data.toObject(), proto, {inplace:false});
       //@ts-ignore
-      proto = mergeObject(proto, d, {inplace:false});
+      proto = mergeObject(proto, d, { inplace: false });
       //proto = mergeObject(d, proto, {inplace:false});
 
       /* remove erroneous fields */
@@ -245,16 +245,21 @@ export default {
         setProperty(newRootActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
       }
       //@ts-ignore
-      mergeObject(newRootActorData.flags[CONSTANTS.MODULE_NAME],d.token.flags[CONSTANTS.MODULE_NAME]);
-    
+      mergeObject(newRootActorData.flags[CONSTANTS.MODULE_NAME], d.token.flags[CONSTANTS.MODULE_NAME]);
+
       /* get the key NAME of the embedded document type.
-      * ex. not 'ActiveEffect' (the class name), 'effect' the collection's field name
-      */
+       * ex. not 'ActiveEffect' (the class name), 'effect' the collection's field name
+       */
       //@ts-ignore
-      const embeddedFields = Object.values(Actor.implementation.metadata.embedded).map( thisClass => thisClass.metadata.collection );
-      
+      const embeddedFields = Object.values(Actor.implementation.metadata.embedded).map(
+        //@ts-ignore
+        (thisClass) => thisClass.metadata.collection,
+      );
+
       /* delete any embedded fields from the actor data */
-      embeddedFields.forEach( field => { delete newRootActorData[field] } )
+      embeddedFields.forEach((field) => {
+        delete newRootActorData[field];
+      });
 
       // END _getRootActorData
 
@@ -266,7 +271,8 @@ export default {
         targetActorData,
         proto.effects,
         targetActorImages,
-        transformOptions);
+        transformOptions,
+      );
       //@ts-ignore
       // newActorData.effects = proto.effects;
       // delete newActorData.effects;
@@ -277,16 +283,16 @@ export default {
         setProperty(newActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
       }
       //@ts-ignore
-      mergeObject(newActorData.flags[CONSTANTS.MODULE_NAME],d.token.flags[CONSTANTS.MODULE_NAME]);
-  
+      mergeObject(newActorData.flags[CONSTANTS.MODULE_NAME], d.token.flags[CONSTANTS.MODULE_NAME]);
+
       /* form the update */
       // const updates = {
-      //   token: <TokenData>proto, 
+      //   token: <TokenData>proto,
       //   actor: <any>newActorData
       // }
 
       delete newActorData.data.token;
-  
+
       /* default is 0,0 -- let's stay where we are */
       // delete newActorData.token.x;
       // delete newActorData.token.y;
@@ -302,32 +308,32 @@ export default {
             data: newActorData,
           },
           // actorId: <string>newActor.id,
-          actorLink: false
+          actorLink: false,
         },
         actor: {
-          data: newActorData
-        }
+          data: newActorData,
+        },
       };
 
       delete updates.token.data.token;
       delete updates.token.actor.data.token;
-  
-      /* 
-      * Protects the actor a bit more, but requires you
-      * to close and repon the sheet after reverting.
-      */
+
+      /*
+       * Protects the actor a bit more, but requires you
+       * to close and repon the sheet after reverting.
+       */
       updates.token.data.actorLink = false;
-  
+
       /* leave the actor link unchanged for a more seamless mutation */
       delete updates.token.data.actorLink;
-  
+
       /* we want to keep our source actor, not swap to a new one entirely */
       delete updates.token.data.actorId;
-  
+
       /* default is 0,0 -- let's stay where we are */
       // delete updates.token.x;
       // delete updates.token.y;
-  
+
       // delete the cached sheet to furce a full re-render
       const sheet = <any>sourceToken.actor?.sheet;
       // await sourceToken.actor?.sheet?.close();
@@ -337,7 +343,6 @@ export default {
 
       // Update placed Token instances
       if (!transformTokens) {
-
         // ======================================================================================
         // SETTING FLAGS
         if (!updates.token.flags) {
@@ -373,13 +378,13 @@ export default {
           {
             name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
             //comparisonKeys:{ ActiveEffect: 'label'}
-            delta:{
+            delta: {
               token: updates.token,
               actor: {
-                data: updates.actor.data
+                data: updates.actor.data,
               },
-              embedded: {}
-            }
+              embedded: {},
+            },
           },
         );
         return;
@@ -389,7 +394,7 @@ export default {
       tokens.map(async (t: Token) => {
         const newTokenData = <any>foundry.utils.deepClone(updates);
         //newTokenData.token._id = t.data._id;
-        
+
         // ======================================================================================
         // SETTING FLAGS
         if (!newTokenData.token.flags) {
@@ -427,20 +432,18 @@ export default {
           {
             name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
             //comparisonKeys:{ ActiveEffect: 'label'}
-            delta:{
+            delta: {
               token: updates.token,
               actor: {
-                  data: updates.actor.data
+                data: updates.actor.data,
               },
-              embedded: {}
-            }
+              embedded: {},
+            },
           },
         );
         return newTokenData;
       });
-
-    }else{
-
+    } else {
       // =============================================
       // THIS IS THE DND5E SOLUTION WITh THE CREATION OF ACTOR)
       // ===========================================
@@ -455,7 +458,7 @@ export default {
 
         return sourceActor.token?.update(tokenData);
       }
-      
+
       // Some info like height and weight of the token are reset to default
       // after the constructor of the actor is invoked solved with a backup of the info of the token
       const tokenBackup = duplicate(d.token);
@@ -489,7 +492,7 @@ export default {
           getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
         );
         setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-  
+
         return newTokenData;
       });
       //@ts-ignore
@@ -507,7 +510,7 @@ export default {
    * @param {boolean} [renderSheet] Render Sheet after revert the transformation.
    * @returns {Promise<Actor>|null}  Original actor if it was reverted.
    */
-  async revertOriginalForm(sourceToken: Token, actorThis: Actor, renderSheet = true) {
+  async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet = true) {
     const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate');
     // if (!actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
     //   return;
@@ -532,7 +535,7 @@ export default {
      * @param {Actor} actorThis                 The original actor before transformation.
      * @param {boolean} renderSheet             Render Sheet after revert the transformation.
      */
-    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, actorThis, renderSheet);
+    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, sourceActor, renderSheet);
 
     const previousOriginalActorTokenData = <TokenData[]>(
       sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
@@ -556,9 +559,8 @@ export default {
         return;
       }
     }
-    try{
-      if(useWarpGate){
-
+    try {
+      if (useWarpGate) {
         // =============================================
         // THIS IS THE SOLUTION WITH WARP GATE (AVOID THE CREATION OF ACTOR)
         // ===========================================
@@ -583,14 +585,13 @@ export default {
           //@ts-ignore
           await warpgate.revert(sourceToken.document, '');
         }
-      }else{
-
+      } else {
         // =============================================
         // THIS IS THE DND5E SOLUTION WITh THE CREATION OF ACTOR)
         // ===========================================
         // Get the Tokens which represent this actor
         if (canvas.ready) {
-          const tokens = actorThis.getActiveTokens(true);
+          const tokens = sourceActor.getActiveTokens(true);
           const tokenData = <TokenData>await original.getTokenData();
           const tokenUpdates = tokens.map((t) => {
             const update = duplicate(tokenData);
@@ -613,53 +614,51 @@ export default {
         }
         // Delete the polymorphed version of the actor, if possible
         // if (game.user?.isGM) {
-          const idsToDelete = <string[]>[];
-          idsToDelete.push(<string>actorThis.id);
-          const othersActorsToDelete = <TokenData[]>(
-            actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-          );
-          othersActorsToDelete.reverse();
-          for (const td of othersActorsToDelete) {
-            if (
-              td.actorId &&
-              !idsToDelete.includes(td.actorId) &&
-              td.actorId != original.id &&
-              game.actors?.get(td.actorId)
-            ) {
-              idsToDelete.push(td.actorId);
-            }
+        const idsToDelete = <string[]>[];
+        idsToDelete.push(<string>sourceActor.id);
+        const othersActorsToDelete = <TokenData[]>(
+          sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        );
+        othersActorsToDelete.reverse();
+        for (const td of othersActorsToDelete) {
+          if (
+            td.actorId &&
+            !idsToDelete.includes(td.actorId) &&
+            td.actorId != original.id &&
+            game.actors?.get(td.actorId)
+          ) {
+            idsToDelete.push(td.actorId);
           }
-          for (const id of idsToDelete) {
-            const actorToDelete = game.actors?.get(id);
-            if (actorToDelete) {
-              info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
-              await actorToDelete.delete();
-            }
+        }
+        for (const id of idsToDelete) {
+          const actorToDelete = game.actors?.get(id);
+          if (actorToDelete) {
+            info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
+            await actorToDelete.delete();
           }
-          // await actorThis.delete();
-        // }        
+        }
+        // await actorThis.delete();
+        // }
       }
 
-      const isRendered = actorThis.sheet?.rendered;
+      const isRendered = sourceActor.sheet?.rendered;
       if (isRendered) {
-        actorThis.sheet?.close();
+        sourceActor.sheet?.close();
       }
       if (isRendered && renderSheet) {
         original.sheet?.render(isRendered);
       }
-
     } finally {
-      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
-      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
-      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-      await actorThis.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+      await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+      await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+      await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
 
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
     }
-    
 
     return original;
   },
@@ -816,12 +815,12 @@ export default {
   },
 
   async prepareDataFromTransformOptions(
-    originalActorData:ActorData, 
-    targetActorData:ActorData, 
-    sourceEffects:any[], 
-    targetActorImages:string[],
-    transformOptions:TransformOptionsGeneric){
-
+    originalActorData: ActorData,
+    targetActorData: ActorData,
+    sourceEffects: any[],
+    targetActorImages: string[],
+    transformOptions: TransformOptionsGeneric,
+  ) {
     const keepPhysical = transformOptions?.keepPhysical || false;
     const keepMental = transformOptions?.keepMental || false;
     const keepSaves = transformOptions?.keepSaves || false;
@@ -862,7 +861,7 @@ export default {
       keepSelf,
       removeAE,
       keepAEOnlyOriginNotEquipment,
-      transformTokens 
+      transformTokens,
     });
 
     /* get the full actor data */
@@ -876,7 +875,7 @@ export default {
 
     // =====================================
     // START SPECIFIC MANAGEMENT FOR SYSTEM
-    // ===================================== 
+    // =====================================
 
     let d = <any>new Object();
     if (keepSelf) {
@@ -885,26 +884,26 @@ export default {
     }
 
     // Prepare data effect
-    const newEffectsOri = (sourceEffects ? <any[]>sourceEffects : <any[]><unknown>originalActorData.effects) || <any[]>[];
+    const newEffectsOri =
+      (sourceEffects ? <any[]>sourceEffects : <any[]>(<unknown>originalActorData.effects)) || <any[]>[];
     const newEffects = <any[]>[];
     for (const effect of newEffectsOri) {
       let originS = '';
       let effectS = undefined;
-      if(effect.value?.data && Object.prototype.hasOwnProperty.call(effect.value?.data,'origin')){
+      if (effect.value?.data && Object.prototype.hasOwnProperty.call(effect.value?.data, 'origin')) {
         originS = effect.value.data.origin;
         effectS = effect.value.data;
-      }else if(effect.data && Object.prototype.hasOwnProperty.call(effect.data,'origin')){
+      } else if (effect.data && Object.prototype.hasOwnProperty.call(effect.data, 'origin')) {
         originS = effect.data.origin;
         effectS = effect.data;
-      }else if(effect.origin && Object.prototype.hasOwnProperty.call(effect,'origin')){
+      } else if (effect.origin && Object.prototype.hasOwnProperty.call(effect, 'origin')) {
         originS = effect.origin;
         effectS = effect;
       }
-      if(effectS){
+      if (effectS) {
         newEffects.push(effectS);
       }
     }
-
 
     // Prepare new data to merge from the source
     d = {
@@ -956,7 +955,6 @@ export default {
     }
 
     if (!keepSelf) {
-
       const vision = keepVision ? originalActorData.token : targetActorData.token;
       for (const k of ['dimSight', 'brightSight', 'dimLight', 'brightLight', 'vision', 'sightAngle']) {
         d.token[k] = vision[k];
@@ -964,7 +962,7 @@ export default {
 
       // Transfer ability scores
       //@ts-ignore
-      if(originalActorData.data.abilities){
+      if (originalActorData.data.abilities) {
         //@ts-ignore
         const abilities = d.data.abilities;
         for (const k of Object.keys(abilities)) {
@@ -980,12 +978,11 @@ export default {
 
       // Transfer skills
       //@ts-ignore
-      if(originalActorData.data.skills){
+      if (originalActorData.data.skills) {
         if (keepSkills) {
           //@ts-ignore
           d.data.skills = originalActorData.data.skills;
-        }
-        else if (mergeSkills) {
+        } else if (mergeSkills) {
           // eslint-disable-next-line prefer-const
           for (let [k, s] of Object.entries(d.data.skills)) {
             //@ts-ignore
@@ -995,19 +992,16 @@ export default {
       }
       // Keep specific items from the original data
       d.items = d.items ? d.items : [];
-      if(originalActorData.items){
+      if (originalActorData.items) {
         d.items = d.items.concat(
           originalActorData.items.filter((i) => {
             if (['class', 'subclass'].includes(i.type)) {
               return keepClass;
-            }
-            else if (i.type === 'feat') {
+            } else if (i.type === 'feat') {
               return keepFeats;
-            }
-            else if (i.type === 'spell') {
+            } else if (i.type === 'spell') {
               return keepSpells;
-            }
-            else {
+            } else {
               return keepItems;
             }
           }),
@@ -1024,7 +1018,7 @@ export default {
 
       // Keep biography
       //@ts-ignore
-      if(originalActorData.data.details.biography){
+      if (originalActorData.data.details.biography) {
         if (keepBio) {
           //@ts-ignore
           d.data.details.biography = originalActorData.data.details.biography;
@@ -1033,7 +1027,7 @@ export default {
 
       // Keep senses
       //@ts-ignore
-      if(originalActorData.data.traits.senses){
+      if (originalActorData.data.traits.senses) {
         if (keepVision) {
           //@ts-ignore
           d.data.traits.senses = originalActorData.data.traits.senses;
@@ -1044,7 +1038,7 @@ export default {
       if (removeAE && !keepAEOnlyOriginNotEquipment) {
         d.effects = [];
       }
-      if(d.effects && (d.effects.length > 0 || d.effects.size > 0)){
+      if (d.effects && (d.effects.length > 0 || d.effects.size > 0)) {
         // Keep active effects only origin not equipment
         if (keepAEOnlyOriginNotEquipment) {
           const tokenEffects = foundry.utils.deepClone(newEffects) || [];
@@ -1053,13 +1047,13 @@ export default {
           for (const effect of tokenEffects) {
             let originS = '';
             let effectS = undefined;
-            if(effect.value?.data && Object.prototype.hasOwnProperty.call(effect.value?.data,'origin')){
+            if (effect.value?.data && Object.prototype.hasOwnProperty.call(effect.value?.data, 'origin')) {
               originS = effect.value.data.origin;
               effectS = effect.value.data;
-            }else if(effect.data && Object.prototype.hasOwnProperty.call(effect.data,'origin')){
+            } else if (effect.data && Object.prototype.hasOwnProperty.call(effect.data, 'origin')) {
               originS = effect.data.origin;
               effectS = effect.data;
-            }else if(effect.origin && Object.prototype.hasOwnProperty.call(effect,'origin')){
+            } else if (effect.origin && Object.prototype.hasOwnProperty.call(effect, 'origin')) {
               originS = effect.origin;
               effectS = effect;
             }
@@ -1071,7 +1065,6 @@ export default {
           d.effects = tokenEffectsNotEquipment;
         }
       }
-      
     }
 
     // =====================================
@@ -1079,5 +1072,5 @@ export default {
     // =====================================
 
     return d;
-  }
+  },
 };

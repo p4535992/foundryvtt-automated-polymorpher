@@ -210,30 +210,25 @@ export class PolymorpherManager extends FormApplication {
     }
 
     // if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
-      // Prepare flag for revert ???
-      const updatesForRevert = <TokenData[]>(
-        this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-      )
-        ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-        : <TokenData[]>[];
-      updatesForRevert.push(this.token.data);
-      await this.actor?.setFlag(
-        CONSTANTS.MODULE_NAME,
-        PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
-        updatesForRevert,
-      );
-      const dialog = await API.renderDialogTransformOptions(
-        tokenFromTransform,
-        this.actor,
-        actorToTransform,
-        animation,
-      );
-      if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
-        this.close();
-      } else {
-        this.maximize();
-      }
-      dialog.render(true);
+    // Prepare flag for revert ???
+    const updatesForRevert = <TokenData[]>(
+      this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+    )
+      ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      : <TokenData[]>[];
+    updatesForRevert.push(this.token.data);
+    await this.actor?.setFlag(
+      CONSTANTS.MODULE_NAME,
+      PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+      updatesForRevert,
+    );
+    const dialog = await API.renderDialogTransformOptions(tokenFromTransform, this.actor, actorToTransform, animation);
+    if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
+      this.close();
+    } else {
+      this.maximize();
+    }
+    dialog.render(true);
     // }
     // // ===========================================
     // // If system is not dnd5e we can use warpgate
@@ -611,24 +606,24 @@ export class PolymorpherManager extends FormApplication {
       return;
     }
     // if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
-      // const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
-      // if (!canPolymorph) {
-      //   warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
-      //   return false;
-      // }
-      // // Define a function to record polymorph settings for future use
-      // const rememberOptions = (html) => {
-      //   const options = {};
-      //   html.find('input').each((i, el) => {
-      //     options[el.name] = el.checked;
-      //   });
-      //   const settings = mergeObject(game.settings.set(CONSTANTS.MODULE_NAME, 'polymorphSettings', settings) || {}, options);
-      //   game.settings.set(CONSTANTS.MODULE_NAME, 'polymorphSettings', settings);
-      //   return settings;
-      // };
+    // const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
+    // if (!canPolymorph) {
+    //   warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
+    //   return false;
+    // }
+    // // Define a function to record polymorph settings for future use
+    // const rememberOptions = (html) => {
+    //   const options = {};
+    //   html.find('input').each((i, el) => {
+    //     options[el.name] = el.checked;
+    //   });
+    //   const settings = mergeObject(game.settings.set(CONSTANTS.MODULE_NAME, 'polymorphSettings', settings) || {}, options);
+    //   game.settings.set(CONSTANTS.MODULE_NAME, 'polymorphSettings', settings);
+    //   return settings;
+    // };
 
-      // Prepare flag for revert ???
-      /*
+    // Prepare flag for revert ???
+    /*
       let updatesForRevert: any = {};
       if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
         updatesForRevert = {
@@ -641,178 +636,178 @@ export class PolymorpherManager extends FormApplication {
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
       */
 
-      const updatesForRevert = <TokenData[]>(
-        this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-      )
-        ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-        : <TokenData[]>[];
-      updatesForRevert.push(this.token.data);
-      await this.actor?.setFlag(
-        CONSTANTS.MODULE_NAME,
-        PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
-        updatesForRevert,
-      );
+    const updatesForRevert = <TokenData[]>(
+      this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+    )
+      ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      : <TokenData[]>[];
+    updatesForRevert.push(this.token.data);
+    await this.actor?.setFlag(
+      CONSTANTS.MODULE_NAME,
+      PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+      updatesForRevert,
+    );
 
-      if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphAcceptSettings`) {
-        if (tokenFromTransform) {
-          if (animationExternal && animationExternal.sequence) {
+    if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphAcceptSettings`) {
+      if (tokenFromTransform) {
+        if (animationExternal && animationExternal.sequence) {
+          //@ts-ignore
+          await animationExternal.sequence.play();
+          await wait(animationExternal.timeToWait);
+        } else if (animation) {
+          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
             //@ts-ignore
-            await animationExternal.sequence.play();
-            await wait(animationExternal.timeToWait);
-          } else if (animation) {
-            if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+            game.macros
+              ?.getName(ANIMATIONS.animationFunctions[animation].fn)
               //@ts-ignore
-              game.macros
-                ?.getName(ANIMATIONS.animationFunctions[animation].fn)
-                //@ts-ignore
-                ?.execute({ tokenFromTransform, tokenDataToTransform });
-            } else {
-              ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
-            }
-            await wait(ANIMATIONS.animationFunctions[animation].time);
+              ?.execute({ tokenFromTransform, tokenDataToTransform });
+          } else {
+            ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
           }
+          await wait(ANIMATIONS.animationFunctions[animation].time);
         }
-        info(`${this.actor.name} turns into a ${actorToTransform.name}`);
-        // TODO show on chat ?
-        //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-        await API.transformInto(
-          tokenFromTransform,
-          this.actor,
-          actorToTransform,
-          <any>{
-            keepPhysical: false,
-            keepMental: false,
-            keepSaves: false,
-            keepSkills: false,
-            mergeSaves: false,
-            mergeSkills: false,
-            keepClass: false,
-            keepFeats: false,
-            keepSpells: false,
-            keepItems: false,
-            keepBio: false,
-            keepVision: true,
-            transformTokens: true,
-          },
-          false,
-        );
-      } else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphWildShape`) {
-        if (tokenFromTransform) {
-          if (animationExternal && animationExternal.sequence) {
-            //@ts-ignore
-            await animationExternal.sequence.play();
-            await wait(animationExternal.timeToWait);
-          } else if (animation) {
-            if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-              //@ts-ignore
-              game.macros
-                ?.getName(ANIMATIONS.animationFunctions[animation].fn)
-                //@ts-ignore
-                ?.execute(tokenFromTransform, tokenDataToTransform);
-            } else {
-              ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
-            }
-            await wait(ANIMATIONS.animationFunctions[animation].time);
-          }
-        }
-        info(`${this.actor.name} turns into a ${actorToTransform.name}`);
-        // TODO show on chat ?
-        //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-        await API.transformInto(
-          tokenFromTransform,
-          this.actor,
-          actorToTransform,
-          <any>{
-            keepBio: true,
-            keepClass: true,
-            keepMental: true,
-            mergeSaves: true,
-            mergeSkills: true,
-            transformTokens: true,
-          },
-          false,
-        );
-      } else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorph`) {
-        if (tokenFromTransform) {
-          if (animationExternal && animationExternal.sequence) {
-            //@ts-ignore
-            await animationExternal.sequence.play();
-            await wait(animationExternal.timeToWait);
-          } else if (animation) {
-            if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-              //@ts-ignore
-              game.macros
-                ?.getName(ANIMATIONS.animationFunctions[animation].fn)
-                //@ts-ignore
-                ?.execute(tokenFromTransform, tokenDataToTransform);
-            } else {
-              ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
-            }
-            await wait(ANIMATIONS.animationFunctions[animation].time);
-          }
-        }
-        info(`${this.actor.name} turns into a ${actorToTransform.name}`);
-        // TODO show on chat ?
-        //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-        await API.transformInto(
-          tokenFromTransform,
-          this.actor,
-          actorToTransform,
-          <any>{
-            keepPhysical: false,
-            keepMental: false,
-            keepSaves: false,
-            keepSkills: false,
-            mergeSaves: false,
-            mergeSkills: false,
-            keepClass: false,
-            keepFeats: false,
-            keepSpells: false,
-            keepItems: false,
-            keepBio: false,
-            keepVision: true,
-            transformTokens: true,
-          },
-          false,
-        );
-      } else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphSelf`) {
-        if (tokenFromTransform) {
-          if (animationExternal && animationExternal.sequence) {
-            //@ts-ignore
-            await animationExternal.sequence.play();
-            await wait(animationExternal.timeToWait);
-          } else if (animation) {
-            if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-              //@ts-ignore
-              game.macros
-                ?.getName(ANIMATIONS.animationFunctions[animation].fn)
-                //@ts-ignore
-                ?.execute(tokenFromTransform, tokenDataToTransform);
-            } else {
-              ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
-            }
-            await wait(ANIMATIONS.animationFunctions[animation].time);
-          }
-        }
-        info(`${this.actor.name} turns into a ${actorToTransform.name}`);
-        // TODO show on chat ?
-        //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-        await API.transformInto(
-          tokenFromTransform,
-          this.actor,
-          actorToTransform,
-          <any>{
-            keepSelf: true,
-            transformTokens: true,
-          },
-          false,
-        );
-      } else {
-        warn(
-          `No default summon type is setted for any polymorphing actor on the list associated to this actor ${actorToTransform.name}`,
-          true,
-        );
       }
+      info(`${this.actor.name} turns into a ${actorToTransform.name}`);
+      // TODO show on chat ?
+      //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+      await API.transformInto(
+        tokenFromTransform,
+        this.actor,
+        actorToTransform,
+        <any>{
+          keepPhysical: false,
+          keepMental: false,
+          keepSaves: false,
+          keepSkills: false,
+          mergeSaves: false,
+          mergeSkills: false,
+          keepClass: false,
+          keepFeats: false,
+          keepSpells: false,
+          keepItems: false,
+          keepBio: false,
+          keepVision: true,
+          transformTokens: true,
+        },
+        false,
+      );
+    } else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphWildShape`) {
+      if (tokenFromTransform) {
+        if (animationExternal && animationExternal.sequence) {
+          //@ts-ignore
+          await animationExternal.sequence.play();
+          await wait(animationExternal.timeToWait);
+        } else if (animation) {
+          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+            //@ts-ignore
+            game.macros
+              ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+              //@ts-ignore
+              ?.execute(tokenFromTransform, tokenDataToTransform);
+          } else {
+            ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+          }
+          await wait(ANIMATIONS.animationFunctions[animation].time);
+        }
+      }
+      info(`${this.actor.name} turns into a ${actorToTransform.name}`);
+      // TODO show on chat ?
+      //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+      await API.transformInto(
+        tokenFromTransform,
+        this.actor,
+        actorToTransform,
+        <any>{
+          keepBio: true,
+          keepClass: true,
+          keepMental: true,
+          mergeSaves: true,
+          mergeSkills: true,
+          transformTokens: true,
+        },
+        false,
+      );
+    } else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorph`) {
+      if (tokenFromTransform) {
+        if (animationExternal && animationExternal.sequence) {
+          //@ts-ignore
+          await animationExternal.sequence.play();
+          await wait(animationExternal.timeToWait);
+        } else if (animation) {
+          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+            //@ts-ignore
+            game.macros
+              ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+              //@ts-ignore
+              ?.execute(tokenFromTransform, tokenDataToTransform);
+          } else {
+            ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+          }
+          await wait(ANIMATIONS.animationFunctions[animation].time);
+        }
+      }
+      info(`${this.actor.name} turns into a ${actorToTransform.name}`);
+      // TODO show on chat ?
+      //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+      await API.transformInto(
+        tokenFromTransform,
+        this.actor,
+        actorToTransform,
+        <any>{
+          keepPhysical: false,
+          keepMental: false,
+          keepSaves: false,
+          keepSkills: false,
+          mergeSaves: false,
+          mergeSkills: false,
+          keepClass: false,
+          keepFeats: false,
+          keepSpells: false,
+          keepItems: false,
+          keepBio: false,
+          keepVision: true,
+          transformTokens: true,
+        },
+        false,
+      );
+    } else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphSelf`) {
+      if (tokenFromTransform) {
+        if (animationExternal && animationExternal.sequence) {
+          //@ts-ignore
+          await animationExternal.sequence.play();
+          await wait(animationExternal.timeToWait);
+        } else if (animation) {
+          if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
+            //@ts-ignore
+            game.macros
+              ?.getName(ANIMATIONS.animationFunctions[animation].fn)
+              //@ts-ignore
+              ?.execute(tokenFromTransform, tokenDataToTransform);
+          } else {
+            ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
+          }
+          await wait(ANIMATIONS.animationFunctions[animation].time);
+        }
+      }
+      info(`${this.actor.name} turns into a ${actorToTransform.name}`);
+      // TODO show on chat ?
+      //await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+      await API.transformInto(
+        tokenFromTransform,
+        this.actor,
+        actorToTransform,
+        <any>{
+          keepSelf: true,
+          transformTokens: true,
+        },
+        false,
+      );
+    } else {
+      warn(
+        `No default summon type is setted for any polymorphing actor on the list associated to this actor ${actorToTransform.name}`,
+        true,
+      );
+    }
     // } else {
     //   // ===========================================
     //   // If system is not dnd5e we can use warpgate
