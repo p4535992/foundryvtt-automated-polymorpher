@@ -207,35 +207,35 @@ const API = {
       }
 
       // Do something with left click
-      if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
+      // if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
         info(`${actor.name} reverts to their original form`);
         // TODO show on chat ?
         //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //actor?.revertOriginalForm();
         this.revertOriginalForm(sourceToken, actor, false);
-      } else {
-        let arrayMutationNames: string[] = <string[]>(
-          actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
-        );
-        if (!arrayMutationNames || arrayMutationNames.length == 0) {
-          arrayMutationNames = [];
-          warn(`Array mutation names for the revert is null or empty`);
-        }
-        if (arrayMutationNames.length > 0) {
-          for (const revertName of arrayMutationNames) {
-            info(`${actor.name} reverts to their original form`);
-            // TODO show on chat ?
-            //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-            //@ts-ignore
-            await warpgate.revert(sourceToken.document, revertName);
-          }
-        } else {
-          //@ts-ignore
-          await warpgate.revert(sourceToken.document, '');
-        }
-      }
-      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-      await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      // } else {
+      //   let arrayMutationNames: string[] = <string[]>(
+      //     actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
+      //   );
+      //   if (!arrayMutationNames || arrayMutationNames.length == 0) {
+      //     arrayMutationNames = [];
+      //     warn(`Array mutation names for the revert is null or empty`);
+      //   }
+      //   if (arrayMutationNames.length > 0) {
+      //     for (const revertName of arrayMutationNames) {
+      //       info(`${actor.name} reverts to their original form`);
+      //       // TODO show on chat ?
+      //       //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+      //       //@ts-ignore
+      //       await warpgate.revert(sourceToken.document, revertName);
+      //     }
+      //   } else {
+      //     //@ts-ignore
+      //     await warpgate.revert(sourceToken.document, '');
+      //   }
+      // }
+      // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+      // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
     } else {
       if (isRandom && isOrdered) {
         warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
