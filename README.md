@@ -12,6 +12,8 @@
 
 ### If you want to buy me a coffee [![alt-text](https://img.shields.io/badge/-Patreon-%23ff424d?style=for-the-badge)](https://www.patreon.com/p4535992)
 
+# THIS MODULE IS LOOKING FOR A NEW ACTIVE DEVELOPER
+
 A user interface to manage the polymorph feature of Dnd5e with summoning animations.
 
 **Note: This is module is inspired from the  wonderful work done by [theRipper93](https://github.com/theripper93) with its [automated-evocations](https://github.com/theripper93/automated-evocations) module.
