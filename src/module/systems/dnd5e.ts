@@ -95,9 +95,22 @@ export default {
     const transformTokens = transformOptions?.transformTokens || true;
 
     // Get the original Actor data and the new source data
-    const originalActorData = <any>sourceActor.toJSON();
+    let originalActorData;
+    try{
+      originalActorData = sourceActor.toJSON();
+    }catch(e){
+      // TODO strange bug toJson is undefined ?
+      originalActorData = sourceActor.toObject();
+    }
     /* get the full actor data */
-    const targetActorData = <any>targetActor.toJSON(); // TODO is better targetActor.toObject() ???
+    let targetActorData;
+    try{
+      targetActorData = targetActor.toJSON();
+    }catch(e){
+      // TODO strange bug toJson is undefined ?
+      targetActorData = targetActor.toObject();
+    }
+
     const targetActorImages = await targetActor.getTokenImages();
     const sourceEffects = sourceToken.actor ? sourceToken.actor.effects : sourceToken.data.effects;
 
@@ -864,8 +877,6 @@ export default {
       transformTokens,
     });
 
-    /* get the full actor data */
-    // const targetActorData = <any>targetActor.toJSON(); // TODO is better targetActor.toObject() ???
     /**
      * dnd5e: npc and character are nearly interchangable.
      * If we dont switch the type, we dont have to fool

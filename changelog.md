@@ -1,3 +1,7 @@
+### 1.0.36
+
+- Strange bug the method "toJson()" for the Actor is undefined ? we try catch with the method "toObject()"
+
 ### 1.0.34-5
 
 - Strange bug with warpgate
