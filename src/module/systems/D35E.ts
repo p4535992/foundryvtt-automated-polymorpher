@@ -94,17 +94,17 @@ export default {
 
     // Get the original Actor data and the new source data
     let originalActorData;
-    try{
+    try {
       originalActorData = sourceActor.toJSON();
-    }catch(e){
+    } catch (e) {
       // TODO strange bug toJson is undefined ?
       originalActorData = sourceActor.toObject();
     }
     /* get the full actor data */
     let targetActorData;
-    try{
+    try {
       targetActorData = targetActor.toJSON();
-    }catch(e){
+    } catch (e) {
       // TODO strange bug toJson is undefined ?
       targetActorData = targetActor.toObject();
     }
@@ -674,12 +674,7 @@ export default {
     return original;
   },
 
-  async renderDialogTransformOptions(
-    sourceToken: Token,
-    sourceActor: Actor,
-    targetActor: Actor,
-    animation: string,
-  ) {
+  async renderDialogTransformOptions(sourceToken: Token, sourceActor: Actor, targetActor: Actor, animation: string) {
     const tokenUpdatesToTransform = await targetActor.getTokenData();
 
     // Define a function to record polymorph settings for future use
@@ -731,12 +726,7 @@ export default {
               info(`${sourceActor.name} turns into a ${targetActor.name}`);
               // TODO show on chat ?
               //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-              await this.transformInto(
-                sourceToken,
-                sourceActor,
-                targetActor,
-                rememberOptions(html),
-                false);
+              await this.transformInto(sourceToken, sourceActor, targetActor, rememberOptions(html), false);
             },
           },
           wildshape: {

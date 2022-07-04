@@ -331,67 +331,37 @@ const API = {
     transformOptions: TransformOptionsGeneric,
     renderSheet: boolean,
   ): Promise<any> {
-    if(!sourceToken){
+    if (!sourceToken) {
       warn(`No source token is been passed`, true);
       return;
     }
-    if(!sourceActor){
+    if (!sourceActor) {
       warn(`No source actor is been passed`, true);
       return;
     }
-    if(!targetActor){
+    if (!targetActor) {
       warn(`No target actor is been passed`, true);
       return;
     }
-    if(!game.actors?.get(<string>sourceActor.id)){
+    if (!game.actors?.get(<string>sourceActor.id)) {
       warn(`No source actor is been found`, true);
       return;
     }
-    if(!game.actors?.get(<string>targetActor.id)){
-      warn(`No target actor is been found`, true);
-      return;
-    }
+    // if(!game.actors?.get(<string>targetActor.id)){
+    //   warn(`No target actor is been found`, true);
+    //   return;
+    // }
 
     if (game.system.id === 'D35E') {
-      return D35E.transformInto(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        transformOptions,
-        renderSheet,
-      );
+      return D35E.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
     } else if (game.system.id === 'dnd5e') {
-      return dnd5e.transformInto(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        transformOptions,
-        renderSheet,
-      );
+      return dnd5e.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
     } else if (game.system.id === 'pf1') {
-      return pf1.transformInto(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        transformOptions,
-        renderSheet
-      );
+      return pf1.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
     } else if (game.system.id === 'pf2e') {
-      return pf2e.transformInto(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        transformOptions,
-        renderSheet,
-      );
+      return pf2e.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
     } else {
-      return generic.transformInto(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        transformOptions,
-        renderSheet,
-      );
+      return generic.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
     }
   },
 
@@ -423,40 +393,15 @@ const API = {
     animation: string,
   ): Promise<Dialog<DialogOptions>> {
     if (game.system.id === 'D35E') {
-      return await D35E.renderDialogTransformOptions(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        animation
-      );
+      return await D35E.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
     } else if (game.system.id === 'dnd5e') {
-      return await dnd5e.renderDialogTransformOptions(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        animation
-      );
+      return await dnd5e.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
     } else if (game.system.id === 'pf1') {
-      return await pf1.renderDialogTransformOptions(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        animation
-      );
+      return await pf1.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
     } else if (game.system.id === 'pf2e') {
-      return await pf2e.renderDialogTransformOptions(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        animation,
-      );
+      return await pf2e.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
     } else {
-      return await generic.renderDialogTransformOptions(
-        sourceToken,
-        sourceActor,
-        targetActor,
-        animation,
-      );
+      return await generic.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
     }
   },
 };
