@@ -666,12 +666,12 @@ export default {
   },
 
   async renderDialogTransformOptions(
-    actorFromTransform: Actor,
-    actorToTransform: Actor,
+    sourceToken: Token,
+    sourceActor: Actor,
+    targetActor: Actor,
     animation: string,
-    tokenFromTransform: Token,
   ) {
-    const tokenUpdatesToTransform = await actorToTransform.getTokenData();
+    const tokenUpdatesToTransform = await targetActor.getTokenData();
 
     // Define a function to record polymorph settings for future use
     const rememberOptions = (html) => {
@@ -700,7 +700,7 @@ export default {
         content: {
           options: this.polymorphSettings,
           i18n: i18nPolymorphSettingsTmp,
-          isToken: actorFromTransform.isToken,
+          isToken: sourceActor.isToken,
         },
         default: 'accept',
         buttons: {
@@ -708,45 +708,51 @@ export default {
             icon: '<i class="fas fa-check"></i>',
             label: i18n(`${CONSTANTS.MODULE_NAME}.polymorphAcceptSettings`),
             callback: async (html) => {
-              if (tokenFromTransform) {
+              if (sourceToken) {
                 if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                   game.macros
                     ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                     //@ts-ignore
-                    ?.execute(tokenFromTransform, tokenUpdatesToTransform);
+                    ?.execute(sourceToken, tokenUpdatesToTransform);
                 } else {
-                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenUpdatesToTransform);
+                  ANIMATIONS.animationFunctions[animation].fn(sourceToken, tokenUpdatesToTransform);
                 }
                 await wait(ANIMATIONS.animationFunctions[animation].time);
               }
-              info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
+              info(`${sourceActor.name} turns into a ${targetActor.name}`);
               // TODO show on chat ?
               //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-              await this.transformInto(actorFromTransform, actorToTransform, rememberOptions(html), false);
+              await this.transformInto(
+                sourceToken,
+                sourceActor,
+                targetActor,
+                rememberOptions(html),
+                false);
             },
           },
           wildshape: {
             icon: '<i class="fas fa-paw"></i>',
             label: i18n(`${CONSTANTS.MODULE_NAME}.polymorphWildShape`),
             callback: async (html) => {
-              if (tokenFromTransform) {
+              if (sourceToken) {
                 if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                   game.macros
                     ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                     //@ts-ignore
-                    ?.execute(tokenFromTransform, tokenUpdatesToTransform);
+                    ?.execute(sourceToken, tokenUpdatesToTransform);
                 } else {
-                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenUpdatesToTransform);
+                  ANIMATIONS.animationFunctions[animation].fn(sourceToken, tokenUpdatesToTransform);
                 }
                 await wait(ANIMATIONS.animationFunctions[animation].time);
               }
-              info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
+              info(`${sourceActor.name} turns into a ${targetActor.name}`);
               // TODO show on chat ?
               //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
               //@ts-ignore
               await this.transformInto(
-                actorFromTransform,
-                actorToTransform,
+                sourceToken,
+                sourceActor,
+                targetActor,
                 {
                   keepBio: true,
                   keepClass: true,
@@ -763,24 +769,25 @@ export default {
             icon: '<i class="fas fa-pastafarianism"></i>',
             label: i18n(`${CONSTANTS.MODULE_NAME}.polymorph`),
             callback: async (html) => {
-              if (tokenFromTransform) {
+              if (sourceToken) {
                 if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
                   game.macros
                     ?.getName(ANIMATIONS.animationFunctions[animation].fn)
                     //@ts-ignore
-                    ?.execute(tokenFromTransform, tokenUpdatesToTransform);
+                    ?.execute(sourceToken, tokenUpdatesToTransform);
                 } else {
-                  ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenUpdatesToTransform);
+                  ANIMATIONS.animationFunctions[animation].fn(sourceToken, tokenUpdatesToTransform);
                 }
                 await wait(ANIMATIONS.animationFunctions[animation].time);
               }
-              info(`${actorFromTransform.name} turns into a ${actorToTransform.name}`);
+              info(`${sourceActor.name} turns into a ${targetActor.name}`);
               // TODO show on chat ?
               //await ChatMessage.create({content: `${targetActor.name} turns into a ${sourceActor.name}`, speaker:{alias: targetActor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
               //@ts-ignore
               await this.transformInto(
-                actorFromTransform,
-                actorToTransform,
+                sourceToken,
+                sourceActor,
+                targetActor,
                 {
                   transformTokens: rememberOptions(html).transformTokens,
                 },
@@ -793,8 +800,9 @@ export default {
             label: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphSelf`),
             callback: (html) =>
               this.transformInto(
-                actorFromTransform,
-                actorToTransform,
+                sourceToken,
+                sourceActor,
+                targetActor,
                 {
                   keepSelf: true,
                   transformTokens: rememberOptions(html).transformTokens,

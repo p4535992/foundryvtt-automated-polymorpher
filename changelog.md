@@ -1,4 +1,4 @@
-### 1.0.36
+### 1.0.36-37
 
 - Strange bug the method "toJson()" for the Actor is undefined ? we try catch with the method "toObject()"
 
