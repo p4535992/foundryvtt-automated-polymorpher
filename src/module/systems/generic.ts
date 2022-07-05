@@ -136,17 +136,17 @@ export default {
     // =====================================
 
     // Set new data flags (TODO FIND A BTTER CODE FOR THIS)
-    if(!sourceToken.actor){
-      setProperty(sourceToken,`actor`,{});
+    if (!sourceToken.actor) {
+      setProperty(sourceToken, `actor`, {});
     }
-    if(!sourceToken.actor?.data){
-      setProperty(<any>sourceToken.actor,`data`,{});
+    if (!sourceToken.actor?.data) {
+      setProperty(<any>sourceToken.actor, `data`, {});
     }
-    if(!sourceToken.actor?.data.flags){
-      setProperty(<any>sourceToken.actor?.data,`flags`,{});
+    if (!sourceToken.actor?.data.flags) {
+      setProperty(<any>sourceToken.actor?.data, `flags`, {});
     }
-    if(!sourceToken.actor?.data.flags[CONSTANTS.MODULE_NAME]){
-      setProperty(<any>sourceToken.actor?.data.flags,`${CONSTANTS.MODULE_NAME}`,{});
+    if (!sourceToken.actor?.data.flags[CONSTANTS.MODULE_NAME]) {
+      setProperty(<any>sourceToken.actor?.data.flags, `${CONSTANTS.MODULE_NAME}`, {});
     }
     setProperty(
       d.flags,
@@ -632,13 +632,18 @@ export default {
             idsToDelete.push(td.actorId);
           }
         }
+        const idsActorToDelete = <string[]>[];
         for (const id of idsToDelete) {
           const actorToDelete = game.actors?.get(id);
           if (actorToDelete) {
             info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
-            await actorToDelete.delete();
+            // await actorToDelete.delete();
+            if (!idsActorToDelete.includes(actorToDelete.id)) {
+              idsActorToDelete.push(actorToDelete.id);
+            }
           }
         }
+        Actor.deleteDocuments(idsActorToDelete);
         // await actorThis.delete();
         // }
       }

@@ -323,7 +323,7 @@ export async function retrieveActorFromData(
         for (const entityComp of pack.index) {
           const actorComp = <StoredDocument<Item>>await pack.getDocument(entityComp._id);
           if (actorComp.id === aId || actorComp.name === aName) {
-            actorFounded =<any>actorComp;
+            actorFounded = <any>actorComp;
             break;
           }
         }

@@ -1,3 +1,7 @@
+### 1.0.39
+
+- Bug fix settings of flags
+
 ### 1.0.36-37-38
 
 - Strange bug the method "toJson()" for the Actor is undefined ? we try catch with the method "toObject()"

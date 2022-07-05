@@ -94,7 +94,6 @@ const API = {
     random = false,
     animationExternal: { sequence: undefined; timeToWait: 0 } | undefined = undefined,
   ): Promise<void> {
-
     const listPolymorphers: PolymorpherData[] =
       // actor &&
       // (<boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
