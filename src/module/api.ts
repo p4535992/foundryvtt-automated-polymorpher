@@ -94,18 +94,7 @@ const API = {
     random = false,
     animationExternal: { sequence: undefined; timeToWait: 0 } | undefined = undefined,
   ): Promise<void> {
-    // const sourceToken = canvas.tokens?.placeables.find((t) => {
-    //   return t.id === sourceTokenIdOrName || t.name === sourceTokenIdOrName;
-    // });
-    // if (!sourceToken) {
-    //   // warn(`No token founded on canvas with id/name '${sourceTokenIdOrName}'`, true);
-    //   return;
-    // }
-    // const actor = retrieveActorFromToken(sourceToken);
-    // if (!actor) {
-    //   // warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
-    //   return;
-    // }
+
     const listPolymorphers: PolymorpherData[] =
       // actor &&
       // (<boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
@@ -126,24 +115,12 @@ const API = {
 
     // TODO find a better method than this
     let lastElement = '';
-    // let specialCaseEndWith1 = false;
-    // if (sourceToken.name.endsWith(')')) {
-    //   specialCaseEndWith1 = true;
-    // }
     const matches = <any[]>sourceToken.name.match(/(?<=\().+?(?=\))/g);
     if (matches && matches.length > 0) {
       lastElement = matches[matches.length - 1];
     } else {
       lastElement = sourceToken.name;
     }
-    // if (specialCaseEndWith1) {
-    //   lastElement = lastElement + ')';
-    // }
-
-    // let tokenDataToTransform = <TokenData>await actor.getTokenData();
-    // let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
-    //     return t.actor?.id === actor.id;
-    //   }) || undefined;
 
     if (removePolymorpher) {
       const updatesForRevert = <TokenData[]>(
@@ -155,18 +132,6 @@ const API = {
         warn(`Can't revert this token without the flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}'`, true);
         return;
       }
-      /*
-      const updatesForRevert: any = actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
-      if (!updatesForRevert) {
-        await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-        await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
-        warn(`Can't revert this token without the flag '${PolymorpherFlags.UPDATES_FOR_REVERT}'`, true);
-        return;
-      }
-      */
-      // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-      // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
-      //await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
 
       const polyData = listPolymorphers.find((a) => {
         return lastElement.toLowerCase().includes(a.name.toLowerCase());
@@ -176,18 +141,10 @@ const API = {
       });
 
       const animation = polyData?.animation;
-      //tokenDataToTransform = updatesForRevert.tokenData || tokenDataToTransform;
-      // const tokenDataToTransform = updatesForRevert.pop() || <TokenData>await actor.getTokenData();
       const tokenDataToTransform = <TokenData>await actor.getTokenData();
       const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
           return t.actor?.id === actor.id;
         }) || tokenDataToTransform;
-
-      // await actor?.setFlag(
-      //   CONSTANTS.MODULE_NAME,
-      //   PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
-      //   updatesForRevert,
-      // );
 
       if (animationExternal && animationExternal.sequence) {
         //@ts-ignore
@@ -207,35 +164,10 @@ const API = {
       }
 
       // Do something with left click
-      // if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
       info(`${actor.name} reverts to their original form`);
       // TODO show on chat ?
       //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-      //actor?.revertOriginalForm();
       this.revertOriginalForm(sourceToken, actor, false);
-      // } else {
-      //   let arrayMutationNames: string[] = <string[]>(
-      //     actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
-      //   );
-      //   if (!arrayMutationNames || arrayMutationNames.length == 0) {
-      //     arrayMutationNames = [];
-      //     warn(`Array mutation names for the revert is null or empty`);
-      //   }
-      //   if (arrayMutationNames.length > 0) {
-      //     for (const revertName of arrayMutationNames) {
-      //       info(`${actor.name} reverts to their original form`);
-      //       // TODO show on chat ?
-      //       //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-      //       //@ts-ignore
-      //       await warpgate.revert(sourceToken.document, revertName);
-      //     }
-      //   } else {
-      //     //@ts-ignore
-      //     await warpgate.revert(sourceToken.document, '');
-      //   }
-      // }
-      // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-      // await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
     } else {
       if (isRandom && isOrdered) {
         warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
@@ -289,13 +221,13 @@ const API = {
       return;
     }
     for (const token of tokens) {
-      if (token && token.document) {
-        if (getProperty(token.document, `data.flags.${CONSTANTS.MODULE_NAME}`)) {
-          const p = getProperty(token.document, `data.flags.${CONSTANTS.MODULE_NAME}`);
+      if (token && token.actor) {
+        if (getProperty(token.actor, `data.flags.${CONSTANTS.MODULE_NAME}`)) {
+          const p = getProperty(token.actor, `data.flags.${CONSTANTS.MODULE_NAME}`);
           for (const key in p) {
             const senseOrConditionIdKey = key;
             const senseOrConditionValue = <any>p[key];
-            await token.document.unsetFlag(CONSTANTS.MODULE_NAME, senseOrConditionIdKey);
+            await token.actor.unsetFlag(CONSTANTS.MODULE_NAME, senseOrConditionIdKey);
           }
           info(`Cleaned up token '${token.name}'`, true);
         }

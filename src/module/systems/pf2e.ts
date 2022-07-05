@@ -145,16 +145,27 @@ export default {
     // =====================================
 
     // Set new data flags (TODO FIND A BTTER CODE FOR THIS)
+    if(!sourceToken.actor){
+      setProperty(sourceToken,`actor`,{});
+    }
+    if(!sourceToken.actor?.data){
+      setProperty(<any>sourceToken.actor,`data`,{});
+    }
+    if(!sourceToken.actor?.data.flags){
+      setProperty(<any>sourceToken.actor?.data,`flags`,{});
+    }
+    if(!sourceToken.actor?.data.flags[CONSTANTS.MODULE_NAME]){
+      setProperty(<any>sourceToken.actor?.data.flags,`${CONSTANTS.MODULE_NAME}`,{});
+    }
     setProperty(
       d.flags,
       `${CONSTANTS.MODULE_NAME}`,
-      getProperty(sourceToken.document.data.flags, `${CONSTANTS.MODULE_NAME}`),
+      getProperty(<any>sourceToken.actor?.data.flags, `${CONSTANTS.MODULE_NAME}`),
     );
     //setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`, getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
     mergeObject(d.flags, sourceActor.data.flags);
     if (
-      //!actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
-      !sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
+      !sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
       !getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
     ) {
       setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, sourceActor.id);
@@ -184,7 +195,7 @@ export default {
 
     // Step up the array of mutation names
     let arrayMutationNames: string[] = <string[]>(
-      sourceToken.document?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
+      sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
     );
     if (!arrayMutationNames || arrayMutationNames.length == 0) {
       arrayMutationNames =
@@ -199,17 +210,6 @@ export default {
       `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
       arrayMutationNames,
     );
-
-    // if (!getProperty(d, `actor`)) {
-    //   setProperty(d, `actor`, {});
-    // }
-    // if (!getProperty(d.actor, `flags`)) {
-    //   setProperty(d.actor, `flags`, {});
-    // }
-    // if (!getProperty(d.actor.flags, `${CONSTANTS.MODULE_NAME}`)) {
-    //   setProperty(d.actor.flags, `${CONSTANTS.MODULE_NAME}`, {});
-    // }
-    // mergeObject(d.actor.flags[CONSTANTS.MODULE_NAME],d.token.flags[CONSTANTS.MODULE_NAME]);
 
     // Close sheet for non-transformed Actor
     await sourceActor.sheet?.close();
@@ -383,7 +383,7 @@ export default {
         //await ChatMessage.create({content: `${actorThis.name} mutate into a ${actorToTransform.name}`, speaker:{alias: actorThis.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
         const tokensMutate = await warpgate.mutate(
-          sourceToken.document,
+          sourceToken.document ? sourceToken.document : sourceToken, // TODO why sourceToken is a TokenDocument and not a Token ?
           updates,
           {},
           {
@@ -437,7 +437,7 @@ export default {
         //await ChatMessage.create({content: `${actorThis.name} mutate into a ${actorToTransform.name}`, speaker:{alias: actorThis.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
         //@ts-ignore
         const tokensMutate = await warpgate.mutate(
-          t.document,
+          t.document ? t.document : t, // TODO why sourceToken is a TokenDocument and not a Token ?
           newTokenData,
           {},
           {
@@ -529,7 +529,7 @@ export default {
     // if (!actorThis.isOwner) {
     //   return warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`), true);
     // }
-    if (!sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
+    if (!sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
       warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`), true);
       return;
     }
@@ -549,7 +549,7 @@ export default {
     Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, sourceActor, renderSheet);
 
     const previousOriginalActorTokenData = <TokenData[]>(
-      sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
     );
     let isTheOriginalActor = false;
     if (!previousOriginalActorTokenData || previousOriginalActorTokenData.length <= 0) {
@@ -557,13 +557,13 @@ export default {
     }
     // Obtain a reference to the original actor
     const original = <Actor>(
-      game.actors?.get(<string>sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
+      game.actors?.get(<string>sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
     );
     if (!original) {
       if (!previousOriginalActorTokenData) {
         warn(
           game.i18n.format(`${CONSTANTS.MODULE_NAME}.polymorphRevertNoOriginalActorWarn`, {
-            reference: <string>sourceToken.document.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
+            reference: <string>sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
           }),
           true,
         );
@@ -577,7 +577,7 @@ export default {
         // ===========================================
 
         let arrayMutationNames: string[] = <string[]>(
-          sourceToken.document?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
+          sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
         );
         if (!arrayMutationNames || arrayMutationNames.length == 0) {
           arrayMutationNames = [];
@@ -586,7 +586,7 @@ export default {
 
         if (arrayMutationNames.length > 0) {
           for (const revertName of arrayMutationNames) {
-            info(`${sourceToken.document.name} reverts to their original form`);
+            info(`${sourceToken.actor?.name} reverts to their original form`);
             // TODO show on chat ?
             //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
             //@ts-ignore

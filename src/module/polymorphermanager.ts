@@ -209,7 +209,6 @@ export class PolymorpherManager extends FormApplication {
       return;
     }
 
-    // if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
     // Prepare flag for revert ???
     const updatesForRevert = <TokenData[]>(
       this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
@@ -229,108 +228,6 @@ export class PolymorpherManager extends FormApplication {
       this.maximize();
     }
     dialog.render(true);
-    // }
-    // // ===========================================
-    // // If system is not dnd5e we can use warpgate
-    // // ===========================================
-    // else {
-    //   const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
-    //   if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-    //     game.macros
-    //       ?.getName(ANIMATIONS.animationFunctions[animation].fn)
-    //       //@ts-ignore
-    //       ?.execute(tokenFromTransform, tokenDataToTransform);
-    //   } else {
-    //     ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
-    //   }
-    //   await wait(ANIMATIONS.animationFunctions[animation].time);
-
-    //   //get custom data macro
-    //   /* DO NOT NEED THESE
-    //   const customTokenData = await game.macros?.getName(`AP_Polymorpher_Macro(${actor.data.name})`)?.execute({
-    //     //@ts-ignore
-    //     polymorpherActor: actor,
-    //     // spellLevel: this.spellLevel || 0,
-    //     // duplicates: duplicates,
-    //     assignedActor: this.actor || game.user?.character || _token?.actor,
-    //   });
-    //   */
-    //   // log("Automated Polymorpher", {
-    //   //   assignedActor: this.caster || game.user?.character || _token?.actor,
-    //   //   spellLevel: this.spellLevel || 0,
-    //   //   duplicates: duplicates,
-    //   //   warpgateData: customTokenData || {},
-    //   //   summon: actor,
-    //   //  tokenData: tokenData,
-    //   //  posData: posData,
-    //   // })
-
-    //   const actorDataTmp = duplicate(actorToTransform.data);
-    //   const updatesForRevert = <TokenData[]>(
-    //     this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-    //   )
-    //     ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-    //     : <TokenData[]>[];
-    //   updatesForRevert.push(this.token.data);
-    //   setProperty(
-    //     actorDataTmp,
-    //     `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`,
-    //     updatesForRevert,
-    //   );
-    //   await this.actor?.setFlag(
-    //     CONSTANTS.MODULE_NAME,
-    //     PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
-    //     updatesForRevert,
-    //   );
-
-    //   const updates = {
-    //     token: {
-    //       name: tokenDataToTransform.name,
-    //       img: tokenDataToTransform.img,
-    //       scale: tokenDataToTransform.scale,
-    //       data: tokenDataToTransform,
-    //       // actor: actorToTransform
-    //       actor: {
-    //         // name: actorToTransform.name,
-    //         data: actorDataTmp.data,
-    //         // data: {
-    //         //   flags: {
-    //         //     'automated-polymorpher': {
-    //         //       updatesforrevert: updatesForRevert,
-    //         //     },
-    //         //   },
-    //         // },
-    //       },
-    //     },
-    //     actor: actorToTransform,
-    //   };
-
-    //   const arrayMutationNames: string[] =
-    //     <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
-    //   const mutationNameOriginalToken = tokenFromTransform.id + randomID();
-    //   if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
-    //     arrayMutationNames.push(mutationNameOriginalToken);
-    //   }
-    //   await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
-    //   info(`${this.actor.name} mutate into a ${actorToTransform.name}`);
-    //   // TODO show on chat ?
-    //   //await ChatMessage.create({content: `${this.actor.name} mutate into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-    //   //@ts-ignore
-    //   await warpgate.mutate(
-    //     tokenFromTransform.document,
-    //     updates, // tokenDataToTransform, //{}, //customTokenData || {},
-    //     {},
-    //     {
-    //       name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
-    //     },
-    //   );
-
-    //   if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
-    //     this.close();
-    //   } else {
-    //     this.maximize();
-    //   }
-    // }
   }
 
   async _onRemovePolymorpher(event) {
@@ -605,7 +502,7 @@ export class PolymorpherManager extends FormApplication {
     if (!actorToTransform) {
       return;
     }
-    // if (!game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate')) {
+
     // const canPolymorph = game.user?.isGM || (this.actor.isOwner && game.settings.get('dnd5e', 'allowPolymorphing'));
     // if (!canPolymorph) {
     //   warn(`You mus enable the setting 'allowPolymorphing' for the dnd5e system`, true);
@@ -808,107 +705,6 @@ export class PolymorpherManager extends FormApplication {
         true,
       );
     }
-    // } else {
-    //   // ===========================================
-    //   // If system is not dnd5e we can use warpgate
-    //   // ===========================================
-    //   if (animationExternal && animationExternal.sequence) {
-    //     //@ts-ignore
-    //     await animationExternal.sequence.play();
-    //     await wait(animationExternal.timeToWait);
-    //   } else if (animation) {
-    //     if (typeof ANIMATIONS.animationFunctions[animation].fn == 'string') {
-    //       //@ts-ignore
-    //       game.macros
-    //         ?.getName(ANIMATIONS.animationFunctions[animation].fn)
-    //         //@ts-ignore
-    //         ?.execute(tokenFromTransform, tokenDataToTransform);
-    //     } else {
-    //       ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
-    //     }
-    //     await wait(ANIMATIONS.animationFunctions[animation].time);
-    //   }
-
-    //   // Prepare flag for revert ???
-    //   /*
-    //   let updatesForRevert: any = {};
-    //   if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
-    //     updatesForRevert = {
-    //       tokenData: this.token.data,
-    //       actorData: this.actor.data,
-    //     };
-    //   } else {
-    //     updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
-    //   }
-
-    //   const actorDataTmp = duplicate(actorToTransform.data);
-    //   setProperty(
-    //     actorDataTmp,
-    //     `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.UPDATES_FOR_REVERT}`,
-    //     updatesForRevert,
-    //   );
-    //   await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
-    //   */
-
-    //   const updatesForRevert = <TokenData[]>(
-    //     this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-    //   )
-    //     ? <TokenData[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-    //     : <TokenData[]>[];
-    //   updatesForRevert.push(this.token.data);
-
-    //   const actorDataTmp = duplicate(actorToTransform.data);
-    //   setProperty(
-    //     actorDataTmp,
-    //     `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`,
-    //     updatesForRevert,
-    //   );
-    //   await this.actor?.setFlag(
-    //     CONSTANTS.MODULE_NAME,
-    //     PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
-    //     updatesForRevert,
-    //   );
-
-    //   const updates = {
-    //     token: {
-    //       name: tokenDataToTransform.name,
-    //       img: tokenDataToTransform.img,
-    //       scale: tokenDataToTransform.scale,
-    //       data: tokenDataToTransform,
-    //       // actor: actorToTransform
-    //       actor: {
-    //         // name: actorToTransform.name,
-    //         data: actorDataTmp.data,
-    //         // data: {
-    //         //   flags: {
-    //         //     'automated-polymorpher': {
-    //         //       updatesforrevert: updatesForRevert,
-    //         //     },
-    //         //   },
-    //         // },
-    //       },
-    //     },
-    //     actor: actorToTransform,
-    //   };
-
-    //   const arrayMutationNames: string[] =
-    //     <string[]>this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
-    //   const mutationNameOriginalToken = tokenFromTransform.id + randomID();
-    //   arrayMutationNames.push(mutationNameOriginalToken);
-    //   await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT, arrayMutationNames);
-    //   info(`${this.actor.name} mutate into a ${actorToTransform.name}`);
-    //   // TODO show on chat ?
-    //   //await ChatMessage.create({content: `${this.actor.name} mutate into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-    //   //@ts-ignore
-    //   await warpgate.mutate(
-    //     tokenFromTransform.document,
-    //     updates, // tokenDataToTransform, // {}, // customTokenData || {},
-    //     {},
-    //     {
-    //       name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
-    //     },
-    //   );
-    // }
   }
 }
 
