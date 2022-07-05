@@ -328,6 +328,7 @@ export async function retrieveActorFromData(
           }
         }
       }
+      actorToTransformLi = <any>actorFounded;
     }
   }
   if (!actorToTransformLi) {
