@@ -317,7 +317,7 @@ export async function retrieveActorFromData(
       }
       */
       // Try to find the actor by exact ID
-      let actorFounded = pack.index.get(aId);
+      let actorFounded:any = pack.index.get(aId);
       // If not found, search for the actor by name
       if (!actorFounded) {
         for (const entityComp of pack.index) {
@@ -327,6 +327,8 @@ export async function retrieveActorFromData(
             break;
           }
         }
+      }else{
+        actorFounded = <StoredDocument<Item>>await pack.getDocument(aId);
       }
       actorToTransformLi = <any>actorFounded;
     }
