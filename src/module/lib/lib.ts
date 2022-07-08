@@ -160,21 +160,21 @@ function addToPolymorphButton(html, sourceToken: Token) {
   //   button = addSlash(button);
   // }
 
-  const actor = retrieveActorFromToken(sourceToken);
-  if (!actor) {
-    // warn(`No actor founded on canvas with token '${sourceToken.id}'`, true);
+  const sourceActor = retrieveActorFromToken(sourceToken);
+  if (!sourceActor) {
+    warn(`No actor founded on canvas with token '${sourceToken.id}'`);
     return;
   }
 
-  const random = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
-  const ordered = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
-  const storeonactor = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR) ?? false;
+  const random = <boolean>sourceActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
+  const ordered = <boolean>sourceActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
+  // const storeonactor = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR) ?? false;
 
   button.find('i').on('click', async (ev) => {
     for (const targetToken of <Token[]>canvas.tokens?.controlled) {
       const targetActor = retrieveActorFromToken(targetToken);
       if (targetActor) {
-        API._invokePolymorpherManagerInner(targetActor, targetToken, false, ordered, random);
+        API._invokePolymorpherManagerInner(targetToken, targetActor, false, ordered, random, undefined);
       }
     }
   });
@@ -183,26 +183,11 @@ function addToPolymorphButton(html, sourceToken: Token) {
       // Do somethign with right click
       const targetActor = retrieveActorFromToken(targetToken);
       if (targetActor) {
-        API._invokePolymorpherManagerInner(targetActor, targetToken, true, ordered, random);
+        API._invokePolymorpherManagerInner(targetToken, targetActor, true, ordered, random, undefined);
       }
     }
   });
 }
-
-// function addToRevertPolymorphButton(html, sourceToken:Token) {
-//   if(!sourceToken || !sourceToken.isOwner){
-//     return;
-//   }
-//   let button = buildButton(html, `Revert transform ${sourceToken.name}`);
-//   button = addSlash(button);
-
-//   button.find('i').on('click', async (ev) => {
-//     API._invokePolymorpherManagerInner(actor,sourceToken,true);
-//   });
-//   button.find('i').on('contextmenu', async (ev) => {
-//     // Do something with right click
-//   });
-// }
 
 function buildButton(html, tooltip) {
   const iconClass = 'fas fa-wind'; // TODO customize icon ???
@@ -279,10 +264,10 @@ export function retrieveActorFromToken(sourceToken: Token): Actor | undefined {
   if (!sourceToken.actor) {
     return undefined;
   }
-  const storeOnActorFlag = <boolean>sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR);
-  if (!storeOnActorFlag) {
-    return sourceToken.actor;
-  }
+  // const storeOnActorFlag = <boolean>sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR);
+  // if (!storeOnActorFlag) {
+  //   return sourceToken.actor;
+  // }
   let actor: Actor | undefined = undefined;
   if (sourceToken.data.actorLink) {
     actor = <Actor>game.actors?.get(<string>sourceToken.data.actorId);
@@ -316,21 +301,20 @@ export async function retrieveActorFromData(
         }
       }
       */
-      // Try to find the actor by exact ID
-      let actorFounded:any = pack.index.get(aId);
+      // If the actor is found in the index, return it by exact ID
+      if (pack.index.get(aId)) {
+        actorToTransformLi = <Actor>await pack.getDocument(aId);
+      }
       // If not found, search for the actor by name
-      if (!actorFounded) {
+      if (!actorToTransformLi) {
         for (const entityComp of pack.index) {
-          const actorComp = <StoredDocument<Item>>await pack.getDocument(entityComp._id);
+          const actorComp = <StoredDocument<Actor>>await pack.getDocument(entityComp._id);
           if (actorComp.id === aId || actorComp.name === aName) {
-            actorFounded = <any>actorComp;
+            actorToTransformLi = actorComp;
             break;
           }
         }
-      }else{
-        actorFounded = <StoredDocument<Item>>await pack.getDocument(aId);
       }
-      actorToTransformLi = <any>actorFounded;
     }
   }
   if (!actorToTransformLi) {

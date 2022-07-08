@@ -2,8 +2,9 @@ import type { TokenData } from '@league-of-foundry-developers/foundry-vtt-types/
 import { ANIMATIONS } from './animations';
 import { PolymorpherData, PolymorpherFlags, TransformOptionsGeneric } from './automatedPolymorpherModels';
 import CONSTANTS from './constants';
-import { error, info, retrieveActorFromToken, wait, warn } from './lib/lib';
+import { error, info, retrieveActorFromData, retrieveActorFromToken, wait, warn } from './lib/lib';
 import { PolymorpherManager } from './polymorphermanager';
+import { automatedPolymorpherSocket } from './socket';
 import D35E from './systems/D35E';
 import dnd5e from './systems/dnd5e';
 import generic from './systems/generic';
@@ -13,7 +14,7 @@ import pf2e from './systems/pf2e';
 const API = {
   async invokePolymorpherManagerArr(...inAttributes: any[]) {
     if (!Array.isArray(inAttributes)) {
-      throw error('invokePolymorpherManager | inAttributes must be of type array');
+      throw error('invokePolymorpherManagerArr | inAttributes must be of type array');
     }
     const [sourceTokenIdOrName, removePolymorpher, ordered, random, animationExternal] = inAttributes;
     const result = await (this as typeof API).invokePolymorpherManager(
@@ -28,7 +29,7 @@ const API = {
 
   async invokePolymorpherManagerFromActorArr(...inAttributes: any[]) {
     if (!Array.isArray(inAttributes)) {
-      throw error('invokePolymorpherManagerFromActor | inAttributes must be of type array');
+      throw error('invokePolymorpherManagerFromActorArr | inAttributes must be of type array');
     }
     const [sourceActorIdOrName, removePolymorpher, ordered, random, animationExternal] = inAttributes;
     const result = await (this as typeof API).invokePolymorpherManagerFromActor(
@@ -39,6 +40,73 @@ const API = {
       animationExternal,
     );
     return result;
+  },
+
+
+  async transformIntoArr(...inAttributes) {
+    if (!Array.isArray(inAttributes)) {
+      throw error('transformIntoArr | inAttributes must be of type array');
+    }
+    const [sourceTokenId,sourceActorId,sourceActorName,targetActorId,targetActorName,transformOptions,renderSheet] = inAttributes;
+
+    const sourceToken = canvas.tokens?.placeables.find((t)=>{
+      return t.id === sourceTokenId;
+    });
+
+    const sourceActor = <Actor>await retrieveActorFromData(sourceActorId, '', '');
+
+    const polymoprhers: PolymorpherData[] =
+      <PolymorpherData[]>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+
+    const currentPolymorph = <PolymorpherData>polymoprhers.find((p) =>{
+      return p.id === targetActorId || p.name === targetActorName;
+    });
+
+    const targetActor = await retrieveActorFromData(currentPolymorph?.id, currentPolymorph?.name , currentPolymorph?.compendiumid);
+    if(!sourceToken){
+      warn(`No source token found with reference '${sourceTokenId}'`, true);
+      return;
+    }
+    if(!sourceActor){
+      warn(`No source actor found with reference '${sourceTokenId}'`, true);
+      return;
+    }
+    if(!targetActor){
+      warn(`No target actor found with reference '${sourceTokenId}'`, true);
+      return;
+    }
+
+    return this.transformIntoImpl(
+      sourceToken,
+      sourceActor,
+      targetActor,
+      transformOptions,
+      renderSheet);
+
+  },
+
+  async revertOriginalFormArr(...inAttributes) {
+    if (!Array.isArray(inAttributes)) {
+      throw error('revertOriginalFormArr | inAttributes must be of type array');
+    }
+    const [sourceTokenId,sourceActorId,sourceActorName,renderSheet] = inAttributes;
+
+    const sourceToken = canvas.tokens?.placeables.find((t)=>{
+      return t.id === sourceTokenId;
+    });
+
+    const sourceActor = <Actor>await retrieveActorFromData(sourceActorId, '', '');
+
+    if(!sourceToken){
+      warn(`No source token found with reference '${sourceTokenId}'`, true);
+      return;
+    }
+    if(!sourceActor){
+      warn(`No source actor found with reference '${sourceTokenId}'`, true);
+      return;
+    }
+
+    this.revertOriginalFormImpl(sourceToken, sourceActor, renderSheet);
   },
 
   async invokePolymorpherManagerFromActor(
@@ -52,8 +120,8 @@ const API = {
       const actor = retrieveActorFromToken(tokenOnCanvas);
       if (actor && (actor.id === sourceActorIdOrName || actor.name === sourceActorIdOrName)) {
         this._invokePolymorpherManagerInner(
-          actor,
           tokenOnCanvas,
+          actor,
           removePolymorpher,
           ordered,
           random,
@@ -78,56 +146,55 @@ const API = {
       warn(`No token founded on canvas with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
-    const actor = retrieveActorFromToken(sourceToken);
-    if (!actor) {
+    const sourceActor = retrieveActorFromToken(sourceToken);
+    if (!sourceActor) {
       warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
-    this._invokePolymorpherManagerInner(actor, sourceToken, removePolymorpher, ordered, random, animationExternal);
+    this._invokePolymorpherManagerInner(sourceToken, sourceActor, removePolymorpher, ordered, random, animationExternal);
   },
 
   async _invokePolymorpherManagerInner(
-    actor: Actor,
-    sourceToken: Token,
-    removePolymorpher = false,
-    ordered = false,
-    random = false,
+    currentToken: Token,
+    currentActor: Actor,
+    removePolymorpher:boolean,
+    ordered:boolean,
+    random:boolean,
     animationExternal: { sequence: undefined; timeToWait: 0 } | undefined = undefined,
   ): Promise<void> {
     const listPolymorphers: PolymorpherData[] =
-      // actor &&
-      // (<boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_LOCAL) ||
-      //   game.settings.get(CONSTANTS.MODULE_NAME, PolymorpherFlags.STORE_ON_ACTOR))
-      //   ? <PolymorpherData[]>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || []
-      //   : <PolymorpherData[]>game.user?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
-      <PolymorpherData[]>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+      <PolymorpherData[]>currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
 
     let isOrdered = ordered;
     let isRandom = random;
 
-    if (!ordered && actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED)) {
-      isOrdered = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
+    if (!ordered && currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED)) {
+      isOrdered = <boolean>currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
     }
-    if (!random && actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM)) {
-      isRandom = <boolean>actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
+    if (!random && currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM)) {
+      isRandom = <boolean>currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
     }
 
     // TODO find a better method than this
     let lastElement = '';
-    const matches = <any[]>sourceToken.name.match(/(?<=\().+?(?=\))/g);
+    const matches = <any[]>currentToken.name.match(/(?<=\().+?(?=\))/g);
     if (matches && matches.length > 0) {
       lastElement = matches[matches.length - 1];
     } else {
-      lastElement = sourceToken.name;
+      lastElement = currentToken.name;
     }
 
     if (removePolymorpher) {
+      // =====================================
+      // REVERT TO ORIGINAL FORM
+      // =====================================
+
       const updatesForRevert = <TokenData[]>(
-        actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+        currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
       );
       if (!updatesForRevert || updatesForRevert.length <= 0) {
-        await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-        await actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+        await currentActor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+        await currentActor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
         warn(`Can't revert this token without the flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}'`, true);
         return;
       }
@@ -140,9 +207,9 @@ const API = {
       });
 
       const animation = polyData?.animation;
-      const tokenDataToTransform = <TokenData>await actor.getTokenData();
+      const tokenDataToTransform = <TokenData>await currentActor.getTokenData();
       const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
-          return t.actor?.id === actor.id;
+          return t.actor?.id === currentActor.id;
         }) || tokenDataToTransform;
 
       if (animationExternal && animationExternal.sequence) {
@@ -163,18 +230,22 @@ const API = {
       }
 
       // Do something with left click
-      info(`${actor.name} reverts to their original form`);
+      info(`${currentActor.name} reverts to their original form`);
       // TODO show on chat ?
       //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-      this.revertOriginalForm(sourceToken, actor, false);
+      this.revertOriginalForm(currentToken, currentActor, false);
     } else {
+      // ================================
+      // TRANSFORM INTO
+      // ================================
+
       if (isRandom && isOrdered) {
         warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
         return;
       }
       if (isRandom) {
         if (listPolymorphers?.length === 1) {
-          new PolymorpherManager(actor, sourceToken).fastSummonPolymorpher(
+          new PolymorpherManager(currentActor, currentToken).fastSummonPolymorpher(
             <PolymorpherData>listPolymorphers[0],
             animationExternal,
           );
@@ -186,7 +257,7 @@ const API = {
           while (randomIndex === polyDataIndex) {
             randomIndex = Math.floor(Math.random() * listPolymorphers.length);
           }
-          new PolymorpherManager(actor, sourceToken).fastSummonPolymorpher(
+          new PolymorpherManager(currentActor, currentToken).fastSummonPolymorpher(
             <PolymorpherData>listPolymorphers[randomIndex],
             animationExternal,
           );
@@ -197,18 +268,18 @@ const API = {
         });
         const nextIndex = polyDataIndex + 1;
         if (listPolymorphers?.length - 1 < nextIndex) {
-          new PolymorpherManager(actor, sourceToken).fastSummonPolymorpher(
+          new PolymorpherManager(currentActor, currentToken).fastSummonPolymorpher(
             <PolymorpherData>listPolymorphers[0],
             animationExternal,
           );
         } else {
-          new PolymorpherManager(actor, sourceToken).fastSummonPolymorpher(
+          new PolymorpherManager(currentActor, currentToken).fastSummonPolymorpher(
             <PolymorpherData>listPolymorphers[nextIndex],
             animationExternal,
           );
         }
       } else {
-        new PolymorpherManager(actor, sourceToken).render(true);
+        new PolymorpherManager(currentActor, currentToken).render(true);
       }
     }
   },
@@ -262,6 +333,25 @@ const API = {
     transformOptions: TransformOptionsGeneric,
     renderSheet: boolean,
   ): Promise<any> {
+
+    return automatedPolymorpherSocket.executeAsGM('transformInto',
+      [sourceToken.id, sourceActor.id,sourceActor.name,targetActor.id,targetActor.name,transformOptions,renderSheet]);
+
+  },
+
+  async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean) {
+
+    return automatedPolymorpherSocket.executeAsGM('revertOriginalForm',
+      [sourceToken.id, sourceActor.id,sourceActor.name,renderSheet]);
+  },
+
+  async transformIntoImpl(
+    sourceToken: Token,
+    sourceActor: Actor,
+    targetActor: Actor,
+    transformOptions: TransformOptionsGeneric,
+    renderSheet: boolean,
+  ): Promise<any> {
     if (!sourceToken) {
       warn(`No source token is been passed`, true);
       return;
@@ -303,7 +393,7 @@ const API = {
    * @param {boolean} [renderSheet] Render Sheet after revert the transformation.
    * @returns {Promise<Actor>|null}  Original actor if it was reverted.
    */
-  async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean) {
+  async revertOriginalFormImpl(sourceToken: Token, sourceActor: Actor, renderSheet: boolean) {
     if (game.system.id === 'D35E') {
       return await D35E.revertOriginalForm(sourceToken, sourceActor, renderSheet);
     } else if (game.system.id === 'dnd5e') {
@@ -317,16 +407,17 @@ const API = {
     }
   },
 
-  async renderDialogTransformOptions(
+  async renderDialogTransformOptionsImpl(
     sourceToken: Token,
     sourceActor: Actor,
     targetActor: Actor,
+    explicitName: string,
     animation: string,
   ): Promise<Dialog<DialogOptions>> {
     if (game.system.id === 'D35E') {
       return await D35E.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
     } else if (game.system.id === 'dnd5e') {
-      return await dnd5e.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
+      return await dnd5e.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
     } else if (game.system.id === 'pf1') {
       return await pf1.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
     } else if (game.system.id === 'pf2e') {

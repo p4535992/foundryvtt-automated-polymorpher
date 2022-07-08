@@ -130,6 +130,8 @@
     "polymorphTokens": "Transform all linked tokens?",
     "polymorphWarn": "You are not allowed to polymorph this actor!",
     "polymorphWildShape": "Wild Shape",
-    "polymorphSelf": "Alter/Disguise Self"
+    "polymorphSelf": "Alter/Disguise Self",
+    "polymorphTransformTokens": "Transform all linked tokens?",
+    "polymorphExplicitName": "Explicit Name of the transformed actor"
   }
 }

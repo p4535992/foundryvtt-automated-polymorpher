@@ -32,6 +32,7 @@ export default {
    * @property {boolean} [removeAE=false]        Remove active effects
    * @property {boolean} [keepAEOnlyOriginNotEquipment=false] Keep only active effects which origin is not equipment
    * @property {boolean} [transformTokens=true]  Transform linked tokens too
+   * @property {string} [explicitName]  Explicit name for generated actor
    */
   polymorphSettings: {
     keepPhysical: false,
@@ -50,6 +51,7 @@ export default {
     removeAE: false,
     keepAEOnlyOriginNotEquipment: false,
     transformTokens: true,
+    explicitName: ''
   },
 
   /**
@@ -72,6 +74,8 @@ export default {
     keepSelf: `${CONSTANTS.MODULE_NAME}.pPolymorphKeepSelf`,
     removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
     keepAEOnlyOriginNotEquipment: `${CONSTANTS.MODULE_NAME}.polymorphKeepAEOnlyOriginNotEquipment`,
+    transformTokens: `${CONSTANTS.MODULE_NAME}.polymorphTransformTokens`,
+    explicitName: `${CONSTANTS.MODULE_NAME}.polymorphExplicitName`,
   },
 
   /**
@@ -681,7 +685,7 @@ export default {
     return original;
   },
 
-  async renderDialogTransformOptions(sourceToken: Token, sourceActor: Actor, targetActor: Actor, animation: string) {
+  async renderDialogTransformOptions(sourceToken: Token, sourceActor: Actor, targetActor: Actor, explicitName:string, animation: string) {
     const tokenUpdatesToTransform = await targetActor.getTokenData();
 
     // Define a function to record polymorph settings for future use
@@ -766,6 +770,7 @@ export default {
                   mergeSaves: true,
                   mergeSkills: true,
                   transformTokens: rememberOptions(html).transformTokens,
+                  explicitName: explicitName
                 },
                 false,
               );
@@ -796,6 +801,7 @@ export default {
                 targetActor,
                 {
                   transformTokens: rememberOptions(html).transformTokens,
+                  explicitName: explicitName
                 },
                 false,
               );
@@ -812,6 +818,7 @@ export default {
                 {
                   keepSelf: true,
                   transformTokens: rememberOptions(html).transformTokens,
+                  explicitName: explicitName
                 },
                 false,
               ),
@@ -853,6 +860,7 @@ export default {
     const removeAE = transformOptions?.removeAE || false;
     const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
     const transformTokens = transformOptions?.transformTokens || true;
+    const explicitName = transformOptions?.explicitName || '';
 
     // Get the original Actor data and the new source data
     // const originalActorData = <any>sourceActor.toJSON();
@@ -878,6 +886,7 @@ export default {
       removeAE,
       keepAEOnlyOriginNotEquipment,
       transformTokens,
+      explicitName
     });
 
     /**
@@ -922,10 +931,10 @@ export default {
     // Prepare new data to merge from the source
     d = {
       type: originalActorData.type, // Remain the same actor type
-      name: `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
-      data: targetActorData.data, // Get the data model of your new form
-      items: targetActorData.items, // Get the items of your new form
-      effects: targetActorData.effects ? newEffects.concat(targetActorData.effects) : newEffects, // Combine active effects from both forms
+      name: explicitName ? explicitName : `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
+      data: keepSelf ? originalActorData.data : targetActorData.data, // Get the data model of your new form
+      items: keepSelf ? originalActorData.items : targetActorData.items, // Get the items of your new form
+      effects: keepSelf ? newEffects : (targetActorData.effects ? newEffects.concat(targetActorData.effects) : newEffects), // Combine active effects from both forms
       //@ts-ignore
       // effects: targetActorData.effects ? originalActorData.effects.concat(targetActorData.effects) : originalActorData.effects,
       img: targetActorData.img, // New appearance

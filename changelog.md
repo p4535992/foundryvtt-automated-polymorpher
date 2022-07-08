@@ -1,3 +1,10 @@
+### 1.0.41
+
+- Removed module setting 'storeonactor', now i always store on actor property with linked and unlinked token for sanity purpose of the code
+- Add socketLib function for invoke 'tranformInto' and revertOriginalFrom' and bypass all permission issue
+- If the polymorph is the type 'alter/disguise self' remove everything from the target actor
+- Try to bug fix: [[BUG] Polymorpher not working anymore](https://github.com/p4535992/foundryvtt-automated-polymorpher/issues/13)
+
 ### 1.0.39-40
 
 - Bug fix settings of flags

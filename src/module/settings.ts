@@ -53,14 +53,14 @@ export const registerSettings = function () {
     type: Boolean,
     default: true,
   });
-  game.settings.register(CONSTANTS.MODULE_NAME, 'storeonactor', {
-    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.title`),
-    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.hint`),
-    scope: 'world',
-    config: true,
-    type: Boolean,
-    default: false,
-  });
+  // game.settings.register(CONSTANTS.MODULE_NAME, 'storeonactor', {
+  //   name: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.title`),
+  //   hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.hint`),
+  //   scope: 'world',
+  //   config: true,
+  //   type: Boolean,
+  //   default: false,
+  // });
   game.settings.register(CONSTANTS.MODULE_NAME, 'hidebutton', {
     name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hidebutton.title`),
     hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hidebutton.hint`),
@@ -372,14 +372,14 @@ function otherSettings(apply = false) {
       type: Boolean,
       default: true,
     },
-    storeonactor: {
-      name: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.title`),
-      hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.hint`),
-      scope: 'world',
-      config: true,
-      type: Boolean,
-      default: false,
-    },
+    // storeonactor: {
+    //   name: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.title`),
+    //   hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.storeonactor.hint`),
+    //   scope: 'world',
+    //   config: true,
+    //   type: Boolean,
+    //   default: false,
+    // },
     hidebutton: {
       name: i18n(`${CONSTANTS.MODULE_NAME}.settings.hidebutton.title`),
       hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.hidebutton.hint`),
