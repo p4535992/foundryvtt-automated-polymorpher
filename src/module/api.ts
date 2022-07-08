@@ -53,7 +53,7 @@ const API = {
       targetActorId,
       targetActorName,
       transformOptions,
-      renderSheet,
+      renderSheet
     ] = inAttributes;
 
     const sourceToken = canvas.tokens?.placeables.find((t) => {
@@ -345,7 +345,7 @@ const API = {
     transformOptions: TransformOptionsGeneric,
     renderSheet: boolean,
   ): Promise<any> {
-    return automatedPolymorpherSocket.executeAsGM('transformInto', [
+    return automatedPolymorpherSocket.executeAsGM('transformInto',
       sourceToken.id,
       sourceActor.id,
       sourceActor.name,
@@ -353,16 +353,16 @@ const API = {
       targetActor.name,
       transformOptions,
       renderSheet,
-    ]);
+    );
   },
 
   async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean) {
-    return automatedPolymorpherSocket.executeAsGM('revertOriginalForm', [
+    return automatedPolymorpherSocket.executeAsGM('revertOriginalForm', 
       sourceToken.id,
       sourceActor.id,
       sourceActor.name,
       renderSheet,
-    ]);
+    );
   },
 
   async transformIntoImpl(

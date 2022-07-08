@@ -17,7 +17,7 @@ import { initHooks, readyHooks, setupHooks } from './module/module';
 import { registerSettings } from './module/settings';
 import CONSTANTS from './module/constants';
 import type API from './module/api';
-import { log } from './module/lib/lib';
+import { error, log } from './module/lib/lib';
 
 /* ------------------------------------ */
 /* Initialize module					*/
@@ -55,14 +55,23 @@ Hooks.once('setup', function () {
 Hooks.once('ready', () => {
   // Do anything once the module is ready
   if (!game.modules.get('sequencer')?.active && game.user?.isGM) {
-    ui.notifications?.error(
+    error(
       `The '${CONSTANTS.MODULE_NAME}' module requires to install and activate the 'sequencer' module.`,
+      true,
     );
     return;
   }
   if (!game.modules.get('warpgate')?.active && game.user?.isGM) {
-    ui.notifications?.error(
+    error(
       `The '${CONSTANTS.MODULE_NAME}' module requires to install and activate the 'warpgate' module.`,
+      true,
+    );
+    return;
+  }
+  if (!game.modules.get('socketlib')?.active && game.user?.isGM) {
+    error(
+      `The '${CONSTANTS.MODULE_NAME}' module requires to install and activate the 'socketlib' module.`,
+      true,
     );
     return;
   }

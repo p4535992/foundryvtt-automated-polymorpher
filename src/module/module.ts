@@ -9,6 +9,8 @@ import { setApi } from '../automated-polymorpher';
 export const initHooks = () => {
   warn('Init Hooks processing');
   Hooks.once('socketlib.ready', registerSocket);
+  // TODO not enter on socketlib.ready
+  registerSocket();
 };
 
 export const setupHooks = () => {

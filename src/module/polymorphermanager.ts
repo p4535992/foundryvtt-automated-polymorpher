@@ -28,7 +28,7 @@ export class PolymorpherManager extends FormApplication {
       id: 'polymorpherManager',
       template: `modules/${CONSTANTS.MODULE_NAME}/templates/polymorphermanager.hbs`,
       resizable: true,
-      width: 400,
+      width: 700,
       height: window.innerHeight > 400 ? 400 : window.innerHeight - 100,
       dragDrop: [{ dragSelector: null, dropSelector: null }],
     };
@@ -244,12 +244,11 @@ export class PolymorpherManager extends FormApplication {
   }
 
   async _onOpenSheet(event) {
-    const actorId = event.currentTarget.parentElement.dataset.aid;
-    const actorName = event.currentTarget.parentElement.dataset.aname;
-    // TODO ADD SOME CHECK FOR NO LINKED ACTOR ?
-    const actorFromTransform = <Actor>game.actors?.contents.find((a) => {
-      return a.id === actorId || a.name === actorName;
-    });
+    const aId = event.currentTarget.parentElement.dataset.aid;
+    const aName = event.currentTarget.parentElement.dataset.aname;
+    const aCompendiumId = event.currentTarget.dataset.acompendiumid;
+    const aExplicitName = event.currentTarget.dataset.aexplicitname;
+    const actorFromTransform = await retrieveActorFromData(aId,aName,aCompendiumId);
     if (actorFromTransform) {
       actorFromTransform.sheet?.render(true);
     }
@@ -331,8 +330,8 @@ export class PolymorpherManager extends FormApplication {
         class="polymorpher-item"
         data-aid="${actorToTransformLi.id}"
         data-aname="${actorToTransformLi.name}"
-        data-acompendiumid="${data.compendiumid}"
-        data-aexplicitname="${data.explicitname}"
+        data-acompendiumid="${data.compendiumid ?? ''}"
+        data-aexplicitname="${data.explicitname ?? actorToTransformLi.name}"
         data-elid="${actorToTransformLi.id}"
         draggable="true">
 
@@ -356,7 +355,7 @@ export class PolymorpherManager extends FormApplication {
             name="explicitname"
             class="explicitname"
             type="text"
-            value=">${data.explicitname ?? actorToTransformLi.data.name}"/>
+            value="${data.explicitname ?? actorToTransformLi.data.name}"/>
         <select class="anim-dropdown">
             ${this.getAnimations(data.animation)}
         </select>
@@ -747,7 +746,9 @@ export class SimplePolymorpherManager extends PolymorpherManager {
 
     html.on('click', '#summon-polymorpher', this._onSummonPolymorpher.bind(this));
     html.on('click', '.actor-name', this._onOpenSheet.bind(this));
+    // TODO maybe i don't need these
     html.on('change', '#explicitname', this._onChangeExplicitName.bind(this));
+    html.on('input', '#explicitname', this._onChangeExplicitName.bind(this));
   }
 
   async _onDrop(event) {
