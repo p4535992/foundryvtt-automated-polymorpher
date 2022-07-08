@@ -345,3 +345,80 @@ export function _getRootActorData(actorDoc: Actor) {
 
   return actorData;
 }
+
+// TODO TO INTEGRATE FOR TRANSFER
+export function transferItemsActor(
+  sourceActor: Actor,
+  targetActor: Actor,
+  originalItemId: string,
+  createdItem: Item,
+  originalQuantity: number,
+  transferedQuantity: number,
+  stackItems: boolean,
+) {
+  const originalItem = sourceActor?.items.get(originalItemId);
+  if (originalItem == undefined) {
+    console.error('Could not find the source item', originalItemId);
+    return;
+  }
+
+  if (transferedQuantity > 0 && transferedQuantity <= originalQuantity) {
+    const newOriginalQuantity = originalQuantity - transferedQuantity;
+    let stacked = false; // will be true if a stack of item has been found and items have been stacked in it
+    if (stackItems) {
+      const potentialStacks = <Item[]>(
+        targetActor?.data.items.filter(
+          (i) => i.name == originalItem.name && diffObject(createdItem, i) && i.data._id !== createdItem.data._id,
+        )
+      );
+      if (potentialStacks.length >= 1) {
+        //@ts-ignore
+        const newQuantity = <number>potentialStacks[0].data.data.quantity + transferedQuantity;
+        potentialStacks[0]?.update({ 'data.quantity': newQuantity });
+        // deleteItemIfZero(targetSheet, <string>createdItem.data._id);
+        stacked = true;
+      }
+    }
+
+    originalItem.update({ 'data.quantity': newOriginalQuantity }).then((i: Item) => {
+      const sh = <FormApplication<FormApplicationOptions, FormApplication.Data<{}, FormApplicationOptions>>>(
+        i.actor?.sheet
+      );
+      //@ts-ignore
+      deleteItemIfZero(<ActorSheet>sh, <string>i.data._id);
+    });
+    if (stacked === false) {
+      //@ts-ignore
+      createdItem.data.data.quantity = transferedQuantity;
+      targetActor?.createEmbeddedDocuments('Item', [<any>createdItem.data]);
+    }
+  } else {
+    error('could not transfer ' + transferedQuantity + ' items', true);
+  }
+}
+
+export function transferPermissionsActor(sourceActor: Actor, targetActor: Actor) {
+  // let sourceActor = //actor to copy the permissions from
+  // let targetActor = //actor to copy the permissions to
+
+  // The important part is the {diff:false, recursive: false},
+  // which ensures that any undefined parts of the permissions object
+  // are not filled in by the existing permissions on the target actor
+
+  // For a straight duplicate of permissions, you should be able to just do:
+  targetActor.update({ permission: _getHandPermission(sourceActor) }, { diff: false, recursive: false });
+}
+
+//this method is on the actor, so "this" is the actor document
+function _getHandPermission(actor: Actor) {
+  const handPermission = <any>duplicate(actor.data.permission);
+  for (const key of Object.keys(handPermission)) {
+    //remove any permissions that are not owner
+    if (handPermission[key] < CONST.DOCUMENT_PERMISSION_LEVELS.OWNER) {
+      delete handPermission[key];
+    }
+    //set default permission to limited/observer
+    handPermission.default = CONST.DOCUMENT_PERMISSION_LEVELS.LIMITED; // CONST.DOCUMENT_PERMISSION_LEVELS.OBSERVER
+  }
+  return handPermission;
+}

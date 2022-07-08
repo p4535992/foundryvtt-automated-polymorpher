@@ -35,6 +35,8 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 - Sadly i have to create a temprary actor for save the data of the polymorphed acotr (just like dnd5e do now), but everything is going by the plan you didn't notice because i automatically delete the actor when you revert the polymorphing, in the worst case scenario you can just go to delete the actor the standard way.
 - Sadly i cannot understand a strange beahviour with warpgater after the mutation the mutated token is still linked to the original actor, i try everything, but it still show the original actor sheet. You can test the behaviour enabling the module settings 'Force use of Warpgate' Here a video of the problem:
 ![img](./wiki/bug_warpgate_1.gif)
+- If you add or remove items on the polymorphed actor the "revert" action wil simply delete the actor without transfer any items, so beware about it
+- **At the moment the warpgate integration doesn't work**
 
 ## Installation
 
@@ -59,6 +61,7 @@ This module uses the [warpgate](https://github.com/trioderegion/warpgate) librar
 ### socketlib
 
 This module uses the [socketlib](https://github.com/manuelVo/foundryvtt-socketlib) library for wrapping core methods. It is a hard dependency and it is recommended for the best experience and compatibility with other modules.
+
 ### advanced-macros (optional)
 
 This module uses the [advanced-macros](https://github.com/League-of-Foundry-Developers/fvtt-advanced-macros) library. It is a optional dependency and it is recommended for the best experience and compatibility with other modules.
@@ -66,6 +69,14 @@ This module uses the [advanced-macros](https://github.com/League-of-Foundry-Deve
 **NOTE: you need this only for the custom macro feature, i don't suggest it is much easier to create the actors and set them up, with the drag and drop but it's up to you**
 
 ## Features 
+
+## Integration wit 'Warpgate'
+
+When the module setting  'Force use of Warpgate' is enabled , we tried to se the warpgate module for mutate the actor.
+You must understand the things:
+
+- Warpgate is a high level module and can be cusomized in many way
+- Warpgate let you mutate the token without the need to create a temporary actor like in the standard behaviour
 
 ## Token configuration panel
 
@@ -87,12 +98,6 @@ After adding actor to the window you will have some options:
 Then you interact with the standard panel of the Polymorph (if the system is dnd5e)
 
 ![image](./wiki/Image3.png)
-
-## Store polymorphers on actor
-
-By default polymorphers are stored per user (so each actor will have the same summon list). If you want a particular actor to have it's own summon list you can use the included macro to switch the actor from global storage to local (on the actor). Simply place a linked actor on the scene, select it and run the macro. Using the other macro to switch it to global again will not wipe the saved polymorphers so setting it to local at a later date will restore the previous list.
-
-For more advanced users you can set the flag with the following command : `actor.setFlag('automated-polymorpher','storeonactor', false)` (set true\false to enable disable the store on actor)
 
 ## Token HUD fast click
 

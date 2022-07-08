@@ -248,7 +248,7 @@ export class PolymorpherManager extends FormApplication {
     const aName = event.currentTarget.parentElement.dataset.aname;
     const aCompendiumId = event.currentTarget.dataset.acompendiumid;
     const aExplicitName = event.currentTarget.dataset.aexplicitname;
-    const actorFromTransform = await retrieveActorFromData(aId,aName,aCompendiumId);
+    const actorFromTransform = await retrieveActorFromData(aId, aName, aCompendiumId);
     if (actorFromTransform) {
       actorFromTransform.sheet?.render(true);
     }
@@ -355,7 +355,7 @@ export class PolymorpherManager extends FormApplication {
             name="explicitname"
             class="explicitname"
             type="text"
-            value="${data.explicitname ?? actorToTransformLi.data.name}"/>
+            value="${data.explicitname ?? actorToTransformLi.data.name}"></input>
         <select class="anim-dropdown">
             ${this.getAnimations(data.animation)}
         </select>

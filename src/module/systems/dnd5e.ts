@@ -8,7 +8,7 @@ import type { PropertiesToSource } from '@league-of-foundry-developers/foundry-v
 import { ANIMATIONS } from '../animations';
 import { PolymorpherData, PolymorpherFlags, TransformOptionsGeneric } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
-import { debug, i18n, info, log, wait, warn } from '../lib/lib';
+import { debug, i18n, info, log, transferPermissionsActor, wait, warn } from '../lib/lib';
 
 export default {
   /**
@@ -371,18 +371,29 @@ export default {
           getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
         );
         setProperty(updates.token.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-
+        setProperty(
+          updates.token.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+          arrayMutationNames,
+        );
+        // NEDDED FOR WARPGATE ????
         //@ts-ignore
-        // if (!updates.actor.data.flags) {
-        //   setProperty(updates.actor.data, `flags`, {});
-        // }
-        // setProperty(
-        //   //@ts-ignore
-        //   updates.actor.data.flags,
-        //   `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-        //   getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
-        // );
-        // setProperty(updates.actor.data, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+        if (!updates.actor.data.flags) {
+          setProperty(updates.actor.data, `flags`, {});
+        }
+        setProperty(
+          //@ts-ignore
+          updates.actor.data.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
+          getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
+        );
+        setProperty(
+          //@ts-ignore
+          updates.actor.data.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+          getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`),
+        );
+        setProperty(updates.actor.data, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
         // ======================================================================================
 
         // TODO show on chat ?
@@ -423,20 +434,31 @@ export default {
           getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
         );
         setProperty(newTokenData.token.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-
-        // if (!newTokenData.actor.data) {
-        //   setProperty(newTokenData.actor, `data`, {});
-        // }
-        // if (!newTokenData.actor.data.flags) {
-        //   setProperty(newTokenData.actor.data, `flags`, {});
-        // }
-        // setProperty(
-        //   //@ts-ignore
-        //   newTokenData.actor.data.flags,
-        //   `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-        //   getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
-        // );
-        // setProperty(newTokenData.actor.data, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+        setProperty(
+          newTokenData.token.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+          arrayMutationNames,
+        );
+        // NEDDED FOR WARPGATE ????
+        if (!newTokenData.actor.data) {
+          setProperty(newTokenData.actor, `data`, {});
+        }
+        if (!newTokenData.actor.data.flags) {
+          setProperty(newTokenData.actor.data, `flags`, {});
+        }
+        setProperty(
+          //@ts-ignore
+          newTokenData.actor.data.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
+          getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
+        );
+        setProperty(
+          //@ts-ignore
+          newTokenData.actor.data.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+          getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`),
+        );
+        setProperty(newTokenData.actor.data, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
         // =======================================================================================================
 
         // TODO show on chat ?
@@ -484,6 +506,11 @@ export default {
       const newActor = await sourceActor.constructor.create(d, { renderSheet: renderSheet });
       mergeObject(d.token, tokenBackup);
 
+      const originalActor = <Actor>(
+        game.actors?.get(<string>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
+      );
+      transferPermissionsActor(originalActor, newActor);
+
       // Update placed Token instances
       // if (!transformTokens) {
       //   return;
@@ -529,12 +556,6 @@ export default {
    */
   async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet = true) {
     const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate');
-    // if (!actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
-    //   return;
-    // }
-    // if (!actorThis.isOwner) {
-    //   return warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`), true);
-    // }
     if (!sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
       warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`), true);
       return;
@@ -555,7 +576,7 @@ export default {
     Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, sourceActor, renderSheet);
 
     const previousOriginalActorTokenData = <TokenData[]>(
-      sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+      sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
     );
     let isTheOriginalActor = false;
     if (!previousOriginalActorTokenData || previousOriginalActorTokenData.length <= 0) {
@@ -563,13 +584,13 @@ export default {
     }
     // Obtain a reference to the original actor
     const original = <Actor>(
-      game.actors?.get(<string>sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
+      game.actors?.get(<string>sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
     );
     if (!original) {
       if (!previousOriginalActorTokenData) {
         warn(
           game.i18n.format(`${CONSTANTS.MODULE_NAME}.polymorphRevertNoOriginalActorWarn`, {
-            reference: <string>sourceToken.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
+            reference: <string>sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR),
           }),
           true,
         );
@@ -592,7 +613,7 @@ export default {
 
         if (arrayMutationNames.length > 0) {
           for (const revertName of arrayMutationNames) {
-            info(`${sourceToken.actor.name} reverts to their original form`);
+            info(`${sourceToken.actor?.name} reverts to their original form`);
             // TODO show on chat ?
             //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
             //@ts-ignore
