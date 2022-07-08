@@ -1,12 +1,14 @@
+import type { ActorDataBaseProperties } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/actorData';
 import type {
   ActorData,
   PrototypeTokenData,
   TokenData,
 } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs';
+import type { PropertiesToSource } from '@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes';
 import { ANIMATIONS } from '../animations';
 import { PolymorpherData, PolymorpherFlags, TransformOptionsGeneric } from '../automatedPolymorpherModels';
 import CONSTANTS from '../constants';
-import { i18n, info, wait, warn } from '../lib/lib';
+import { debug, i18n, info, log, transferPermissionsActor, wait, warn } from '../lib/lib';
 
 export default {
   /**
@@ -30,6 +32,7 @@ export default {
    * @property {boolean} [removeAE=false]        Remove active effects
    * @property {boolean} [keepAEOnlyOriginNotEquipment=false] Keep only active effects which origin is not equipment
    * @property {boolean} [transformTokens=true]  Transform linked tokens too
+   * @property {string} [explicitName]  Explicit name for generated actor
    */
   polymorphSettings: {
     keepPhysical: false,
@@ -48,6 +51,7 @@ export default {
     removeAE: false,
     keepAEOnlyOriginNotEquipment: false,
     transformTokens: true,
+    explicitName: '',
   },
 
   /**
@@ -67,9 +71,11 @@ export default {
     keepItems: `${CONSTANTS.MODULE_NAME}.polymorphKeepItems`,
     keepBio: `${CONSTANTS.MODULE_NAME}.polymorphKeepBio`,
     keepVision: `${CONSTANTS.MODULE_NAME}.polymorphKeepVision`,
-    keepSelf: `${CONSTANTS.MODULE_NAME}.pPolymorphKeepSelf`,
+    keepSelf: `${CONSTANTS.MODULE_NAME}.polymorphKeepSelf`,
     removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
     keepAEOnlyOriginNotEquipment: `${CONSTANTS.MODULE_NAME}.polymorphKeepAEOnlyOriginNotEquipment`,
+    transformTokens: `${CONSTANTS.MODULE_NAME}.polymorphTransformTokens`,
+    explicitName: `${CONSTANTS.MODULE_NAME}.polymorphExplicitName`,
   },
 
   /**
@@ -365,18 +371,29 @@ export default {
           getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
         );
         setProperty(updates.token.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-
+        setProperty(
+          updates.token.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+          arrayMutationNames,
+        );
+        // NEDDED FOR WARPGATE ????
         //@ts-ignore
-        // if (!updates.actor.data.flags) {
-        //   setProperty(updates.actor.data, `flags`, {});
-        // }
-        // setProperty(
-        //   //@ts-ignore
-        //   updates.actor.data.flags,
-        //   `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-        //   getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
-        // );
-        // setProperty(updates.actor.data, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+        if (!updates.actor.data.flags) {
+          setProperty(updates.actor.data, `flags`, {});
+        }
+        setProperty(
+          //@ts-ignore
+          updates.actor.data.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
+          getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
+        );
+        setProperty(
+          //@ts-ignore
+          updates.actor.data.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+          getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`),
+        );
+        setProperty(updates.actor.data, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
         // ======================================================================================
 
         // TODO show on chat ?
@@ -417,20 +434,31 @@ export default {
           getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
         );
         setProperty(newTokenData.token.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-
-        // if (!newTokenData.actor.data) {
-        //   setProperty(newTokenData.actor, `data`, {});
-        // }
-        // if (!newTokenData.actor.data.flags) {
-        //   setProperty(newTokenData.actor.data, `flags`, {});
-        // }
-        // setProperty(
-        //   //@ts-ignore
-        //   newTokenData.actor.data.flags,
-        //   `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-        //   getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
-        // );
-        // setProperty(newTokenData.actor.data, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+        setProperty(
+          newTokenData.token.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+          arrayMutationNames,
+        );
+        // NEDDED FOR WARPGATE ????
+        if (!newTokenData.actor.data) {
+          setProperty(newTokenData.actor, `data`, {});
+        }
+        if (!newTokenData.actor.data.flags) {
+          setProperty(newTokenData.actor.data, `flags`, {});
+        }
+        setProperty(
+          //@ts-ignore
+          newTokenData.actor.data.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
+          getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
+        );
+        setProperty(
+          //@ts-ignore
+          newTokenData.actor.data.flags,
+          `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+          getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`),
+        );
+        setProperty(newTokenData.actor.data, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
         // =======================================================================================================
 
         // TODO show on chat ?
@@ -478,6 +506,11 @@ export default {
       const newActor = await sourceActor.constructor.create(d, { renderSheet: renderSheet });
       mergeObject(d.token, tokenBackup);
 
+      const originalActor = <Actor>(
+        game.actors?.get(<string>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
+      );
+      transferPermissionsActor(originalActor, newActor);
+
       // Update placed Token instances
       // if (!transformTokens) {
       //   return;
@@ -523,12 +556,6 @@ export default {
    */
   async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet = true) {
     const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate');
-    // if (!actorThis.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
-    //   return;
-    // }
-    // if (!actorThis.isOwner) {
-    //   return warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`), true);
-    // }
     if (!sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
       warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`), true);
       return;
@@ -586,7 +613,7 @@ export default {
 
         if (arrayMutationNames.length > 0) {
           for (const revertName of arrayMutationNames) {
-            info(`${sourceToken.actor.name} reverts to their original form`);
+            info(`${sourceToken.actor?.name} reverts to their original form`);
             // TODO show on chat ?
             //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
             //@ts-ignore
@@ -679,7 +706,13 @@ export default {
     return original;
   },
 
-  async renderDialogTransformOptions(sourceToken: Token, sourceActor: Actor, targetActor: Actor, animation: string) {
+  async renderDialogTransformOptions(
+    sourceToken: Token,
+    sourceActor: Actor,
+    targetActor: Actor,
+    explicitName: string,
+    animation: string,
+  ) {
     const tokenUpdatesToTransform = await targetActor.getTokenData();
 
     // Define a function to record polymorph settings for future use
@@ -764,6 +797,7 @@ export default {
                   mergeSaves: true,
                   mergeSkills: true,
                   transformTokens: rememberOptions(html).transformTokens,
+                  explicitName: explicitName,
                 },
                 false,
               );
@@ -794,6 +828,7 @@ export default {
                 targetActor,
                 {
                   transformTokens: rememberOptions(html).transformTokens,
+                  explicitName: explicitName,
                 },
                 false,
               );
@@ -810,6 +845,7 @@ export default {
                 {
                   keepSelf: true,
                   transformTokens: rememberOptions(html).transformTokens,
+                  explicitName: explicitName,
                 },
                 false,
               ),
@@ -851,6 +887,7 @@ export default {
     const removeAE = transformOptions?.removeAE || false;
     const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
     const transformTokens = transformOptions?.transformTokens || true;
+    const explicitName = transformOptions?.explicitName || '';
 
     // Get the original Actor data and the new source data
     // const originalActorData = <any>sourceActor.toJSON();
@@ -876,6 +913,7 @@ export default {
       removeAE,
       keepAEOnlyOriginNotEquipment,
       transformTokens,
+      explicitName,
     });
 
     /**
@@ -920,10 +958,14 @@ export default {
     // Prepare new data to merge from the source
     d = {
       type: originalActorData.type, // Remain the same actor type
-      name: `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
-      data: targetActorData.data, // Get the data model of your new form
-      items: targetActorData.items, // Get the items of your new form
-      effects: targetActorData.effects ? newEffects.concat(targetActorData.effects) : newEffects, // Combine active effects from both forms
+      name: explicitName ? explicitName : `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
+      data: keepSelf ? originalActorData.data : targetActorData.data, // Get the data model of your new form
+      items: keepSelf ? originalActorData.items : targetActorData.items, // Get the items of your new form
+      effects: keepSelf
+        ? newEffects
+        : targetActorData.effects
+        ? newEffects.concat(targetActorData.effects)
+        : newEffects, // Combine active effects from both forms
       //@ts-ignore
       // effects: targetActorData.effects ? originalActorData.effects.concat(targetActorData.effects) : originalActorData.effects,
       img: targetActorData.img, // New appearance
@@ -996,6 +1038,7 @@ export default {
       }
 
       // Transfer skills
+      //@ts-ignore
       if (
         //@ts-ignore
         originalActorData.data.skills &&
@@ -1118,192 +1161,4 @@ export default {
 
     return d;
   },
-
-  // =====================================================================
-
-  // async createWildShapeBuff(actorThis:Actor, itemData) {
-  //     const data = await this.toPolymorphBuff(itemData, "wildshape");
-
-  //     if (data._id) delete data._id;
-  //     //@ts-ignore
-  //     await actorThis.createEmbeddedEntity("Item", data);
-  // },
-
-  // async createPolymorphBuff(itemData, type) {
-  //     const data = await this.toPolymorphBuff(itemData, "polymorph");
-
-  //     if (data._id) delete data._id;
-  //     //@ts-ignore
-  //     await actorThis.createEmbeddedEntity("Item", data);
-  // },
-
-  // async createAlterSelfBuff(itemData, type) {
-  //     const data = await this.toPolymorphBuff(itemData, "alter-self");
-
-  //     if (data._id) delete data._id;
-  //     //@ts-ignore
-  //     await actorThis.createEmbeddedEntity("Item", data);
-  // },
-
-  // async createLycantrophyBuff(itemData, type) {
-  //     const data = await this.toPolymorphBuff(itemData, "lycantrophy");
-
-  //     if (data._id) delete data._id;
-  //     //@ts-ignore
-  //     await actorThis.createEmbeddedEntity("Item", data);
-  // },
-
-  // async toPolymorphBuff(origData:ActorData, polymorphdata:Actor, type:string) {
-  //     //@ts-ignore
-  //     /*
-  //     let data = duplicate(game.system.template.Item.buff);
-  //     for (const t of data.templates) {
-  //          //@ts-ignore
-  //         mergeObject(data, duplicate(game.system.template.Item.templates[t]));
-  //     }
-  //     delete data.templates;
-  //     data = await this.polymorphBuffFromActor(data, origData, type)
-  //     return data;
-  //     */
-  //     return await this.polymorphBuffFromActor(polymorphdata, origData, type);
-  // },
-
-  // async polymorphBuffFromActor(data:Actor, origData:Actor,type) {
-
-  //     data = {
-  //         type: "buff",
-  //         name: origData.name,
-  //         img: origData.img,
-  //         data: data,
-  //     };
-
-  //     data.data.shapechange = {source: origData, type:type}
-  //     data.data.buffType = "shapechange";
-  //     data.data.sizeOverride = origData.data.traits.size;
-
-  //     data.data.changes = []
-  //     data.data.changes.push(
-  //         ...(origData.items.find(i => i.type === "class")?.data?.changes || [])
-  //     )
-  //     if (type === "polymorph" || type === "wildshape") {
-  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.abilities.str.total")}`, "ability", "str", "replace", getProperty(origData, "data.abilities.str.total")]]) // Strength
-  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.abilities.dex.total")}`, "ability", "dex", "replace", getProperty(origData, "data.abilities.dex.total")]]) // Dexterity
-  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.abilities.con.total")}`, "ability", "con", "replace", getProperty(origData, "data.abilities.con.total")]]) // Constitution
-  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.land.total")}`, "speed", "landSpeed", "replace", getProperty(origData, "data.attributes.speed.land.total")]])
-  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.climb.total")}`, "speed", "climbSpeed", "replace", getProperty(origData, "data.attributes.speed.climb.total")]])
-  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.swim.total")}`, "speed", "swimSpeed", "replace", getProperty(origData, "data.attributes.speed.swim.total")]])
-  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.burrow.total")}`, "speed", "burrowSpeed", "replace", getProperty(origData, "data.attributes.speed.burrow.total")]])
-  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.speed.fly.total")}`, "speed", "flySpeed", "replace", getProperty(origData, "data.attributes.speed.fly.total")]])
-  //         data.data.changes = data.data.changes.concat([[`${getProperty(origData, "data.attributes.naturalACTotal")}`, "ac", "nac", "base", getProperty(origData, "data.attributes.naturalACTotal")]])
-  //     }
-
-  //     data.data.activateActions = []
-  //     if (type === "wildshape") {
-  //         data.data.activateActions = data.data.activateActions.concat([{
-  //             "name": "Activate Wildshape",
-  //             "action": "Condition set wildshaped to true on self",
-  //             "condition": "",
-  //             "img": ""
-  //         },{
-  //             "name": "Set Portrait",
-  //             "action": `Update set data.shapechangeImg to ${origData.data.tokenImg} on self`,
-  //             "condition": "",
-  //             "img": ""
-  //         },{
-  //             "name": "Meld weapons",
-  //             "action": "Set attack * field data.melded to true on self; Set weapon * field data.melded to true on self; Set equipment * field data.melded to true on self",
-  //             "condition": "",
-  //             "img": ""
-  //         }])
-  //     } else if (type === "polymorph") {
-  //         data.data.activateActions = data.data.activateActions.concat([ {
-  //             "name": "Activate Polymorph",
-  //             "action": "Condition set polymorph to true on self",
-  //             "condition": "",
-  //             "img": ""
-  //         },{
-  //             "name": "Set Portrait",
-  //             "action": `Update set data.shapechangeImg to ${origData.data.tokenImg} on self`,
-  //             "condition": "",
-  //             "img": ""
-  //         },{
-  //             "name": "Meld weapons",
-  //             "action": "Set attack:natural * field data.melded to true on self;",
-  //             "condition": "",
-  //             "img": ""
-  //         }])
-  //     } else if (type === "alter-self") {
-  //         data.data.activateActions = data.data.activateActions.concat([{
-  //             "name": "Set Portrait",
-  //             "action": `Update set data.shapechangeImg to ${origData.data.tokenImg} on self`,
-  //             "condition": "",
-  //             "img": ""
-  //         }])
-  //     }
-
-  //     data.data.deactivateActions = []
-
-  //     if (type === "wildshape") {
-  //         data.data.deactivateActions = data.data.deactivateActions.concat([{
-  //             "name": "Deactivate Wildshape",
-  //             "action": "Condition set wildshaped to false on self",
-  //             "condition": "",
-  //             "img": ""
-  //         },{
-  //             "name": "Unmeld weapons",
-  //             "action": "Set attack * field data.melded to false on self; Set weapon * field data.melded to false on self; Set equipment * field data.melded to false on self",
-  //             "condition": "",
-  //             "img": ""
-  //         },{
-  //             "name": "Set Portrait",
-  //             "action": `Update set data.shapechangeImg to icons/svg/mystery-man.svg on self`,
-  //             "condition": "",
-  //             "img": ""
-  //         }])
-  //     } else if (type === "polymorph") {
-  //         data.data.deactivateActions = data.data.deactivateActions.concat([ {
-  //             "name": "Deactivate Polymorph",
-  //             "action": "Condition set polymorph to false on self",
-  //             "condition": "",
-  //             "img": ""
-  //         },{
-  //             "name": "Unmeld weapons",
-  //             "action": "Set attack:natural * field data.melded to false on self;",
-  //             "condition": "",
-  //             "img": ""
-  //         },{
-  //             "name": "Set Portrait",
-  //             "action": `Update set data.shapechangeImg to icons/svg/mystery-man.svg on self`,
-  //             "condition": "",
-  //             "img": ""
-  //         }])
-  //     } else if (type === "alter-self") {
-  //         data.data.deactivateActions = data.data.deactivateActions.concat([{
-  //             "name": "Set Portrait",
-  //             "action": `Update set data.shapechangeImg to icons/svg/mystery-man.svg on self`,
-  //             "condition": "",
-  //             "img": ""
-  //         }])
-  //     }
-
-  //     // Speedlist
-  //     const speedDesc = []
-  //     for (const speedKey of Object.keys(origData.data.attributes.speed)) {
-  //         if (getProperty(origData, `data.attributes.speed.${speedKey}.total`) > 0) {
-  //             //@ts-ignore
-  //             speedDesc.push(speedKey.charAt(0).toUpperCase() + speedKey.slice(1) + " " + getProperty(origData, `data.attributes.speed.${speedKey}.total`) + " ft.")
-  //         }
-  //     }
-
-  //     // Set description
-  //     data.data.description.value = await renderTemplate("systems/D35E/templates/internal/shapechange-description.html", {
-  //         size: game.i18n.localize(CONFIG.D35E.actorSizes[origData.data.traits.size]),
-  //         type: origData.data.details.type,
-  //         speed: speedDesc.join(', '),
-  //         str: origData.data.abilities.str.total,
-  //         dex: origData.data.abilities.dex.total,
-  //         con: origData.data.abilities.con.total,
-  //     });
-  //     return data;
-  // }
 };

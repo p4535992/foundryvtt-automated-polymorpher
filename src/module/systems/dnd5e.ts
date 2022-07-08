@@ -71,7 +71,7 @@ export default {
     keepItems: `${CONSTANTS.MODULE_NAME}.polymorphKeepItems`,
     keepBio: `${CONSTANTS.MODULE_NAME}.polymorphKeepBio`,
     keepVision: `${CONSTANTS.MODULE_NAME}.polymorphKeepVision`,
-    keepSelf: `${CONSTANTS.MODULE_NAME}.pPolymorphKeepSelf`,
+    keepSelf: `${CONSTANTS.MODULE_NAME}.polymorphKeepSelf`,
     removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
     keepAEOnlyOriginNotEquipment: `${CONSTANTS.MODULE_NAME}.polymorphKeepAEOnlyOriginNotEquipment`,
     transformTokens: `${CONSTANTS.MODULE_NAME}.polymorphTransformTokens`,

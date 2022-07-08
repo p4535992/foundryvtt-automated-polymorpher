@@ -417,8 +417,8 @@ function _getHandPermission(actor: Actor) {
     if (handPermission[key] < CONST.DOCUMENT_PERMISSION_LEVELS.OWNER) {
       delete handPermission[key];
     }
-    //set default permission to limited/observer
-    handPermission.default = CONST.DOCUMENT_PERMISSION_LEVELS.LIMITED; // CONST.DOCUMENT_PERMISSION_LEVELS.OBSERVER
+    //set default permission to none/limited/observer
+    handPermission.default = CONST.DOCUMENT_PERMISSION_LEVELS.NONE; // CONST.DOCUMENT_PERMISSION_LEVELS.OBSERVER
   }
   return handPermission;
 }

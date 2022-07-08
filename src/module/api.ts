@@ -212,10 +212,16 @@ const API = {
       }
 
       const polyData = listPolymorphers.find((a) => {
-        return lastElement.toLowerCase().includes(a.name.toLowerCase());
+        return (
+          lastElement.toLowerCase().includes(a.name.toLowerCase()) ||
+          lastElement.toLowerCase().includes(a.explicitname.toLowerCase())
+        );
       });
       const polyDataIndex = listPolymorphers.findIndex((a) => {
-        return lastElement.toLowerCase().includes(a.name.toLowerCase());
+        return (
+          lastElement.toLowerCase().includes(a.name.toLowerCase()) ||
+          lastElement.toLowerCase().includes(a.explicitname.toLowerCase())
+        );
       });
 
       const animation = polyData?.animation;
@@ -263,7 +269,10 @@ const API = {
           );
         } else {
           const polyDataIndex = listPolymorphers.findIndex((a) => {
-            return lastElement.toLowerCase().includes(a.name.toLowerCase());
+            return (
+              lastElement.toLowerCase().includes(a.name.toLowerCase()) ||
+              lastElement.toLowerCase().includes(a.explicitname.toLowerCase())
+            );
           });
           let randomIndex = 0;
           while (randomIndex === polyDataIndex) {
@@ -276,7 +285,10 @@ const API = {
         }
       } else if (isOrdered) {
         const polyDataIndex = listPolymorphers.findIndex((a) => {
-          return lastElement.toLowerCase().includes(a.name.toLowerCase());
+          return (
+            lastElement.toLowerCase().includes(a.name.toLowerCase()) ||
+            lastElement.toLowerCase().includes(a.explicitname.toLowerCase())
+          );
         });
         const nextIndex = polyDataIndex + 1;
         if (listPolymorphers?.length - 1 < nextIndex) {
@@ -437,15 +449,15 @@ const API = {
     animation: string,
   ): Promise<Dialog<DialogOptions>> {
     if (game.system.id === 'D35E') {
-      return await D35E.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
+      return await D35E.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
     } else if (game.system.id === 'dnd5e') {
       return await dnd5e.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
     } else if (game.system.id === 'pf1') {
-      return await pf1.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
+      return await pf1.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
     } else if (game.system.id === 'pf2e') {
-      return await pf2e.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
+      return await pf2e.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
     } else {
-      return await generic.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, animation);
+      return await generic.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
     }
   },
 };
