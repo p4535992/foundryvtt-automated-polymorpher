@@ -297,9 +297,9 @@ export class PolymorpherManager extends FormApplication {
       for (const polymorpher of data) {
         const aId = polymorpher.id;
         const aName = polymorpher.name;
-        const acompendiumid = polymorpher.compendiumid;
-        const aexplicitname = polymorpher.explicitname;
-        const actorToTransformLi = await retrieveActorFromData(aId, aName, acompendiumid);
+        const aCompendiumId = polymorpher.compendiumid;
+        const aExplicitName = polymorpher.explicitname;
+        const actorToTransformLi = await retrieveActorFromData(aId, aName, aCompendiumId);
         if (!actorToTransformLi) {
           warn(`No actor founded for the token with id/name '${polymorpher.name}'`, true);
           continue;
@@ -406,17 +406,14 @@ export class PolymorpherManager extends FormApplication {
         number: <number>$(polymorpher).find('#polymorpher-number-val').val(),
         defaultsummontype: <string>$(polymorpher).find('.defaultSummonType').val(),
         compendiumid: <string>polymorpher.dataset.acompendiumid,
-        explicitname: <string>polymorpher.dataset.aexplicitname,
+        explicitname: <string>$(polymorpher).find('.explicitname').val(),
       });
     }
 
     const isOrdered = <string>this.element.parent().find('.polymorpher-ordered').val() === 'true' ?? false;
     const isRandom = <string>this.element.parent().find('.polymorpher-random').val() === 'true' ?? false;
-    const explicitname = <string>this.element.parent().find('.explicitname').val();
     // const isStoreonactor = <string>this.element.parent().find('.polymorpher-storeonactor').val() === 'true' ?? false;
-
     const currentCompendium = <string>this.element.parent().find('.polymorpher-selectcompendium').val();
-
     if (isRandom && isOrdered) {
       warn(`Attention you can't enable the 'ordered' and the 'random' both at the same time`);
     }
@@ -450,7 +447,7 @@ export class PolymorpherManager extends FormApplication {
             number: <number>$(polymorpher).find('#polymorpher-number-val').val(),
             defaultsummontype: <string>$(polymorpher).find('.defaultSummonType').val(),
             compendiumid: <string>currentCompendium,
-            explicitname: <string>explicitname,
+            explicitname: <string>$(polymorpher).find('.explicitname').val(),
           });
         }
       }
