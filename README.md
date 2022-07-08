@@ -131,6 +131,7 @@ Invoke the polymorpher manager feature from macro
 | removePolymorpher | <code>boolean</code> | This action should revert the polymorpher if the current token is polymorphed | <code>false</code> |
 | ordered | <code>boolean</code> | The 'ordered' feature is enabled for this polymorphing | <code>false</code> |
 | random | <code>boolean</code> | The 'random' feature is enabled for this polymorphing | <code>0</code> |
+| explicitName | <code>string</code> | The explicit name to assign to the target actor | <code></code> |
 | animationExternal | <code>{ sequence:Sequence, timeToWait:number }</code> | Advanced: Use your personal sequence animation and the time needed to wait before the polymorph action, checkout the [Sequencer module](https://github.com/fantasycalendar/FoundryVTT-Sequencer) for more information  | <code>undefined</code> |
 
 **NOTE:** If both 'random' and 'ordered' are false the standard dialog will be rendered.
@@ -187,6 +188,7 @@ Invoke the polymorpher manager feature from macro
 | removePolymorpher | <code>boolean</code> | This action should revert the polymorpher if the current token is polymorphed | <code>false</code> |
 | ordered | <code>boolean</code> | The 'ordered' feature is enabled for this polymorphing | <code>false</code> |
 | random | <code>boolean</code> | The 'random' feature is enabled for this polymorphing | <code>0</code> |
+| explicitName | <code>string</code> | The explicit name to assign to the target actor | <code></code> |
 | animationExternal | <code>{ sequence:Sequence, timeToWait:number }</code> | Advanced: Use your personal sequence animation and the time needed to wait before the polymorph action, checkout the [Sequencer module](https://github.com/fantasycalendar/FoundryVTT-Sequencer) for more information  | <code>undefined</code> |
 
 **NOTE:** If both 'random' and 'ordered' are false the standard dialog will be rendered.
