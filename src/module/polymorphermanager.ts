@@ -162,7 +162,7 @@ export class PolymorpherManager extends FormApplication {
             number: 0,
             defaultsummontype: '',
             compendiumid: '',
-            explicitname: ''
+            explicitname: '',
           },
           actorToTransformLi,
         ),
@@ -213,7 +213,13 @@ export class PolymorpherManager extends FormApplication {
       PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
       updatesForRevert,
     );
-    const dialog = await API.renderDialogTransformOptionsImpl(tokenFromTransform, this.actor, actorToTransform, aExplicitName,animation);
+    const dialog = await API.renderDialogTransformOptionsImpl(
+      tokenFromTransform,
+      this.actor,
+      actorToTransform,
+      aExplicitName,
+      animation,
+    );
     if (game.settings.get(CONSTANTS.MODULE_NAME, 'autoclose')) {
       this.close();
     } else {
@@ -249,12 +255,14 @@ export class PolymorpherManager extends FormApplication {
     }
   }
 
-  async _onChangeExplicitName(event){
+  async _onChangeExplicitName(event) {
     const explicitName = event.currentTarget.parentElement.dataset.aexplicitname;
     // Tretrieve attribute data-aexplicitname on the warpgate button
-    $(event.currentTarget.parentElement.find('.warpgate-btn').each(function(){
-      $(this).attr('data-aexplicitname',explicitName);
-    }));
+    $(
+      event.currentTarget.parentElement.find('.warpgate-btn').each(function () {
+        $(this).attr('data-aexplicitname', explicitName);
+      }),
+    );
   }
 
   async loadPolymorphers() {
@@ -338,7 +346,7 @@ export class PolymorpherManager extends FormApplication {
             data-aid="${actorToTransformLi.id}"
             data-aname="${actorToTransformLi.name}"
             data-acompendiumid="${data.compendiumid}"
-            data-aexplicitname="${data.explicitname  ?? actorToTransformLi.name}"
+            data-aexplicitname="${data.explicitname ?? actorToTransformLi.name}"
             data-elid="${actorToTransformLi.id}">
           </div>
         </div>
@@ -585,7 +593,7 @@ export class PolymorpherManager extends FormApplication {
           keepBio: false,
           keepVision: true,
           transformTokens: true,
-          explicitName: aExplicitName
+          explicitName: aExplicitName,
         },
         false,
       );
@@ -622,7 +630,7 @@ export class PolymorpherManager extends FormApplication {
           mergeSaves: true,
           mergeSkills: true,
           transformTokens: true,
-          explicitName: aExplicitName
+          explicitName: aExplicitName,
         },
         false,
       );
@@ -666,7 +674,7 @@ export class PolymorpherManager extends FormApplication {
           keepBio: false,
           keepVision: true,
           transformTokens: true,
-          explicitName: aExplicitName
+          explicitName: aExplicitName,
         },
         false,
       );
@@ -699,7 +707,7 @@ export class PolymorpherManager extends FormApplication {
         <any>{
           keepSelf: true,
           transformTokens: true,
-          explicitName: aExplicitName
+          explicitName: aExplicitName,
         },
         false,
       );

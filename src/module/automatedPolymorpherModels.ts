@@ -48,7 +48,7 @@ export class PolymorpherData {
   number: number;
   defaultsummontype: string;
   compendiumid: string;
-  explicitname:string;
+  explicitname: string;
 }
 
 export class PolymorpherCompendiumData {
@@ -74,7 +74,7 @@ export class TransformOptionsGeneric {
   removeAE = false;
   keepAEOnlyOriginNotEquipment = false;
   transformTokens = true;
-  explicitName = ''
+  explicitName = '';
 }
 
 /* pf2e */

@@ -42,14 +42,21 @@ const API = {
     return result;
   },
 
-
   async transformIntoArr(...inAttributes) {
     if (!Array.isArray(inAttributes)) {
       throw error('transformIntoArr | inAttributes must be of type array');
     }
-    const [sourceTokenId,sourceActorId,sourceActorName,targetActorId,targetActorName,transformOptions,renderSheet] = inAttributes;
+    const [
+      sourceTokenId,
+      sourceActorId,
+      sourceActorName,
+      targetActorId,
+      targetActorName,
+      transformOptions,
+      renderSheet,
+    ] = inAttributes;
 
-    const sourceToken = canvas.tokens?.placeables.find((t)=>{
+    const sourceToken = canvas.tokens?.placeables.find((t) => {
       return t.id === sourceTokenId;
     });
 
@@ -58,50 +65,48 @@ const API = {
     const polymoprhers: PolymorpherData[] =
       <PolymorpherData[]>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
 
-    const currentPolymorph = <PolymorpherData>polymoprhers.find((p) =>{
+    const currentPolymorph = <PolymorpherData>polymoprhers.find((p) => {
       return p.id === targetActorId || p.name === targetActorName;
     });
 
-    const targetActor = await retrieveActorFromData(currentPolymorph?.id, currentPolymorph?.name , currentPolymorph?.compendiumid);
-    if(!sourceToken){
+    const targetActor = await retrieveActorFromData(
+      currentPolymorph?.id,
+      currentPolymorph?.name,
+      currentPolymorph?.compendiumid,
+    );
+    if (!sourceToken) {
       warn(`No source token found with reference '${sourceTokenId}'`, true);
       return;
     }
-    if(!sourceActor){
+    if (!sourceActor) {
       warn(`No source actor found with reference '${sourceTokenId}'`, true);
       return;
     }
-    if(!targetActor){
+    if (!targetActor) {
       warn(`No target actor found with reference '${sourceTokenId}'`, true);
       return;
     }
 
-    return this.transformIntoImpl(
-      sourceToken,
-      sourceActor,
-      targetActor,
-      transformOptions,
-      renderSheet);
-
+    return this.transformIntoImpl(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
   },
 
   async revertOriginalFormArr(...inAttributes) {
     if (!Array.isArray(inAttributes)) {
       throw error('revertOriginalFormArr | inAttributes must be of type array');
     }
-    const [sourceTokenId,sourceActorId,sourceActorName,renderSheet] = inAttributes;
+    const [sourceTokenId, sourceActorId, sourceActorName, renderSheet] = inAttributes;
 
-    const sourceToken = canvas.tokens?.placeables.find((t)=>{
+    const sourceToken = canvas.tokens?.placeables.find((t) => {
       return t.id === sourceTokenId;
     });
 
     const sourceActor = <Actor>await retrieveActorFromData(sourceActorId, '', '');
 
-    if(!sourceToken){
+    if (!sourceToken) {
       warn(`No source token found with reference '${sourceTokenId}'`, true);
       return;
     }
-    if(!sourceActor){
+    if (!sourceActor) {
       warn(`No source actor found with reference '${sourceTokenId}'`, true);
       return;
     }
@@ -151,15 +156,22 @@ const API = {
       warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
       return;
     }
-    this._invokePolymorpherManagerInner(sourceToken, sourceActor, removePolymorpher, ordered, random, animationExternal);
+    this._invokePolymorpherManagerInner(
+      sourceToken,
+      sourceActor,
+      removePolymorpher,
+      ordered,
+      random,
+      animationExternal,
+    );
   },
 
   async _invokePolymorpherManagerInner(
     currentToken: Token,
     currentActor: Actor,
-    removePolymorpher:boolean,
-    ordered:boolean,
-    random:boolean,
+    removePolymorpher: boolean,
+    ordered: boolean,
+    random: boolean,
     animationExternal: { sequence: undefined; timeToWait: 0 } | undefined = undefined,
   ): Promise<void> {
     const listPolymorphers: PolymorpherData[] =
@@ -333,16 +345,24 @@ const API = {
     transformOptions: TransformOptionsGeneric,
     renderSheet: boolean,
   ): Promise<any> {
-
-    return automatedPolymorpherSocket.executeAsGM('transformInto',
-      [sourceToken.id, sourceActor.id,sourceActor.name,targetActor.id,targetActor.name,transformOptions,renderSheet]);
-
+    return automatedPolymorpherSocket.executeAsGM('transformInto', [
+      sourceToken.id,
+      sourceActor.id,
+      sourceActor.name,
+      targetActor.id,
+      targetActor.name,
+      transformOptions,
+      renderSheet,
+    ]);
   },
 
   async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean) {
-
-    return automatedPolymorpherSocket.executeAsGM('revertOriginalForm',
-      [sourceToken.id, sourceActor.id,sourceActor.name,renderSheet]);
+    return automatedPolymorpherSocket.executeAsGM('revertOriginalForm', [
+      sourceToken.id,
+      sourceActor.id,
+      sourceActor.name,
+      renderSheet,
+    ]);
   },
 
   async transformIntoImpl(

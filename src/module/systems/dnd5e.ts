@@ -51,7 +51,7 @@ export default {
     removeAE: false,
     keepAEOnlyOriginNotEquipment: false,
     transformTokens: true,
-    explicitName: ''
+    explicitName: '',
   },
 
   /**
@@ -685,7 +685,13 @@ export default {
     return original;
   },
 
-  async renderDialogTransformOptions(sourceToken: Token, sourceActor: Actor, targetActor: Actor, explicitName:string, animation: string) {
+  async renderDialogTransformOptions(
+    sourceToken: Token,
+    sourceActor: Actor,
+    targetActor: Actor,
+    explicitName: string,
+    animation: string,
+  ) {
     const tokenUpdatesToTransform = await targetActor.getTokenData();
 
     // Define a function to record polymorph settings for future use
@@ -770,7 +776,7 @@ export default {
                   mergeSaves: true,
                   mergeSkills: true,
                   transformTokens: rememberOptions(html).transformTokens,
-                  explicitName: explicitName
+                  explicitName: explicitName,
                 },
                 false,
               );
@@ -801,7 +807,7 @@ export default {
                 targetActor,
                 {
                   transformTokens: rememberOptions(html).transformTokens,
-                  explicitName: explicitName
+                  explicitName: explicitName,
                 },
                 false,
               );
@@ -818,7 +824,7 @@ export default {
                 {
                   keepSelf: true,
                   transformTokens: rememberOptions(html).transformTokens,
-                  explicitName: explicitName
+                  explicitName: explicitName,
                 },
                 false,
               ),
@@ -886,7 +892,7 @@ export default {
       removeAE,
       keepAEOnlyOriginNotEquipment,
       transformTokens,
-      explicitName
+      explicitName,
     });
 
     /**
@@ -934,7 +940,11 @@ export default {
       name: explicitName ? explicitName : `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
       data: keepSelf ? originalActorData.data : targetActorData.data, // Get the data model of your new form
       items: keepSelf ? originalActorData.items : targetActorData.items, // Get the items of your new form
-      effects: keepSelf ? newEffects : (targetActorData.effects ? newEffects.concat(targetActorData.effects) : newEffects), // Combine active effects from both forms
+      effects: keepSelf
+        ? newEffects
+        : targetActorData.effects
+        ? newEffects.concat(targetActorData.effects)
+        : newEffects, // Combine active effects from both forms
       //@ts-ignore
       // effects: targetActorData.effects ? originalActorData.effects.concat(targetActorData.effects) : originalActorData.effects,
       img: targetActorData.img, // New appearance

@@ -48,19 +48,13 @@ export function registerSocket() {
     API.invokePolymorpherManagerFromActorArr(...args),
   );
 
-
   automatedPolymorpherSocket.register('invokePolymorpherManagerFromActor', (...args) =>
     API.invokePolymorpherManagerFromActorArr(...args),
   );
 
+  automatedPolymorpherSocket.register('transformInto', (...args) => API.transformIntoArr(...args));
 
-  automatedPolymorpherSocket.register('transformInto', (...args) =>
-    API.transformIntoArr(...args),
-  );
-
-  automatedPolymorpherSocket.register('revertOriginalForm', (...args) =>
-    API.revertOriginalFormArr(...args),
-  );
+  automatedPolymorpherSocket.register('revertOriginalForm', (...args) => API.revertOriginalFormArr(...args));
 
   /**
    * UI sockets
