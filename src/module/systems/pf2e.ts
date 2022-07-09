@@ -668,41 +668,42 @@ export default {
           await canvas.scene?.updateEmbeddedDocuments('Token', [update]);
         }
         // Delete the polymorphed version of the actor, if possible
-        // if (game.user?.isGM) {
-        const idsToDelete = <string[]>[];
-        idsToDelete.push(<string>sourceActor.id);
-        const othersActorsToDelete = <TokenData[]>(
-          sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-        );
-        othersActorsToDelete.reverse();
-        for (const td of othersActorsToDelete) {
-          if (
-            td.actorId &&
-            !idsToDelete.includes(td.actorId) &&
-            td.actorId != original.id &&
-            game.actors?.get(td.actorId)
-          ) {
-            idsToDelete.push(td.actorId);
+        if (!game.settings.get(CONSTANTS.MODULE_NAME, 'doNotDeleteTmpActors')) {
+          const idsToDelete = <string[]>[];
+          idsToDelete.push(<string>sourceActor.id);
+          const othersActorsToDelete = <TokenData[]>(
+            sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+          );
+          othersActorsToDelete.reverse();
+          for (const td of othersActorsToDelete) {
+            if (
+              td.actorId &&
+              !idsToDelete.includes(td.actorId) &&
+              td.actorId != original.id &&
+              game.actors?.get(td.actorId)
+            ) {
+              idsToDelete.push(td.actorId);
+            }
           }
-        }
-        const idsActorToDelete = <string[]>[];
-        for (const id of idsToDelete) {
-          const actorToDelete = game.actors?.get(id);
-          if (actorToDelete) {
-            info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
-            if (actorToDelete.name != original.name) {
-              // await actorToDelete.delete();
-              if (!idsActorToDelete.includes(actorToDelete.id)) {
-                idsActorToDelete.push(actorToDelete.id);
+          const idsActorToDelete = <string[]>[];
+          for (const id of idsToDelete) {
+            const actorToDelete = game.actors?.get(id);
+            if (actorToDelete) {
+              info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
+              if (actorToDelete.name != original.name) {
+                // await actorToDelete.delete();
+                if (!idsActorToDelete.includes(actorToDelete.id)) {
+                  idsActorToDelete.push(actorToDelete.id);
+                }
               }
             }
           }
+          if (idsActorToDelete.length > 0) {
+            Actor.deleteDocuments(idsActorToDelete);
+          }
+          // await actorThis.delete();
+          // }
         }
-        if (idsActorToDelete.length > 0) {
-          Actor.deleteDocuments(idsActorToDelete);
-        }
-        // await actorThis.delete();
-        // }
       }
 
       const isRendered = sourceActor.sheet?.rendered;

@@ -12,6 +12,8 @@
 
 ### If you want to buy me a coffee [![alt-text](https://img.shields.io/badge/-Patreon-%23ff424d?style=for-the-badge)](https://www.patreon.com/p4535992)
 
+# [BETA] Due to several issues that I cannot solve (details on the github project), the module has been categorized as beta, there is an open commission on the league server for anyone interested.
+
 # THIS MODULE IS LOOKING FOR A NEW ACTIVE DEVELOPER
 
 A user interface to manage the polymorph feature of Dnd5e with summoning animations.
@@ -36,7 +38,7 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 - Sadly i cannot understand a strange beahviour with warpgater after the mutation the mutated token is still linked to the original actor, i try everything, but it still show the original actor sheet. You can test the behaviour enabling the module settings 'Force use of Warpgate' Here a video of the problem:
 ![img](./wiki/bug_warpgate_1.gif)
 - If you add or remove items on the polymorphed actor the "revert" action wil simply delete the actor without transfer any items, so beware about it
-- **At the moment the warpgate integration doesn't work**
+- **At the moment the warpgate integration doesn't work, so don't use**
 
 ## Installation
 

@@ -49,62 +49,82 @@
     "settings": {
       "storeonactor": {
         "title": "Store Polymorphers on Actor",
+        "name": "Store Polymorphers on Actor",
         "hint": "Store the polymorphers on the actor instead of the token by default."
       },
       "enableautomations": {
         "title": "Enable Automations",
+        "name": "Enable Automations",
         "hint": "Enable the polymorpher automation system on spellcast."
       },
       "autoclose": {
         "title": "Auto-Close",
+        "name": "Auto-Close",
         "hint": "Automatically close the polymorpher window after summoning."
       },
       "hidebutton": {
         "title": "Hide Polymorpher Button",
+        "name": "Hide Polymorpher Button",
         "hint": "Hide the polymorpher button on the character sheet."
       },
       "restrictOwned": {
         "title": "Only Owned Actors",
+        "name": "Only Owned Actors",
         "hint": "Restrict the polymorpher list to only show owned polymorphers actors."
       },
       "restrictOnlyGM": {
         "title": "Only GM can see Polymorpher button",
+        "name": "Only GM can see Polymorpher button",
         "hint": "Restrict the polymorpher list to GMs only"
       },
       "removeLabelSheetHeader": {
         "title": "Remove label from sheet header button",
+        "name": "Remove label from sheet header button",
         "hint": "Remove label from sheet header button useful for small monitor, tablet"
       },
       "hudColumn": {
         "title": "HUD Column",
+        "name": "HUD Column",
         "hint": "Which HUD column to place the button in"
       },
       "hudTopBottom": {
         "title": "HUD Top/Bottom",
+        "name": "HUD Top/Bottom",
         "hint": "Where to place the button in the column"
       },
       "hudEnable": {
         "title": "Enable token HUD feature",
+        "name": "Enable token HUD feature",
         "hint": "Avoid the rendering of the polymorpher manager for fast polymorphing when click on the hud button. All the entities with a 'default summon type' setted on the token/actor configuration, will let you avoid the rendering of the polymorpher manager, can be really useful for fast combat, there two options 'random' and 'ordered' you can't enable both. Remember you must own the token for see the HUD button"
       },
       "hudColorButton": {
         "title": "Color button for the 'Polymorphing' button",
+        "name": "Color button for the 'Polymorphing' button",
         "hint": "Choose what color to use for the 'Polymorphing' button"
       },
       "hudColorButtonRestoreTransformation": {
         "title": "Color button for the 'Restore Transformation'",
+        "name": "Color button for the 'Restore Transformation'",
         "hint": "Choose what color to use for the 'Restore Transformation'"
       },
       "forceUseOfWarpgate": {
         "title": "Force use of Warpgate",
+        "name": "Force use of Warpgate",
         "hint": "THE WARPGATE INTEGRATION HAS SOME ISSUE THERE IS A BOUNTY ON THE LEGUE SERVER FOR ANYONE INTERESTED. If enabled it will use the warpgate mutate function instead the system default mechanism."
       },
+      "doNotDeleteTmpActors": {
+        "title": "Do not delete temporary actors",
+        "name": "Do not delete temporary actors",
+        "hint": "Do not automatically delete temporary actors, useful if you want to take control of everything."
+      },
       "reset": {
+        "title": "Reset settings to default",
         "name": "Reset settings to default",
         "label": "Reset Settings To Default",
         "hint": "This will reset all of the settings of back to the active game system's default."
       },
       "debug": {
+        "title": "Enable debugging",
         "name": "Enable debugging",
         "label": "Prints debug messages to the console",
         "hint": " "

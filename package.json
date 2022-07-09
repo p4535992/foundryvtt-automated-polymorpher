@@ -2,8 +2,8 @@
   "private": true,
   "name": "automated-polymorpher",
   "title": "",
-  "description": "A user interface to manage polymorpher with summoning animations and automated summoning for spells",
-  "version": "1.0.41",
+  "description": "[BETA] A user interface to manage polymorpher with summoning animations and automated summoning for spells",
+  "version": "1.0.42",
   "scripts": {
     "package": "gulp package",
     "build": "gulp build && gulp link",

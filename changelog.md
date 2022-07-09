@@ -1,3 +1,10 @@
+### 1.0.42
+
+- Add header sheet button and context option for revert the transformation
+- Add code for transfer permission when create the new tmp actor
+- Add module setting for customize the color of the new 'Restore Transformation' button
+- Add module setitng for avoid to delete the temp actor if you want to do stuff
+
 ### 1.0.41
 
 - Removed module setting 'storeonactor', now i always store on actor property with linked and unlinked token for sanity purpose of the code

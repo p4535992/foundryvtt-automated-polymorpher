@@ -149,6 +149,15 @@ export const registerSettings = function () {
     config: true,
   });
 
+  game.settings.register(CONSTANTS.MODULE_NAME, 'doNotDeleteTmpActors', {
+    name: i18n(`${CONSTANTS.MODULE_NAME}.settings.doNotDeleteTmpActors.title`),
+    hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.doNotDeleteTmpActors.hint`),
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: false,
+  });
+
   game.settings.register(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate', {
     name: i18n(`${CONSTANTS.MODULE_NAME}.settings.forceUseOfWarpgate.title`),
     hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.forceUseOfWarpgate.hint`),
@@ -475,6 +484,15 @@ function otherSettings(apply = false) {
       type: String,
       default: '#d66460',
       config: true,
+    },
+
+    doNotDeleteTmpActors: {
+      name: i18n(`${CONSTANTS.MODULE_NAME}.settings.doNotDeleteTmpActors.title`),
+      hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.doNotDeleteTmpActors.hint`),
+      scope: 'world',
+      config: true,
+      type: Boolean,
+      default: false,
     },
 
     forceUseOfWarpgate: {
