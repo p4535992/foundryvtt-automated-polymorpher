@@ -504,6 +504,13 @@ export default {
       // Create new Actor with transformed data
       //@ts-ignore
       const newActor = await sourceActor.constructor.create(d, { renderSheet: renderSheet });
+      // Force this to be true
+      await newActor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
+      await newActor.setFlag(
+        CONSTANTS.MODULE_NAME,
+        PolymorpherFlags.ORIGINAL_ACTOR,
+        getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
+      );
       mergeObject(d.token, tokenBackup);
 
       const originalActor = <Actor>(
@@ -540,7 +547,17 @@ export default {
         return newTokenData;
       });
       //@ts-ignore
-      return canvas.scene?.updateEmbeddedDocuments('Token', updates);
+      const tokensFinal = <TokenDocument[]>await canvas.scene?.updateEmbeddedDocuments('Token', updates);
+      for (const tokenFinal of tokensFinal) {
+        // Force this to be true
+        await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
+        await tokenFinal.actor?.setFlag(
+          CONSTANTS.MODULE_NAME,
+          PolymorpherFlags.ORIGINAL_ACTOR,
+          getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`),
+        );
+      }
+      return tokensFinal;
     }
 
     /* run mutation and label it 'powermorph' */
@@ -692,6 +709,11 @@ export default {
         original.sheet?.render(isRendered);
       }
     } finally {
+      await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+      await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+      await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+
       await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
       await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
       await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
@@ -701,6 +723,11 @@ export default {
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
       await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+
+      await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+      await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+      await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+      await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
     }
 
     return original;

@@ -23,6 +23,7 @@
         "cancel": "Cancel"
       }
     },
+    "polymorphRestoreTransformationBtn": "Restore Transformation",
     "actorSheetBtn": "Polymorphers",
     "animations": {
       "fire": "Fire",
@@ -87,12 +88,16 @@
         "hint": "Avoid the rendering of the polymorpher manager for fast polymorphing when click on the hud button. All the entities with a 'default summon type' setted on the token/actor configuration, will let you avoid the rendering of the polymorpher manager, can be really useful for fast combat, there two options 'random' and 'ordered' you can't enable both. Remember you must own the token for see the HUD button"
       },
       "hudColorButton": {
-        "title": "HUD feature color button",
-        "hint": "Choose what color to use for the HUD button"
+        "title": "Color button for the 'Polymorphing' button",
+        "hint": "Choose what color to use for the 'Polymorphing' button"
+      },
+      "hudColorButtonRestoreTransformation": {
+        "title": "Color button for the 'Restore Transformation'",
+        "hint": "Choose what color to use for the 'Restore Transformation'"
       },
       "forceUseOfWarpgate": {
         "title": "Force use of Warpgate",
-        "hint": "If enabled it will use the warpgate mutate function instead the system default mechanism."
+        "hint": "THE WARPGATE INTEGRATION HAS SOME ISSUE THERE IS A BOUNTY ON THE LEGUE SERVER FOR ANYONE INTERESTED. If enabled it will use the warpgate mutate function instead the system default mechanism."
       },
       "reset": {
         "name": "Reset settings to default",
