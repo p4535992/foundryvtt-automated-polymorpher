@@ -181,7 +181,9 @@ export default {
     let previousTokenData =
       <TokenData[]>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) ||
       [];
-    const currentTokenData = await sourceActor.getTokenData();
+    // const currentTokenData = await sourceActor.getTokenData();
+    const currentTokenData = sourceToken.data;
+
     if (currentTokenData._id && previousTokenData.filter((z) => z._id === currentTokenData._id).length <= 0) {
       previousTokenData.push(currentTokenData);
       previousTokenData = previousTokenData.filter(
@@ -526,12 +528,20 @@ export default {
       // if (!transformTokens) {
       //   return;
       // }
-      let tokens = sourceActor.getActiveTokens(true);
-      if (!transformTokens) {
-        tokens = tokens.filter((t) => {
+      let tokens = <Token[]>[];
+      if (transformTokens) {
+        tokens = <Token[]>sourceActor.getActiveTokens(true);
+        if (!tokens || tokens.length == 0) {
+          tokens = sourceActor.getActiveTokens();
+        }
+        const tokensTmp = tokens.filter((t) => {
           //return actorUpdates.token.id === t.data._id;
-          return targetActorData._id === t.actor?.id;
+          //return targetActorData._id === t.actor?.id;
+          return sourceActor.id === t.actor?.id;
         });
+        tokens = tokensTmp;
+      } else {
+        tokens = [sourceToken];
       }
       const updates = tokens.map((t) => {
         const newTokenData = <TokenData>foundry.utils.deepClone(d.token);

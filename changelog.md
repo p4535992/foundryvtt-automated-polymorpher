@@ -1,7 +1,9 @@
 ### 1.0.43
 
-- Addswade system
-- Add check for avoid a arreo during the revert action
+- Add swade system
+- Add check for avoid a array during the revert action
+- Many bug fix
+- Add text field 'explicitName' on the dialog config custom
 
 ### 1.0.42
 

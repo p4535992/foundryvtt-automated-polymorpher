@@ -40,6 +40,46 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 - If you add or remove items on the polymorphed actor the "revert" action wil simply delete the actor without transfer any items, so beware about it
 - **At the moment the warpgate integration doesn't work, so don't use**
 
+## How contribute to your own multisystem
+
+I don't have time for check every system attributes and skill need help from the community for accomplish this, every system file has a method called `
+
+```
+  async prepareDataFromTransformOptions(
+    originalActorData: ActorData,
+    targetActorData: ActorData,
+    sourceEffects: any[],
+    targetActorImages: string[],
+    transformOptions: TransformOptionsGeneric,
+  ):Promise<any>
+```
+where usually as common values i use these:
+```
+const targetActorImages = await targetActor.getTokenImages();
+const sourceEffects = sourceToken.actor ? sourceToken.actor.effects : sourceToken.data.effects;
+const transformOptions = {
+  keepPhysical = false;
+  keepMental = false;
+  keepSaves = false;
+  keepSkills = false;
+  mergeSaves = false;
+  mergeSkills = false;
+  keepClass = false;
+  keepFeats = false;
+  keepSpells = false;
+  keepItems = false;
+  keepBio = false;
+  keepVision = false;
+  keepSelf = false;
+  removeAE = false;
+  keepAEOnlyOriginNotEquipment = false;
+  transformTokens = true;
+  explicitName = '';
+}
+```
+
+These settings should customized
+
 ## Installation
 
 It's always easiest to install modules from the in game add-on browser.
