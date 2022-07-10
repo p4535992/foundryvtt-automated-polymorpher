@@ -10,6 +10,7 @@ import dnd5e from './systems/dnd5e';
 import generic from './systems/generic';
 import pf1 from './systems/pf1';
 import pf2e from './systems/pf2e';
+import swade from './systems/swade';
 
 const API = {
   async invokePolymorpherManagerArr(...inAttributes: any[]) {
@@ -64,10 +65,22 @@ const API = {
 
     const polymoprhers: PolymorpherData[] =
       <PolymorpherData[]>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+    if (!polymoprhers) {
+      warn(
+        `No polymorph flags with id '${PolymorpherFlags.POLYMORPHERS}' is been found!  Usually this happened with unlinked token, sadly you need a linked actor to the token`,
+      );
+      return undefined;
+    }
 
     const currentPolymorph = <PolymorpherData>polymoprhers.find((p) => {
       return p.id === targetActorId || p.name === targetActorName;
     });
+    if (!currentPolymorph) {
+      warn(
+        `No polymoprher is been found! Usually this happened with unlinked token, sadly you need a linked actor to the token`,
+      );
+      return undefined;
+    }
 
     const targetActor = await retrieveActorFromData(
       currentPolymorph?.id,
@@ -415,6 +428,8 @@ const API = {
       return pf1.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
     } else if (game.system.id === 'pf2e') {
       return pf2e.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
+    } else if (game.system.id === 'swade') {
+      return swade.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
     } else {
       return generic.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
     }
@@ -436,6 +451,8 @@ const API = {
       return await pf1.revertOriginalForm(sourceToken, sourceActor, renderSheet);
     } else if (game.system.id === 'pf2e') {
       return await pf2e.revertOriginalForm(sourceToken, sourceActor, renderSheet);
+    } else if (game.system.id === 'swade') {
+      return await swade.revertOriginalForm(sourceToken, sourceActor, renderSheet);
     } else {
       return await generic.revertOriginalForm(sourceToken, sourceActor, renderSheet);
     }
@@ -456,6 +473,8 @@ const API = {
       return await pf1.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
     } else if (game.system.id === 'pf2e') {
       return await pf2e.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
+    } else if (game.system.id === 'swade') {
+      return await swade.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
     } else {
       return await generic.renderDialogTransformOptions(sourceToken, sourceActor, targetActor, explicitName, animation);
     }

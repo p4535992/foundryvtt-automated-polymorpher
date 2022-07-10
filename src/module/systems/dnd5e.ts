@@ -513,10 +513,14 @@ export default {
       );
       mergeObject(d.token, tokenBackup);
 
-      const originalActor = <Actor>(
+      let originalActor = <Actor>(
         game.actors?.get(<string>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
       );
-      transferPermissionsActor(originalActor, newActor);
+      // If no originalActorIsFounded it must be the orginal itself
+      if (!originalActor) {
+        originalActor = sourceActor;
+      }
+      await transferPermissionsActor(originalActor, newActor);
 
       // Update placed Token instances
       // if (!transformTokens) {
@@ -1029,15 +1033,30 @@ export default {
 
     // Specific additional adjustments
     //@ts-ignore
-    d.data.details.alignment = originalActorData.data.details.alignment; // Don't change alignment
+    if (originalActorData.data.details?.alignment) {
+      //@ts-ignore
+      d.data.details.alignment = originalActorData.data.details.alignment; // Don't change alignment
+    }
     //@ts-ignore
-    d.data.attributes.exhaustion = originalActorData.data.attributes.exhaustion; // Keep your prior exhaustion level
+    if (originalActorData.data.attributes.exhaustion) {
+      //@ts-ignore
+      d.data.attributes.exhaustion = originalActorData.data.attributes.exhaustion; // Keep your prior exhaustion level
+    }
     //@ts-ignore
-    d.data.attributes.inspiration = originalActorData.data.attributes.inspiration; // Keep inspiration
+    if (originalActorData.data.attributes.inspiration) {
+      //@ts-ignore
+      d.data.attributes.inspiration = originalActorData.data.attributes.inspiration; // Keep inspiration
+    }
     //@ts-ignore
-    d.data.spells = originalActorData.data.spells; // Keep spell slots
+    if (originalActorData.data.spells) {
+      //@ts-ignore
+      d.data.spells = originalActorData.data.spells; // Keep spell slots
+    }
     //@ts-ignore
-    d.data.attributes.ac.flat = targetActorData.data.attributes.ac.value; // Override AC
+    if (targetActorData.data.attributes.ac) {
+      //@ts-ignore
+      d.data.attributes.ac.flat = targetActorData.data.attributes.ac.value; // Override AC
+    }
 
     // Token appearance updates
     d.token = <PrototypeTokenData>{ name: d.name };
@@ -1133,34 +1152,35 @@ export default {
       }
 
       // Keep senses
-      if (!d.data.traits.senses) {
-        d.data.traits.senses = [];
-      } else if (typeof d.data.traits.senses === 'string' || d.data.traits.senses instanceof String) {
-        d.data.traits.senses = [
-          {
-            value: d.data.traits.senses,
-          },
-        ];
-      } else if (
-        typeof d.data.traits.senses === 'object' &&
-        !Array.isArray(d.data.traits.senses) &&
-        d.data.traits.senses !== null
-      ) {
-        d.data.traits.senses = [d.data.traits.senses];
-      }
+      if (d.data.traits) {
+        if (!d.data.traits.senses) {
+          d.data.traits.senses = [];
+        } else if (typeof d.data.traits.senses === 'string' || d.data.traits.senses instanceof String) {
+          d.data.traits.senses = [
+            {
+              value: d.data.traits.senses,
+            },
+          ];
+        } else if (
+          typeof d.data.traits.senses === 'object' &&
+          !Array.isArray(d.data.traits.senses) &&
+          d.data.traits.senses !== null
+        ) {
+          d.data.traits.senses = [d.data.traits.senses];
+        }
 
-      if (
-        //@ts-ignore
-        originalActorData.data.traits.senses &&
-        //@ts-ignore
-        (originalActorData.data.traits.senses.length > 0 || originalActorData.data.traits.senses.size > 0)
-      ) {
-        if (keepVision) {
+        if (
           //@ts-ignore
-          d.data.traits.senses = originalActorData.data.traits.senses;
+          originalActorData.data.traits.senses &&
+          //@ts-ignore
+          (originalActorData.data.traits.senses.length > 0 || originalActorData.data.traits.senses.size > 0)
+        ) {
+          if (keepVision) {
+            //@ts-ignore
+            d.data.traits.senses = originalActorData.data.traits.senses;
+          }
         }
       }
-
       // Not keep active effects
       if (removeAE && !keepAEOnlyOriginNotEquipment) {
         d.effects = [];

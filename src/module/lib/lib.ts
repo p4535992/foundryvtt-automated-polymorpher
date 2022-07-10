@@ -397,7 +397,7 @@ export function transferItemsActor(
   }
 }
 
-export function transferPermissionsActor(sourceActor: Actor, targetActor: Actor) {
+export async function transferPermissionsActor(sourceActor: Actor, targetActor: Actor): Promise<Actor> {
   // let sourceActor = //actor to copy the permissions from
   // let targetActor = //actor to copy the permissions to
 
@@ -406,7 +406,9 @@ export function transferPermissionsActor(sourceActor: Actor, targetActor: Actor)
   // are not filled in by the existing permissions on the target actor
 
   // For a straight duplicate of permissions, you should be able to just do:
-  targetActor.update({ permission: _getHandPermission(sourceActor) }, { diff: false, recursive: false });
+  return <Actor>(
+    await targetActor.update({ permission: _getHandPermission(sourceActor) }, { diff: false, recursive: false })
+  );
 }
 
 //this method is on the actor, so "this" is the actor document
