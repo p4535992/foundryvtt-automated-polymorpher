@@ -7,6 +7,13 @@
 			</label>
 		</div>
 	{{/each}}
+	<div>
+		<label class="text" for="explicitName">
+			<input type="text" id="explicitName" name="explicitName" placeholder="{{content.targetActorName}}"
+				value="{{content.targetActorName}}">
+			{{localize "automated-polymorpher.polymorphExplicitName"}}
+		</label>
+	</div>
 	{{#unless content.isToken}}
 	<hr>
 	<div>

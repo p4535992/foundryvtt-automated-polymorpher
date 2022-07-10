@@ -23,7 +23,7 @@ export default {
    * @property {boolean} [transformTokens=true]  Transform linked tokens too
    * @property {string} [explicitName]  Explicit name for generated actor
    */
-  polymorphSettings: {
+  polymorphSettings: <TransformOptionsGeneric>{
     keepVision: true,
     keepSelf: false,
     removeAE: false,
@@ -635,37 +635,43 @@ export default {
           await canvas.scene?.updateEmbeddedDocuments('Token', [update]);
         }
         // Delete the polymorphed version of the actor, if possible
-        if (!game.settings.get(CONSTANTS.MODULE_NAME,'doNotDeleteTmpActors')) {
+        if (!game.settings.get(CONSTANTS.MODULE_NAME, 'doNotDeleteTmpActors')) {
           const idsToDelete = <string[]>[];
           idsToDelete.push(<string>sourceActor.id);
           const othersActorsToDelete = <TokenData[]>(
             sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
           );
-          othersActorsToDelete.reverse();
-          for (const td of othersActorsToDelete) {
-            if (
-              td.actorId &&
-              !idsToDelete.includes(td.actorId) &&
-              td.actorId != original.id &&
-              game.actors?.get(td.actorId)
-            ) {
-              idsToDelete.push(td.actorId);
-            }
-          }
-          const idsActorToDelete = <string[]>[];
-          for (const id of idsToDelete) {
-            const actorToDelete = game.actors?.get(id);
-            if (actorToDelete) {
-              info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
-              // await actorToDelete.delete();
-              if (!idsActorToDelete.includes(actorToDelete.id)) {
-                idsActorToDelete.push(actorToDelete.id);
+          if (othersActorsToDelete && Array.isArray(othersActorsToDelete) && othersActorsToDelete.length > 0) {
+            othersActorsToDelete.reverse();
+            for (const td of othersActorsToDelete) {
+              if (
+                td.actorId &&
+                !idsToDelete.includes(td.actorId) &&
+                td.actorId != original.id &&
+                game.actors?.get(td.actorId)
+              ) {
+                idsToDelete.push(td.actorId);
               }
             }
+          } else {
+            warn(
+              `Invoked the revert to original, but no flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}' is been found or is empty`,
+            );
           }
-          Actor.deleteDocuments(idsActorToDelete);
-          // await actorThis.delete();
-          // }
+          if (idsToDelete.length > 0) {
+            const idsActorToDelete = <string[]>[];
+            for (const id of idsToDelete) {
+              const actorToDelete = game.actors?.get(id);
+              if (actorToDelete) {
+                info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
+                // await actorToDelete.delete();
+                if (!idsActorToDelete.includes(actorToDelete.id)) {
+                  idsActorToDelete.push(actorToDelete.id);
+                }
+              }
+            }
+            Actor.deleteDocuments(idsActorToDelete);
+          }
         }
       }
 
@@ -713,13 +719,17 @@ export default {
     // Define a function to record polymorph settings for future use
     const rememberOptions = (html) => {
       const options = {};
-      html.find('input').each((i, el) => {
+      html.find('input[type=checkbox]').each((i, el) => {
         options[el.name] = el.checked;
       });
-      //const settings = mergeObject(<TransformOptionsDnd5e>game.settings.get(CONSTANTS.MODULE_NAME, "polymorphSettings") || {}, options);
+
+      html.find('input#explicitName').each((i, el) => {
+        options['explicitName'] = el.value;
+      });
+      //const settings = mergeObject(game.settings.get(CONSTANTS.MODULE_NAME, "polymorphSettings") || {}, options);
       //game.settings.set(CONSTANTS.MODULE_NAME, 'polymorphSettings', settings);
       // TODO findd a way to sav the custom settings on client side
-      const settings = mergeObject(this.polymorphSettings || {}, options);
+      const settings = <TransformOptionsGeneric>mergeObject(this.polymorphSettings || {}, options);
       return settings;
     };
 
@@ -738,6 +748,7 @@ export default {
           options: this.polymorphSettings,
           i18n: i18nPolymorphSettingsTmp,
           isToken: sourceActor.isToken,
+          targetActorName: explicitName ?? targetActor.name,
         },
         default: 'accept',
         buttons: {

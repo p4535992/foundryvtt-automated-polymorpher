@@ -1,3 +1,8 @@
+### 1.0.43
+
+- Addswade system
+- Add check for avoid a arreo during the revert action
+
 ### 1.0.42
 
 - Add header sheet button and context option for revert the transformation

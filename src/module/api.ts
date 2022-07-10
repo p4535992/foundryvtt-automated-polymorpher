@@ -214,15 +214,13 @@ const API = {
       const polyData = listPolymorphers.find((a) => {
         return (
           lastElement.toLowerCase().includes(a.name.toLowerCase()) ||
-          (a.explicitname && lastElement.toLowerCase().includes(a.explicitname.toLowerCase())
-          )
+          (a.explicitname && lastElement.toLowerCase().includes(a.explicitname.toLowerCase()))
         );
       });
       const polyDataIndex = listPolymorphers.findIndex((a) => {
         return (
           lastElement.toLowerCase().includes(a.name.toLowerCase()) ||
-          (a.explicitname && lastElement.toLowerCase().includes(a.explicitname.toLowerCase())
-          )
+          (a.explicitname && lastElement.toLowerCase().includes(a.explicitname.toLowerCase()))
         );
       });
 
@@ -273,8 +271,7 @@ const API = {
           const polyDataIndex = listPolymorphers.findIndex((a) => {
             return (
               lastElement.toLowerCase().includes(a.name.toLowerCase()) ||
-              (a.explicitname && lastElement.toLowerCase().includes(a.explicitname.toLowerCase())
-              )
+              (a.explicitname && lastElement.toLowerCase().includes(a.explicitname.toLowerCase()))
             );
           });
           let randomIndex = 0;
@@ -290,8 +287,7 @@ const API = {
         const polyDataIndex = listPolymorphers.findIndex((a) => {
           return (
             lastElement.toLowerCase().includes(a.name.toLowerCase()) ||
-            (a.explicitname && lastElement.toLowerCase().includes(a.explicitname.toLowerCase())
-            )
+            (a.explicitname && lastElement.toLowerCase().includes(a.explicitname.toLowerCase()))
           );
         });
         const nextIndex = polyDataIndex + 1;
