@@ -7,7 +7,7 @@
             class="polymorpher-random"
             type="checkbox"
             value="{{random}}"
-            {{#if random}}checked{{/if}}
+            {{#if random}} checked{{/if}}
             onclick="$(this).attr('value', this.checked ? true : false)"
         />
         <label>{{localize "automated-polymorpher.dialogs.ordered"}}</label>
@@ -17,7 +17,7 @@
             class="polymorpher-ordered"
             type="checkbox"
             value="{{ordered}}"
-            {{#if ordered}}checked{{/if}}
+            {{#if ordered}} checked{{/if}}
             onclick="$(this).attr('value', this.checked ? true : false)"
         />
         {{!--
