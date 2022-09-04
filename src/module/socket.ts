@@ -1,7 +1,7 @@
 import CONSTANTS from "./constants";
 import API from "./api";
 import { debug } from "./lib/lib";
-import { setSocket } from "../automated-polymorpher";
+import { setSocket } from "../main";
 
 export let automatedPolymorpherSocket;
 
