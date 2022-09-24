@@ -69,6 +69,14 @@ export const registerSettings = function () {
 		type: Boolean,
 		default: false,
 	});
+	game.settings.register(CONSTANTS.MODULE_NAME, "disableSettingsForNoGM", {
+		name: i18n(`${CONSTANTS.MODULE_NAME}.settings.disableSettingsForNoGM.title`),
+		hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.disableSettingsForNoGM.hint`),
+		scope: "world",
+		config: true,
+		type: Boolean,
+		default: true,
+	});
 	game.settings.register(CONSTANTS.MODULE_NAME, "restrictOwned", {
 		name: i18n(`${CONSTANTS.MODULE_NAME}.settings.restrictOwned.title`),
 		hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.restrictOwned.hint`),

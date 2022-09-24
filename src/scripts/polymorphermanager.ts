@@ -4,6 +4,7 @@ import API from "./api";
 import { PolymorpherData, PolymorpherFlags, PolymorpherCompendiumData } from "./automatedPolymorpherModels";
 import CONSTANTS from "./constants";
 import { error, i18n, info, retrieveActorFromData, wait, warn } from "./lib/lib";
+import { automatedPolymorpherSocket } from "./socket";
 
 export class PolymorpherManager extends FormApplication {
 	// caster: Actor;
@@ -71,6 +72,8 @@ export class PolymorpherManager extends FormApplication {
 			}
 		}
 		data.compendiums = compendiumsData;
+		const disable = game.settings.get(CONSTANTS.MODULE_NAME, "disableSettingsForNoGM") && !game.user?.isGM;
+		data.showoptionstogm = disable ? false : true;
 		return data;
 	}
 
@@ -131,6 +134,11 @@ export class PolymorpherManager extends FormApplication {
 	}
 
 	async _onDrop(event) {
+		const disable = game.settings.get(CONSTANTS.MODULE_NAME, "disableSettingsForNoGM") && !game.user?.isGM;
+		if (disable) {
+			warn(`Can't drop any actor while settings 'disableSettingsForNoGM' is enabled`, true);
+		}
+
 		let data;
 		try {
 			data = JSON.parse(event.dataTransfer.getData("text/plain"));
@@ -145,11 +153,11 @@ export class PolymorpherManager extends FormApplication {
 				target.before($(li));
 			}
 		}
-		if (!data?.type) {
-			// || data?.type !== 'Actor'){
-			return;
-		}
-		const actorToTransformLi = await retrieveActorFromData(data.id, data.name, "");
+		if (!data?.type) return;
+		//@ts-ignore
+		if (!data.type === "Actor") return;
+		const actorId = data.uuid ? data.uuid.replace("Actor.", "") : undefined;
+		const actorToTransformLi = await retrieveActorFromData(actorId, "", "", false);
 		if (actorToTransformLi) {
 			this.element.find("#polymorpher-list").append(
 				this.generateLi(
@@ -178,7 +186,17 @@ export class PolymorpherManager extends FormApplication {
 		const aName = event.currentTarget.dataset.aname;
 		const aCompendiumId = event.currentTarget.dataset.acompendiumid;
 		const aExplicitName = event.currentTarget.dataset.aexplicitname;
-		const actorToTransform = await retrieveActorFromData(aId, aName, aCompendiumId);
+		// const actorToTransform = await retrieveActorFromData(aId, aName, aCompendiumId, true);
+		const actorToTransformId = await automatedPolymorpherSocket.executeAsGM(
+			"retrieveAndPrepareActor",
+			aId,
+			aName,
+			aCompendiumId,
+			true,
+			this.actor.id,
+			game.user?.id
+		);
+		const actorToTransform = await retrieveActorFromData(actorToTransformId, undefined, undefined, false);
 		if (!actorToTransform) {
 			warn(
 				`The actor you try to polimorphing not exists anymore, please set up again the actor on the polymorpher manager`,
@@ -248,7 +266,7 @@ export class PolymorpherManager extends FormApplication {
 		const aName = event.currentTarget.parentElement.dataset.aname;
 		const aCompendiumId = event.currentTarget.dataset.acompendiumid;
 		const aExplicitName = event.currentTarget.dataset.aexplicitname;
-		const actorFromTransform = await retrieveActorFromData(aId, aName, aCompendiumId);
+		const actorFromTransform = await retrieveActorFromData(aId, aName, aCompendiumId, false);
 		if (actorFromTransform) {
 			actorFromTransform.sheet?.render(true);
 		}
@@ -306,7 +324,7 @@ export class PolymorpherManager extends FormApplication {
 				const aName = polymorpher.name;
 				const aCompendiumId = polymorpher.compendiumid;
 				const aExplicitName = polymorpher.explicitname;
-				const actorToTransformLi = await retrieveActorFromData(aId, aName, aCompendiumId);
+				const actorToTransformLi = await retrieveActorFromData(aId, aName, aCompendiumId, false);
 				if (!actorToTransformLi) {
 					warn(`No actor founded for the token with id/name '${polymorpher.name}'`, true);
 					continue;
@@ -322,7 +340,7 @@ export class PolymorpherManager extends FormApplication {
 		if (!actorToTransformLi) {
 			return "";
 		}
-
+		const disable = game.settings.get(CONSTANTS.MODULE_NAME, "disableSettingsForNoGM") && !game.user?.isGM;
 		const restricted = game.settings.get(CONSTANTS.MODULE_NAME, "restrictOwned");
 		if (restricted && !actorToTransformLi.isOwner) return "";
 		const $li = $(`
@@ -355,18 +373,20 @@ export class PolymorpherManager extends FormApplication {
             name="explicitname"
             class="explicitname"
             type="text"
+			${disable ? " readonly " : " "}
             value="${data.explicitname ?? actorToTransformLi.data.name}"></input>
-        <select class="anim-dropdown">
+        <select class="anim-dropdown" ${disable ? " disabled " : " "}>
             ${this.getAnimations(data.animation)}
         </select>
         <select
           id="automated-polymorpher.defaultSummonType"
           class="defaultSummonType" name="defaultSummonType"
           data-dtype="String"
-          is="ms-dropdown-ap">
+          is="ms-dropdown-ap" 
+		  ${disable ? " disabled " : " "}>
           ${this.getDefaultSummonTypes(data.defaultsummontype, data)}
         </select>
-        <i id="remove-polymorpher" class="fas fa-trash"></i>
+		${disable ? "" : '<i id="remove-polymorpher" class="fas fa-trash"></i>'}
       </li>`);
 		//    <i id="advanced-params" class="fas fa-edit"></i>
 		return $li;
@@ -493,7 +513,17 @@ export class PolymorpherManager extends FormApplication {
 		const aName = polymorpherData.name;
 		const aCompendiumId = polymorpherData.compendiumid;
 		const aExplicitName = polymorpherData.explicitname;
-		const actorToTransform = await retrieveActorFromData(aId, aName, aCompendiumId);
+		// const actorToTransform = await retrieveActorFromData(aId, aName, aCompendiumId, true);
+		const actorToTransformId = await automatedPolymorpherSocket.executeAsGM(
+			"retrieveAndPrepareActor",
+			aId,
+			aName,
+			aCompendiumId,
+			true,
+			this.actor.id,
+			game.user?.id
+		);
+		const actorToTransform = await retrieveActorFromData(actorToTransformId, undefined, undefined, false);
 		if (!actorToTransform) {
 			warn(
 				`The actor you try to polymorphism not exists anymore, please set up again the actor on the polymorpher manager`,
@@ -742,7 +772,7 @@ export class SimplePolymorpherManager extends PolymorpherManager {
 			const aId = summon.id;
 			const aName = summon.name;
 			const aCompendiumId = summon.compendiumid;
-			const actorToTransformLi = await retrieveActorFromData(aId, aName, aCompendiumId);
+			const actorToTransformLi = await retrieveActorFromData(aId, aName, aCompendiumId, false);
 			if (actorToTransformLi) {
 				this.element.find("#polymorpher-list").append(this.generateLi(summon, actorToTransformLi));
 			} else {
@@ -758,7 +788,10 @@ export class SimplePolymorpherManager extends PolymorpherManager {
 	}
 
 	async _onDrop(event) {
-		// DO NOTHING
+		const disable = game.settings.get(CONSTANTS.MODULE_NAME, "disableSettingsForNoGM") && !game.user?.isGM;
+		if (disable) {
+			warn(`Can't drop any actor while settings 'disableSettingsForNoGM' is enabled`, true);
+		}
 	}
 
 	close() {

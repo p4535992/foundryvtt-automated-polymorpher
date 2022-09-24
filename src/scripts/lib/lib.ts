@@ -9,6 +9,10 @@ import type { ActorData } from "@league-of-foundry-developers/foundry-vtt-types/
 // Module Generic function
 // =============================
 
+export function is_real_number(inNumber) {
+	return !isNaN(inNumber) && typeof inNumber === "number" && isFinite(inNumber);
+}
+
 export function isGMConnected(): boolean {
 	return Array.from(<Users>game.users).find((user) => user.isGM && user.active) ? true : false;
 }
@@ -282,48 +286,48 @@ export function retrieveActorFromToken(sourceToken: Token): Actor | undefined {
 	return actor;
 }
 
-export async function retrieveActorFromData(
-	aId: string,
-	aName: string,
-	currentCompendium: string
-): Promise<Actor | null> {
-	let actorToTransformLi: Actor | null = null;
-	if (currentCompendium && currentCompendium != "none" && currentCompendium != "nonenodelete") {
-		const pack = game.packs.get(currentCompendium);
-		if (pack) {
-			await pack.getIndex();
-			/*
-      for (const entityComp of pack.index) {
-        const actorComp = <Actor>await pack.getDocument(entityComp._id);
-        if (actorComp.id === aId || actorComp.name === aName) {
-          actorToTransformLi = actorComp;
-          break;
-        }
-      }
-      */
-			// If the actor is found in the index, return it by exact ID
-			if (pack.index.get(aId)) {
-				actorToTransformLi = <Actor>await pack.getDocument(aId);
-			}
-			// If not found, search for the actor by name
-			if (!actorToTransformLi) {
-				for (const entityComp of pack.index) {
-					const actorComp = <StoredDocument<Actor>>await pack.getDocument(entityComp._id);
-					if (actorComp.id === aId || actorComp.name === aName) {
-						actorToTransformLi = actorComp;
-						break;
-					}
-				}
-			}
-		}
-	}
-	if (!actorToTransformLi) {
-		actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
-			return a.id === aId || a.name === aName;
-		});
-	}
-	return actorToTransformLi;
-}
+// export async function retrieveActorFromData(
+// 	aId: string,
+// 	aName: string,
+// 	currentCompendium: string
+// ): Promise<Actor | null> {
+// 	let actorToTransformLi: Actor | null = null;
+// 	if (currentCompendium && currentCompendium != "none" && currentCompendium != "nonenodelete") {
+// 		const pack = game.packs.get(currentCompendium);
+// 		if (pack) {
+// 			await pack.getIndex();
+// 			/*
+//       for (const entityComp of pack.index) {
+//         const actorComp = <Actor>await pack.getDocument(entityComp._id);
+//         if (actorComp.id === aId || actorComp.name === aName) {
+//           actorToTransformLi = actorComp;
+//           break;
+//         }
+//       }
+//       */
+// 			// If the actor is found in the index, return it by exact ID
+// 			if (pack.index.get(aId)) {
+// 				actorToTransformLi = <Actor>await pack.getDocument(aId);
+// 			}
+// 			// If not found, search for the actor by name
+// 			if (!actorToTransformLi) {
+// 				for (const entityComp of pack.index) {
+// 					const actorComp = <StoredDocument<Actor>>await pack.getDocument(entityComp._id);
+// 					if (actorComp.id === aId || actorComp.name === aName) {
+// 						actorToTransformLi = actorComp;
+// 						break;
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+// 	if (!actorToTransformLi) {
+// 		actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
+// 			return a.id === aId || a.name === aName;
+// 		});
+// 	}
+// 	return actorToTransformLi;
+// }
 
 /* returns the actor data sans ALL embedded collections */
 export function _getRootActorData(actorDoc: Actor) {
@@ -400,23 +404,148 @@ export function transferItemsActor(
 	}
 }
 
-export async function transferPermissionsActor(sourceActor: Actor, targetActor: Actor): Promise<Actor> {
+export async function retrieveActorFromData(
+	aId,
+	aName,
+	currentCompendium,
+	createOnWorld = false
+): Promise<Actor | null> {
+	let actorToTransformLi: Actor | null = null;
+	if (!aId && !aName) {
+		return null;
+	}
+	actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
+		return a.id === aId || a.name === aName;
+	});
+	if (
+		!actorToTransformLi &&
+		currentCompendium &&
+		currentCompendium != "none" &&
+		currentCompendium != "nonenodelete"
+	) {
+		const pack = <any>game.packs.get(currentCompendium);
+		if (pack) {
+			await pack.getIndex();
+			// If the actor is found in the index, return it by exact ID
+			if (pack.index.get(aId)) {
+				actorToTransformLi = <Actor>await pack.getDocument(aId);
+			}
+			// If not found, search for the actor by name
+			if (!actorToTransformLi) {
+				for (const entityComp of pack.index) {
+					const actorComp = <Actor>await pack.getDocument(entityComp._id);
+					if (actorComp.id === aId || actorComp.name === aName) {
+						actorToTransformLi = actorComp;
+						break;
+					}
+				}
+			}
+		}
+		if (actorToTransformLi && createOnWorld) {
+			// Create actor from compendium
+			const collection = <any>game.collections.get(pack.documentName);
+			const id = actorToTransformLi.id; // li.data("document-id");
+			actorToTransformLi = await collection.importFromCompendium(pack, id, {}, { renderSheet: false });
+		}
+	}
+	if (!actorToTransformLi) {
+		actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
+			return a.id === aId || a.name === aName;
+		});
+	}
+	return actorToTransformLi;
+}
+
+export async function rollFromString(rollString, actor) {
+	let myvalue = 0;
+	if (!rollString) {
+		// Ignore ???
+		if (rollString === "0") {
+			myvalue = 0;
+		} else {
+			myvalue = 1;
+		}
+	} else {
+		if (
+			String(rollString).toLowerCase().includes("data.") ||
+			String(rollString).toLowerCase().includes("system.")
+		) {
+			const formula = rollString.replace(/data\./g, "@").replace(/system\./g, "@");
+			const data = actor ? actor.getRollData() : {};
+			const roll = new Roll(formula, data);
+			// Roll the dice.
+			let myresult = 0;
+			//roll.roll();
+			try {
+				// TODO Roll#evaluate is becoming asynchronous. In the short term you may pass async=true or async=false
+				// to evaluation options to nominate your preferred behavior.
+				roll.evaluate({ async: false });
+				//await roll.evaluate({async: true});
+				myresult = roll.total ? roll.total : parseInt(roll.result);
+			} catch (e) {
+				myresult = parseInt(eval(roll.result));
+			}
+			if (!is_real_number(myresult)) {
+				warn(`The formula '${formula}' doesn't return a number we set the default 1`);
+				myvalue = 1;
+			} else {
+				myvalue = myresult;
+			}
+		} else if (!is_real_number(rollString)) {
+			const formula = rollString;
+			const data = actor ? actor.getRollData() : {};
+			const roll = new Roll(formula, data);
+			// Roll the dice.
+			let myresult = 0;
+			//roll.roll();
+			try {
+				// TODO Roll#evaluate is becoming asynchronous. In the short term you may pass async=true or async=false
+				// to evaluation options to nominate your preferred behavior.
+				roll.evaluate({ async: false });
+				//await roll.evaluate({async: true});
+				myresult = roll.total ? roll.total : parseInt(roll.result);
+			} catch (e) {
+				myresult = parseInt(eval(roll.result));
+			}
+			if (!is_real_number(myresult)) {
+				warn(`The formula '${formula}' doesn't return a number we set the default 1`);
+				myvalue = 1;
+			} else {
+				myvalue = myresult;
+			}
+		} else if (is_real_number(rollString)) {
+			myvalue = Number(rollString);
+		} else {
+			myvalue = 0;
+		}
+	}
+	return myvalue;
+}
+
+export async function transferPermissionsActorInner(sourceActor, targetActor, user) {
+	// if (!game.user.isGM) throw new Error("You do not have the ability to configure permissions.");
+
 	// let sourceActor = //actor to copy the permissions from
 	// let targetActor = //actor to copy the permissions to
 
 	// The important part is the {diff:false, recursive: false},
 	// which ensures that any undefined parts of the permissions object
 	// are not filled in by the existing permissions on the target actor
+	// const user = game.users.get(userId);
+
+	// Set ownership
+	// const ownershipLevels = {};
+	// ownershipLevels[userId] = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+	// // Update a single Document
+	// targetActor.update({ ownership: ownershipLevels }, { diff: false, recursive: false, noHook: true });
 
 	// For a straight duplicate of permissions, you should be able to just do:
-	return <Actor>(
-		await targetActor.update({ permission: _getHandPermission(sourceActor) }, { diff: false, recursive: false })
-	);
+	return await targetActor.update({ permission: _getHandPermission(sourceActor) }, { diff: false, recursive: false });
 }
 
 //this method is on the actor, so "this" is the actor document
-function _getHandPermission(actor: Actor) {
-	const handPermission = <any>duplicate(actor.data.permission);
+function _getHandPermission(actor) {
+	const handPermission = duplicate(actor.permission);
 	for (const key of Object.keys(handPermission)) {
 		//remove any permissions that are not owner
 		if (handPermission[key] < CONST.DOCUMENT_PERMISSION_LEVELS.OWNER) {

@@ -2,7 +2,15 @@ import type { TokenData } from "@league-of-foundry-developers/foundry-vtt-types/
 import { ANIMATIONS } from "./animations";
 import { PolymorpherData, PolymorpherFlags, TransformOptionsGeneric } from "./automatedPolymorpherModels";
 import CONSTANTS from "./constants";
-import { error, info, retrieveActorFromData, retrieveActorFromToken, wait, warn } from "./lib/lib";
+import {
+	error,
+	info,
+	retrieveActorFromData,
+	retrieveActorFromToken,
+	transferPermissionsActorInner,
+	wait,
+	warn,
+} from "./lib/lib";
 import { PolymorpherManager } from "./polymorphermanager";
 import { automatedPolymorpherSocket } from "./socket";
 import D35E from "./systems/D35E";
@@ -13,21 +21,6 @@ import pf2e from "./systems/pf2e";
 import swade from "./systems/swade";
 
 const API = {
-	async invokePolymorpherManagerArr(...inAttributes: any[]) {
-		if (!Array.isArray(inAttributes)) {
-			throw error("invokePolymorpherManagerArr | inAttributes must be of type array");
-		}
-		const [sourceTokenIdOrName, removePolymorpher, ordered, random, animationExternal] = inAttributes;
-		const result = await (this as typeof API).invokePolymorpherManager(
-			sourceTokenIdOrName,
-			removePolymorpher,
-			ordered,
-			random,
-			animationExternal
-		);
-		return result;
-	},
-
 	async invokePolymorpherManagerFromActorArr(...inAttributes: any[]) {
 		if (!Array.isArray(inAttributes)) {
 			throw error("invokePolymorpherManagerFromActorArr | inAttributes must be of type array");
@@ -41,90 +34,6 @@ const API = {
 			animationExternal
 		);
 		return result;
-	},
-
-	async transformIntoArr(...inAttributes) {
-		if (!Array.isArray(inAttributes)) {
-			throw error("transformIntoArr | inAttributes must be of type array");
-		}
-		const [
-			sourceTokenId,
-			sourceActorId,
-			sourceActorName,
-			targetActorId,
-			targetActorName,
-			transformOptions,
-			renderSheet,
-		] = inAttributes;
-
-		const sourceToken = canvas.tokens?.placeables.find((t) => {
-			return t.id === sourceTokenId;
-		});
-
-		const sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
-
-		const polymoprhers: PolymorpherData[] =
-			<PolymorpherData[]>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
-		if (!polymoprhers) {
-			warn(
-				`No polymorph flags with id '${PolymorpherFlags.POLYMORPHERS}' is been found!  Usually this happened with unlinked token, sadly you need a linked actor to the token`
-			);
-			return undefined;
-		}
-
-		const currentPolymorph = <PolymorpherData>polymoprhers.find((p) => {
-			return p.id === targetActorId || p.name === targetActorName;
-		});
-		if (!currentPolymorph) {
-			warn(
-				`No polymoprher is been found! Usually this happened with unlinked token, sadly you need a linked actor to the token`
-			);
-			return undefined;
-		}
-
-		const targetActor = await retrieveActorFromData(
-			currentPolymorph?.id,
-			currentPolymorph?.name,
-			currentPolymorph?.compendiumid
-		);
-		if (!sourceToken) {
-			warn(`No source token found with reference '${sourceTokenId}'`, true);
-			return;
-		}
-		if (!sourceActor) {
-			warn(`No source actor found with reference '${sourceTokenId}'`, true);
-			return;
-		}
-		if (!targetActor) {
-			warn(`No target actor found with reference '${sourceTokenId}'`, true);
-			return;
-		}
-
-		return this.transformIntoImpl(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
-	},
-
-	async revertOriginalFormArr(...inAttributes) {
-		if (!Array.isArray(inAttributes)) {
-			throw error("revertOriginalFormArr | inAttributes must be of type array");
-		}
-		const [sourceTokenId, sourceActorId, sourceActorName, renderSheet] = inAttributes;
-
-		const sourceToken = canvas.tokens?.placeables.find((t) => {
-			return t.id === sourceTokenId;
-		});
-
-		const sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
-
-		if (!sourceToken) {
-			warn(`No source token found with reference '${sourceTokenId}'`, true);
-			return;
-		}
-		if (!sourceActor) {
-			warn(`No source actor found with reference '${sourceTokenId}'`, true);
-			return;
-		}
-
-		this.revertOriginalFormImpl(sourceToken, sourceActor, renderSheet);
 	},
 
 	async invokePolymorpherManagerFromActor(
@@ -148,6 +57,21 @@ const API = {
 				break;
 			}
 		}
+	},
+
+	async invokePolymorpherManagerArr(...inAttributes: any[]) {
+		if (!Array.isArray(inAttributes)) {
+			throw error("invokePolymorpherManagerArr | inAttributes must be of type array");
+		}
+		const [sourceTokenIdOrName, removePolymorpher, ordered, random, animationExternal] = inAttributes;
+		const result = await (this as typeof API).invokePolymorpherManager(
+			sourceTokenIdOrName,
+			removePolymorpher,
+			ordered,
+			random,
+			animationExternal
+		);
+		return result;
 	},
 
 	async invokePolymorpherManager(
@@ -327,6 +251,11 @@ const API = {
 		}
 	},
 
+	async cleanUpTokenSelectedArr(...inAttributes) {
+		const result = await this.cleanUpTokenSelected();
+		return result;
+	},
+
 	async cleanUpTokenSelected() {
 		const tokens = <Token[]>canvas.tokens?.controlled;
 		if (!tokens || tokens.length === 0) {
@@ -335,8 +264,8 @@ const API = {
 		}
 		for (const token of tokens) {
 			if (token && token.actor) {
-				if (getProperty(token.actor, `data.flags.${CONSTANTS.MODULE_NAME}`)) {
-					const p = getProperty(token.actor, `data.flags.${CONSTANTS.MODULE_NAME}`);
+				if (getProperty(token.actor, `flags.${CONSTANTS.MODULE_NAME}`)) {
+					const p = getProperty(token.actor, `flags.${CONSTANTS.MODULE_NAME}`);
 					for (const key in p) {
 						const senseOrConditionIdKey = key;
 						const senseOrConditionValue = <any>p[key];
@@ -350,8 +279,8 @@ const API = {
 		}
 		for (const token of tokens) {
 			if (token && token.actor) {
-				if (getProperty(token.actor, `data.flags.${CONSTANTS.MODULE_NAME}`)) {
-					const p = getProperty(token.actor, `data.flags.${CONSTANTS.MODULE_NAME}`);
+				if (getProperty(token.actor, `flags.${CONSTANTS.MODULE_NAME}`)) {
+					const p = getProperty(token.actor, `flags.${CONSTANTS.MODULE_NAME}`);
 					for (const key in p) {
 						const senseOrConditionIdKey = key;
 						const senseOrConditionValue = <any>p[key];
@@ -365,8 +294,117 @@ const API = {
 		}
 	},
 
+	async transferPermissionsActorArr(...inAttributes) {
+		if (!Array.isArray(inAttributes)) {
+			throw error("transferPermissionsActorArr | inAttributes must be of type array");
+		}
+		const [sourceActorId, targetActorId, userId] = inAttributes;
+		const sourceActor = game.actors?.get(sourceActorId);
+		const targetActor = game.actors?.get(targetActorId);
+		const user = game.users?.get(userId);
+		const result = await this.transferPermissionsActor(sourceActor, targetActor, user);
+		return result.id;
+	},
+	async transferPermissionsActor(sourceActor, targetActor, user) {
+		return await transferPermissionsActorInner(sourceActor, targetActor, user);
+	},
+	async retrieveAndPrepareActorArr(...inAttributes) {
+		if (!Array.isArray(inAttributes)) {
+			throw error("retrieveAndPrepareActorArr | inAttributes must be of type array");
+		}
+		const [aId, aName, currentCompendium, createOnWorld, sourceActorId, userId] = inAttributes;
+		const result = await this.retrieveAndPrepareActor(
+			aId,
+			aName,
+			currentCompendium,
+			createOnWorld,
+			sourceActorId,
+			userId
+		);
+		return result.id;
+	},
+
+	async retrieveAndPrepareActor(aId, aName, currentCompendium, createOnWorld, sourceActorId, userId) {
+		const targetActor = await retrieveActorFromData(aId, aName, currentCompendium, createOnWorld);
+		const sourceActor = await retrieveActorFromData(sourceActorId, undefined, undefined, false);
+		const user = <User>game.users?.get(userId);
+		if (!user.isGM) {
+			if (sourceActor && targetActor) {
+				//this.transferPermissionsActor(sourceActor,targetActor);
+				// Set ownership
+				const ownershipLevels = {};
+				ownershipLevels[userId] = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+				// Update a single Document
+				targetActor.update({ ownership: ownershipLevels }, { diff: false, recursive: false, noHook: true });
+			}
+		}
+		return targetActor;
+	},
+
 	get polymorphSetting(): TransformOptionsGeneric {
 		return <TransformOptionsGeneric>game.settings.get(CONSTANTS.MODULE_NAME, "polymorphSetting");
+	},
+
+	async transformIntoArr(...inAttributes) {
+		if (!Array.isArray(inAttributes)) {
+			throw error("transformIntoArr | inAttributes must be of type array");
+		}
+		const [
+			sourceTokenId,
+			sourceActorId,
+			sourceActorName,
+			targetActorId,
+			targetActorName,
+			transformOptions,
+			renderSheet,
+		] = inAttributes;
+
+		const sourceToken = canvas.tokens?.placeables.find((t) => {
+			return t.id === sourceTokenId;
+		});
+
+		const sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
+
+		const polymoprhers: PolymorpherData[] =
+			<PolymorpherData[]>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
+		if (!polymoprhers) {
+			warn(
+				`No polymorph flags with id '${PolymorpherFlags.POLYMORPHERS}' is been found!  Usually this happened with unlinked token, sadly you need a linked actor to the token`
+			);
+			return undefined;
+		}
+
+		const currentPolymorph = <PolymorpherData>polymoprhers.find((p) => {
+			return p.id === targetActorId || p.name === targetActorName;
+		});
+		if (!currentPolymorph) {
+			warn(
+				`No polymoprher is been found! Usually this happened with unlinked token, sadly you need a linked actor to the token`
+			);
+			return undefined;
+		}
+
+		const targetActor = await retrieveActorFromData(
+			currentPolymorph?.id,
+			currentPolymorph?.name,
+			currentPolymorph?.compendiumid,
+			false
+		);
+
+		if (!sourceToken) {
+			warn(`No source token found with reference '${sourceTokenId}'`, true);
+			return;
+		}
+		if (!sourceActor) {
+			warn(`No source actor found with reference '${sourceTokenId}'`, true);
+			return;
+		}
+		if (!targetActor) {
+			warn(`No target actor found with reference '${sourceTokenId}'`, true);
+			return;
+		}
+
+		return this.transformIntoImpl(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
 	},
 
 	async transformInto(
@@ -386,6 +424,30 @@ const API = {
 			transformOptions,
 			renderSheet
 		);
+	},
+
+	async revertOriginalFormArr(...inAttributes) {
+		if (!Array.isArray(inAttributes)) {
+			throw error("revertOriginalFormArr | inAttributes must be of type array");
+		}
+		const [sourceTokenId, sourceActorId, sourceActorName, renderSheet] = inAttributes;
+
+		const sourceToken = canvas.tokens?.placeables.find((t) => {
+			return t.id === sourceTokenId;
+		});
+
+		const sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "", false);
+
+		if (!sourceToken) {
+			warn(`No source token found with reference '${sourceTokenId}'`, true);
+			return;
+		}
+		if (!sourceActor) {
+			warn(`No source actor found with reference '${sourceTokenId}'`, true);
+			return;
+		}
+
+		this.revertOriginalFormImpl(sourceToken, sourceActor, renderSheet);
 	},
 
 	async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean) {

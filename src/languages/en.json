@@ -67,6 +67,10 @@
 				"name": "Hide Polymorpher Button",
 				"hint": "Hide the polymorpher button on the character sheet."
 			},
+			"disableSettingsForNoGM": {
+				"title": "Disable dialog summon settings for no GM",
+				"hint": "Disable the settings (such as the compendium option, store in actor, delete all button, animation type and number of creatures) from summon dialog and block drop of actors for no GM player."
+			},
 			"restrictOwned": {
 				"title": "Only Owned Actors",
 				"name": "Only Owned Actors",

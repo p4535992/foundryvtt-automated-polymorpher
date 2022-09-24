@@ -1,5 +1,5 @@
 #polymorpherManager {
-	min-width: 320px;
+	min-width: 500px;
 }
 
 #polymorpherManager .window-content {
@@ -84,8 +84,8 @@
 }
 
 .polymorpher-number {
-	width: 25px;
-	min-width: 25px;
+	width: 80px;
+	min-width: 80px;
 	text-align: center;
 	margin-left: auto;
 	margin-right: -13px;
