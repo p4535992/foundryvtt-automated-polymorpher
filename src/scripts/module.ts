@@ -4,7 +4,7 @@ import { ANIMATIONS } from "./animations";
 import CONSTANTS from "./constants";
 import API from "./api";
 import { registerSocket } from "./socket";
-import { setApi } from "../main";
+import { setApi } from "../automated-polymorpher";
 import { PolymorpherFlags } from "./automatedPolymorpherModels";
 
 export const initHooks = () => {

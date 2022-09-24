@@ -1,14 +1,38 @@
 {
-	"name": "automated-polymorpher",
+	"id": "automated-polymorpher",
 	"title": "[BETA] Automated Evocations - Polymorpher Manager",
 	"description": "[BETA] A user interface to manage polymorpher with summoning animations and automated summoning for spells",
-	"version": "1.0.43",
-	"author": "p4535992",
+	"version": "1.1.0",
+	"authors": [
+		{
+			"name": "theripper93",
+			"url": "https://github.com/theripper93",
+			"discord": "theripper93#3276",
+			"twitter": "",
+			"patreon": "theripper93",
+			"github": "theripper93",
+			"ko-fi": "",
+			"reddit": "u/theripper93",
+			"email": "tsplab@gmail.com"
+		},
+		{
+			"name": "p4535992",
+			"url": "https://github.com/p4535992",
+			"discord": "",
+			"twitter": "",
+			"patreon": "p4535992",
+			"github": "p4535992",
+			"ko-fi": "",
+			"reddit": "",
+			"email": ""
+		}
+	],
 	"type": "module",
 	"socket": true,
 	"includes": [
 		"./assets/**",
 		"./lang/**",
+		"./languages/**",
 		"./scripts/**",
 		"./styles/**",
 		"./templates/**",
@@ -35,26 +59,33 @@
 		{
 			"lang": "en",
 			"name": "English",
-			"path": "lang/en.json"
+			"path": "languages/en.json"
 		},
 		{
 			"lang": "de",
-			"name": "Deutsch",
-			"path": "lang/de.json"
+			"name": "Deutsch (German)",
+			"path": "languages/de.json"
+		},
+		{
+			"lang": "fr",
+			"name": "Français (French)",
+			"path": "languages/fr.json"
 		},
 		{
 			"lang": "ja",
 			"name": "日本語",
-			"path": "lang/ja.json"
+			"path": "languages/ja.json"
 		}
 	],
 	"packs": [],
-	"systems": [],
 	"scripts": [],
 	"esmodules": ["automated-polymorpher.js"],
 	"styles": ["styles/polymorphermanager.css"],
-	"minimumCoreVersion": "9",
-	"compatibleCoreVersion": "9",
+	"compatibility": {
+		"minimum": 10,
+		"verified": 10,
+		"maximum": 10
+	},
 	"manifestPlusVersion": "1.2.1",
 	"url": "https://github.com/p4535992/foundryvtt-automated-polymorpher",
 	"manifest": "https://github.com/p4535992/foundryvtt-automated-polymorpher/releases/latest/download/module.json",
@@ -63,19 +94,33 @@
 	"changelog": "https://github.com/p4535992/foundryvtt-automated-polymorpher/blob/v1.0.43/changelog.md",
 	"bugs": "https://github.com/p4535992/foundryvtt-automated-polymorpher/issues",
 	"allowBugReporter": true,
-	"dependencies": [
-		{
-			"name": "sequencer"
-		},
-		{
-			"name": "warpgate"
-		},
-		{
-			"name": "socketlib"
-		}
-	],
-	"flags": {
-		"manifestPlusVersion": "1.2.0",
-		"allowBugReporter": true
+	"relationships": {
+		"systems": [],
+		"requires": [
+			{
+				"id": "lib-wrapper",
+				"type": "module",
+				"manifest": "https://github.com/ruipin/fvtt-lib-wrapper/releases/latest/download/module.json",
+				"compatibility": {}
+			},
+			{
+				"id": "socketlib",
+				"type": "module",
+				"manifest": "https://raw.githubusercontent.com/manuelVo/foundryvtt-socketlib/develop/module.json",
+				"compatibility": {}
+			},
+			{
+				"id": "sequencer",
+				"type": "module",
+				"compatibility": {}
+			},
+			{
+				"id": "warpgate",
+				"type": "module",
+				"manifest": "https://github.com/trioderegion/warpgate/releases/latest/download/module.json",
+				"compatibility": {}
+			}
+		],
+		"conflicts": []
 	}
 }
