@@ -15,14 +15,26 @@ export const ANIMATIONS = {
 					.belowTokens()
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.wait(750)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/fire_earth_explosion_CIRCLE_01.webm`)
 					.belowTokens()
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.play();
 			},
 			time: 1000,
@@ -36,21 +48,39 @@ export const ANIMATIONS = {
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/air_infinity_RECTANGLE_01.webm`)
 					.belowTokens()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.wait(750)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/air_portal_CIRCLE_01.webm`)
 					.belowTokens()
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.wait(750)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/air_puff_CIRCLE_01.webm`)
 					.belowTokens()
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.play();
 			},
 			time: 1650,
@@ -65,14 +95,26 @@ export const ANIMATIONS = {
 					.belowTokens()
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.55)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.55
+					)
 					.wait(750)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/electric_blast_01.webm`)
 					.belowTokens()
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.repeats(6, 100, 170, 250, 320, 400)
 					.play();
 			},
@@ -90,21 +132,39 @@ export const ANIMATIONS = {
 					.belowTokens()
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.55)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.55
+					)
 					.wait(750)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/JB2A/LightningStrike_01a_800x800.webm`)
 					.atLocation(template)
 					.repeats(3, 100, 400, 600)
 					.randomizeMirrorX()
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.55 * 2)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.55
+					)
 					.wait(750)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/JB2A/Impact_12_Regular_Blue_400x400.webm`)
 					.belowTokens()
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.55)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.55
+					)
 					.play();
 			},
 			time: 1650,
@@ -120,14 +180,26 @@ export const ANIMATIONS = {
 					.randomRotation()
 					.atLocation(template)
 					.repeats(6, 50, 25, 75, 60, 20)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.55)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.55
+					)
 					.wait(500)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/create_water_CIRCLE_01.webm`)
 					.belowTokens()
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.play();
 			},
 			time: 1000,
@@ -149,7 +221,13 @@ export const ANIMATIONS = {
 					.scaleIn(1, 1200, { ease: "easeInOutCubic" })
 					.scaleOut(0, 1500, { ease: "easeInCubic" })
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.wait(650)
 					.effect()
 					.file(
@@ -157,7 +235,13 @@ export const ANIMATIONS = {
 					)
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.55)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.55
+					)
 					.play();
 			},
 			time: 1500,
@@ -179,7 +263,13 @@ export const ANIMATIONS = {
 					.scaleIn(1, 1200, { ease: "easeInOutCubic" })
 					.scaleOut(0, 1500, { ease: "easeInCubic" })
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.wait(950)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/JB2A/Darkness_01_Black_600x600.webm`)
@@ -191,7 +281,13 @@ export const ANIMATIONS = {
 					.scaleIn(0, 1200, { ease: "easeInOutCubic" })
 					.scaleOut(1, 1500, { ease: "easeInCubic" })
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.45)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.45
+					)
 					.play();
 			},
 			time: 1500,
@@ -208,13 +304,25 @@ export const ANIMATIONS = {
 					.atLocation(template)
 					.randomOffset()
 					.repeats(6, 50, 25, 75, 60, 20)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.15)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.15
+					)
 					.wait(500)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/energy_pulse_yellow_CIRCLE.webm`)
 					.belowTokens()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.play();
 			},
 			time: 650,
@@ -228,7 +336,13 @@ export const ANIMATIONS = {
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/magic_explosion_symbol_CIRCLE.webm`)
 					.belowTokens()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.play();
 			},
 			time: 1150,
@@ -250,13 +364,25 @@ export const ANIMATIONS = {
 					.scaleIn(1, 1200, { ease: "easeInOutCubic" })
 					.scaleOut(0, 1500, { ease: "easeInCubic" })
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.wait(650)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/JB2A/Explosion_02_Blue_400x400.webm`)
 					.randomRotation()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.55)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.55
+					)
 					.play();
 			},
 			time: 820,
@@ -269,7 +395,13 @@ export const ANIMATIONS = {
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/heart_red_SQUARE.webm`)
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.play();
 			},
 			time: 400,
@@ -285,13 +417,25 @@ export const ANIMATIONS = {
 					.atLocation(template)
 					.randomOffset()
 					.repeats(6, 150, 225, 375, 460, 520)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.65)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.65
+					)
 					.wait(900)
 					.effect()
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/magic_symbol_SQUARE_05.webm`)
 					.belowTokens()
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.play();
 			},
 			time: 1350,
@@ -307,14 +451,26 @@ export const ANIMATIONS = {
 					.belowTokens()
 					.atLocation(template)
 					.randomRotation()
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.wait(100)
 					.effect()
 					.file(
 						`modules/${CONSTANTS.MODULE_NAME}/assets/animations/JB2A/BardicInspiration_01_Regular_GreenOrange_400x400.webm`
 					)
 					.atLocation(template)
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.45)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.45
+					)
 					.play();
 			},
 			time: 600,
@@ -327,7 +483,13 @@ export const ANIMATIONS = {
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/four_element_strike_SQUARE_01.webm`)
 					.atLocation(template)
 					.belowTokens()
-					.scale(Math.max(tokenData.width, tokenData.height) * tokenData.scale * 0.35)
+					.scale(
+						((Math.max(tokenData.width, tokenData.height) *
+							//@ts-ignore
+							(tokenData.texture.scaleX + tokenData.texture.scaleY)) /
+							2) *
+							0.35
+					)
 					.play();
 			},
 			time: 700,

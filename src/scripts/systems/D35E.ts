@@ -337,13 +337,13 @@ export default {
 					system: proto,
 					// actor: actorToTransform
 					actor: {
-						system: newActorData,
+						system: newActorData.system,
 					},
 					// actorId: <string>newActor.id,
 					actorLink: false,
 				},
 				actor: {
-					system: newActorData,
+					system: newActorData.system,
 				},
 			};
 
@@ -434,6 +434,7 @@ export default {
 			const tokens = sourceActor.getActiveTokens(true);
 			tokens.map(async (t: Token) => {
 				const newTokenData = <any>foundry.utils.deepClone(updates);
+				//newTokenData._id = t.id;
 
 				// ======================================================================================
 				// SETTING FLAGS
@@ -554,7 +555,7 @@ export default {
 				tokens = [sourceToken];
 			}
 			const updates = tokens.map((t) => {
-				const newTokenData = <TokenData>foundry.utils.deepClone(d.token);
+				const newTokenData = <TokenData>foundry.utils.deepClone(d.prototypeToken);
 				newTokenData._id = t.document.id;
 				newTokenData.actorId = <string>newActor.id;
 				newTokenData.actorLink = true;
@@ -1056,7 +1057,9 @@ export default {
 			//@ts-ignore
 			// effects: targetActorData.effects ? originalActorData.effects.concat(targetActorData.effects) : originalActorData.effects,
 			img: targetActorData.img, // New appearance
-			permission: originalActorData.permission, // Use the original actor permissions
+			// permission: originalActorData.permission, // Use the original actor permissions
+			//@ts-ignore
+			ownership: originalActorData.ownership, // Use the original actor permissions
 			folder: originalActorData.folder, // Be displayed in the same sidebar folder
 			flags: originalActorData.flags, // Use the original actor flags
 			// x: sourceToken.x,
@@ -1103,20 +1106,32 @@ export default {
 		}
 
 		// Token appearance updates
-		d.token = <PrototypeTokenData>{ name: d.name };
-		for (const k of ["width", "height", "scale", "img", "mirrorX", "mirrorY", "tint", "alpha", "lockRotation"]) {
-			d.token[k] = targetActorData.token[k];
+		//@ts-ignore
+		d.token = <PrototypeTokenData>{ name: d.name, texture: {} };
+		// for (const k of ["width", "height", "scale", "img", "mirrorX", "mirrorY", "tint", "alpha", "lockRotation"]) {
+		// 	d.token[k] = targetActorData.token[k];
+		// }
+		for (const k of ["width", "height", "alpha", "lockRotation"]) {
+			//@ts-ignore
+			d.prototypeToken[k] = targetActorData.prototypeToken[k];
+		}
+		for (const k of ["offsetX", "offsetY", "scaleX", "scaleY", "src", "tint"]) {
+			//@ts-ignore
+			d.prototypeToken.texture[k] = targetActorData.prototypeToken.texture[k];
 		}
 
-		if (targetActorData.token.randomImg) {
-			const images = targetActorImages; // await targetActor.getTokenImages();
-			d.token.img = <string>images[Math.floor(Math.random() * images.length)];
+		//@ts-ignore
+		if (targetActorData.prototypeToken.randomImg) {
+			// const images = await target.getTokenImages();
+			const images = targetActorImages;
+			d.prototypeToken.texture.src = images[Math.floor(Math.random() * images.length)];
 		}
 
 		if (!keepSelf) {
-			const vision = keepVision ? originalActorData.token : targetActorData.token;
+			//@ts-ignore
+			const vision = keepVision ? originalActorData.prototypeToken : targetActorData.prototypeToken;
 			for (const k of ["dimSight", "brightSight", "dimLight", "brightLight", "vision", "sightAngle"]) {
-				d.token[k] = vision[k];
+				d.prototypeToken[k] = vision[k];
 			}
 
 			// Transfer ability scores
@@ -1160,6 +1175,7 @@ export default {
 					}
 				}
 			}
+
 			// Keep specific items from the original data
 			d.items = d.items ? d.items : [];
 			if (originalActorData.items && originalActorData.items.size > 0) {
@@ -1182,7 +1198,7 @@ export default {
 				d.items.push({
 					type: "class",
 					name: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphTmpClass`),
-					system: { levels: d.system.details.cr },
+					data: { levels: d.system.details.cr },
 				});
 			}
 
