@@ -28,19 +28,13 @@ export function registerSocket() {
 
 	automatedPolymorpherSocket.register("revertOriginalForm", (...args) => API.revertOriginalFormArr(...args));
 
-	/**
-	 * UI sockets
-	 */
-
-	/**
-	 * Item & attribute sockets
-	 */
-
-	/**
-	 * Effects
-	 */
-
-	// Basic
+	automatedPolymorpherSocket.register("cleanUpTokenSelected", (...args) => API.cleanUpTokenSelectedArr(...args));
+	automatedPolymorpherSocket.register("transferPermissionsActor", (...args) =>
+		API.transferPermissionsActorArr(...args)
+	);
+	automatedPolymorpherSocket.register("retrieveAndPrepareActor", (...args) =>
+		API.retrieveAndPrepareActorArr(...args)
+	);
 
 	setSocket(automatedPolymorpherSocket);
 	return automatedPolymorpherSocket;

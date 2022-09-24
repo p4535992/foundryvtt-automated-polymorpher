@@ -1,6 +1,11 @@
 import type { TokenData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
 import { ANIMATIONS } from "./animations";
-import { PolymorpherData, PolymorpherFlags, TransformOptionsGeneric } from "./automatedPolymorpherModels";
+import {
+	PolymorpherData,
+	PolymorpherFlags,
+	TokenRevertData,
+	TransformOptionsGeneric,
+} from "./automatedPolymorpherModels";
 import CONSTANTS from "./constants";
 import {
 	error,
@@ -138,7 +143,7 @@ const API = {
 			// REVERT TO ORIGINAL FORM
 			// =====================================
 
-			const updatesForRevert = <TokenDocument[]>(
+			const updatesForRevert = <TokenRevertData[]>(
 				currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			);
 			if (!updatesForRevert || updatesForRevert.length <= 0) {

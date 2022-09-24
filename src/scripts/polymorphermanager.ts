@@ -1,7 +1,12 @@
 import type { TokenData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import { ANIMATIONS } from "./animations";
 import API from "./api";
-import { PolymorpherData, PolymorpherFlags, PolymorpherCompendiumData } from "./automatedPolymorpherModels";
+import {
+	PolymorpherData,
+	PolymorpherFlags,
+	PolymorpherCompendiumData,
+	TokenRevertData,
+} from "./automatedPolymorpherModels";
 import CONSTANTS from "./constants";
 import { error, i18n, info, retrieveActorFromData, wait, warn } from "./lib/lib";
 import { automatedPolymorpherSocket } from "./socket";
@@ -218,14 +223,18 @@ export class PolymorpherManager extends FormApplication {
 		}
 
 		// Prepare flag for revert ???
-		const updatesForRevert = <TokenDocument[]>(
+		const updatesForRevert = <TokenRevertData[]>(
 			this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 		)
-			? <TokenDocument[]>(
+			? <TokenRevertData[]>(
 					this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			  )
-			: <TokenDocument[]>[];
-		updatesForRevert.push(this.token.document);
+			: <TokenRevertData[]>[];
+		updatesForRevert.push({
+			//@ts-ignore
+			actorId: <string>this.token.document.actorId,
+			id: <string>this.token.document.id,
+		});
 		await this.actor?.setFlag(
 			CONSTANTS.MODULE_NAME,
 			PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
@@ -574,14 +583,18 @@ export class PolymorpherManager extends FormApplication {
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
       */
 
-		const updatesForRevert = <TokenDocument[]>(
+		const updatesForRevert = <TokenRevertData[]>(
 			this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 		)
-			? <TokenDocument[]>(
+			? <TokenRevertData[]>(
 					this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			  )
-			: <TokenDocument[]>[];
-		updatesForRevert.push(this.token.document);
+			: <TokenRevertData[]>[];
+		updatesForRevert.push({
+			//@ts-ignore
+			actorId: <string>this.token.document.actorId,
+			id: <string>this.token.document.id,
+		});
 		await this.actor?.setFlag(
 			CONSTANTS.MODULE_NAME,
 			PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,

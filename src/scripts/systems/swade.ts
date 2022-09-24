@@ -6,7 +6,12 @@ import type {
 } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import type { PropertiesToSource } from "@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes";
 import { ANIMATIONS } from "../animations";
-import { PolymorpherData, PolymorpherFlags, TransformOptionsGeneric } from "../automatedPolymorpherModels";
+import {
+	PolymorpherData,
+	PolymorpherFlags,
+	TokenRevertData,
+	TransformOptionsGeneric,
+} from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
 import { debug, i18n, info, log, transferPermissionsActorInner, wait, warn } from "../lib/lib";
 
@@ -182,14 +187,18 @@ export default {
 		setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 
 		let previousTokenData =
-			<TokenDocument[]>(
+			<TokenRevertData[]>(
 				sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			) || [];
 		// const currentTokenData = await sourceActor.getTokenData();
 		const currentTokenData = sourceToken.document;
 
 		if (currentTokenData.id && previousTokenData.filter((z) => z.id === currentTokenData.id).length <= 0) {
-			previousTokenData.push(currentTokenData);
+			previousTokenData.push({
+				//@ts-ignore
+				actorId: <string>currentTokenData.actorId,
+				id: <string>currentTokenData.id,
+			});
 			previousTokenData = previousTokenData.filter(
 				(value, index, self) => index === self.findIndex((t) => t.id === null || t.id === value.id)
 			);
@@ -325,16 +334,16 @@ export default {
 					name: proto.name,
 					img: proto.img,
 					scale: proto.scale,
-					data: proto,
+					system: proto,
 					// actor: actorToTransform
 					actor: {
-						data: newActorData,
+						system: newActorData,
 					},
 					// actorId: <string>newActor.id,
 					actorLink: false,
 				},
 				actor: {
-					data: newActorData,
+					system: newActorData,
 				},
 			};
 
@@ -608,7 +617,7 @@ export default {
 		 */
 		Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, sourceActor, renderSheet);
 
-		const previousOriginalActorTokenData = <TokenDocument[]>(
+		const previousOriginalActorTokenData = <TokenRevertData[]>(
 			sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 		);
 		let isTheOriginalActor = false;
@@ -689,7 +698,7 @@ export default {
 				if (!game.settings.get(CONSTANTS.MODULE_NAME, "doNotDeleteTmpActors")) {
 					const idsToDelete = <string[]>[];
 					idsToDelete.push(<string>sourceActor.id);
-					const othersActorsToDelete = <TokenDocument[]>(
+					const othersActorsToDelete = <TokenRevertData[]>(
 						sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 					);
 					if (
@@ -1037,7 +1046,8 @@ export default {
 		d = {
 			type: originalActorData.type, // Remain the same actor type
 			name: explicitName ? explicitName : `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
-			data: keepSelf ? originalActorData : targetActorData, // Get the data model of your new form
+			//@ts-ignore
+			system: keepSelf ? originalActorData.system : targetActorData.system, // Get the data model of your new form
 			items: keepSelf ? originalActorData.items : targetActorData.items, // Get the items of your new form
 			effects: keepSelf
 				? newEffects
@@ -1173,7 +1183,7 @@ export default {
 				d.items.push({
 					type: "class",
 					name: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphTmpClass`),
-					data: { levels: d.system.details.cr },
+					system: { levels: d.system.details.cr },
 				});
 			}
 

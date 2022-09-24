@@ -13,6 +13,11 @@ export class Creature {
 	animation?: string;
 }
 
+export class TokenRevertData {
+	actorId: string;
+	id: string;
+}
+
 // export class CreatureData{
 //   animation:string;
 //   level:number;
