@@ -190,7 +190,7 @@ export default {
 			<TokenRevertData[]>(
 				sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			) || [];
-		// const currentTokenData = await sourceActor.getTokenData();
+		// const currentTokenData = await sourceActor.getTokenDocument();
 		const currentTokenData = sourceToken.document;
 
 		if (currentTokenData.id && previousTokenData.filter((z) => z.id === currentTokenData.id).length <= 0) {
@@ -242,8 +242,8 @@ export default {
 
 			/* get the new protodata and remove its null x/y */
 			const newActor = targetActor;
-
-			let proto = <TokenData>(await newActor.getTokenData()).toObject();
+			//@ts-ignore
+			let proto = <TokenDocument>(await newActor.getTokenDocument()).toObject();
 			//@ts-ignore
 			delete proto.x;
 			//@ts-ignore
@@ -301,6 +301,7 @@ export default {
 			const newActorData = await this.prepareDataFromTransformOptions(
 				newRootActorData,
 				targetActorData,
+				//@ts-ignore
 				proto.effects,
 				targetActorImages,
 				transformOptions
@@ -332,8 +333,15 @@ export default {
 			const updates = {
 				token: <any>{
 					name: proto.name,
+					//@ts-ignore
 					img: proto.img,
-					scale: proto.scale,
+					// scale: proto.scale,
+					texture: {
+						//@ts-ignore
+						scaleX: proto.texture.scaleX,
+						//@ts-ignore
+						scaleY: proto.texture.scaleY,
+					},
 					system: proto,
 					// actor: actorToTransform
 					actor: {
@@ -671,7 +679,8 @@ export default {
 				// Get the Tokens which represent this actor
 				if (canvas.ready) {
 					const tokens = sourceActor.getActiveTokens(true);
-					const tokenData = <TokenData>await original.getTokenData();
+					//@ts-ignore
+					const tokenData = <TokenDocument>await original.getTokenDocument();
 					const tokenUpdates = tokens.map((t) => {
 						const update = duplicate(tokenData);
 						update._id = t.id;
@@ -786,7 +795,8 @@ export default {
 		explicitName: string,
 		animation: string
 	) {
-		const tokenUpdatesToTransform = await targetActor.getTokenData();
+		//@ts-ignore
+		const tokenUpdatesToTransform = await targetActor.getTokenDocument();
 
 		// Define a function to record polymorph settings for future use
 		const rememberOptions = (html) => {
@@ -1062,9 +1072,17 @@ export default {
 			// x: sourceToken.x,
 			// y: sourceToken.y,
 			// token: sourceToken.toObject()
-			width: targetActorData.token.width,
-			height: targetActorData.token.height,
-			scale: targetActorData.token.scale,
+			//@ts-ignore
+			width: targetActorData.prototypeToken.width,
+			//@ts-ignore
+			height: targetActorData.prototypeToken.height,
+			// scale: targetActorData.prototypeToken.scale,
+			texture: {
+				//@ts-ignore
+				scaleX: targetActorData.prototypeToken.texture.scaleX,
+				//@ts-ignore
+				scaleY: targetActorData.prototypeToken.texture.scaleY,
+			},
 		};
 
 		// Specifically delete some data attributes
@@ -1277,7 +1295,7 @@ export default {
 			delete effectTmp._id;
 			tokenEffectsCleaned.push(effectTmp);
 		}
-		d.effects = tokenEffectsCleaned;		
+		d.effects = tokenEffectsCleaned;
 
 		// =====================================
 		// END SPECIFIC MANAGEMENT FOR SYSTEM

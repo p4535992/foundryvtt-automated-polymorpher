@@ -540,7 +540,8 @@ export class PolymorpherManager extends FormApplication {
 			);
 			return;
 		}
-		const tokenDataToTransform = <TokenData>await actorToTransform.getTokenData();
+		//@ts-ignore
+		const tokenDataToTransform = <TokenDocument>await actorToTransform.getTokenDocument();
 
 		let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
 				return t.actor?.id === this.actor.id;

@@ -50,7 +50,7 @@ export default {
      */
     delete actorUpdates.type;
 
-    const tokenUpdates = await targetActor.getTokenData();
+    const tokenUpdates = await targetActor.getTokenDocument();
 
     /* Protects the actor a bit more, but requires you
     * to close and repon the sheet after reverting.

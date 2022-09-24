@@ -1,3 +1,7 @@
+### 1.1.0-1
+
+- Update to fvtt10
+
 ### 1.0.43
 
 - Add swade system

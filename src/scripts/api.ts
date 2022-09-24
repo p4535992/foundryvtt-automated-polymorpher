@@ -173,7 +173,8 @@ const API = {
 			});
 
 			const animation = polyData?.animation;
-			const tokenDataToTransform = <TokenData>await currentActor.getTokenData();
+			//@ts-ignore
+			const tokenDataToTransform = <TokenDocument>await currentActor.getTokenDocument();
 			const tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
 					return t.actor?.id === currentActor.id;
 				}) || tokenDataToTransform;
