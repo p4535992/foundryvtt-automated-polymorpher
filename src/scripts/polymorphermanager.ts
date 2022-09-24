@@ -218,14 +218,14 @@ export class PolymorpherManager extends FormApplication {
 		}
 
 		// Prepare flag for revert ???
-		const updatesForRevert = <TokenData[]>(
+		const updatesForRevert = <TokenDocument[]>(
 			this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 		)
-			? <TokenData[]>(
+			? <TokenDocument[]>(
 					this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			  )
-			: <TokenData[]>[];
-		updatesForRevert.push(this.token.data);
+			: <TokenDocument[]>[];
+		updatesForRevert.push(this.token.document);
 		await this.actor?.setFlag(
 			CONSTANTS.MODULE_NAME,
 			PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
@@ -356,7 +356,7 @@ export class PolymorpherManager extends FormApplication {
         <div class="summon-btn">
           <img
             class="actor-image"
-            src="${actorToTransformLi.data.img}" alt="">
+            src="${actorToTransformLi.img}" alt="">
           <div
             class="warpgate-btn"
             id="summon-polymorpher"
@@ -367,14 +367,14 @@ export class PolymorpherManager extends FormApplication {
             data-elid="${actorToTransformLi.id}">
           </div>
         </div>
-    	  <span class="actor-name">${actorToTransformLi.data.name}</span>
+    	  <span class="actor-name">${actorToTransformLi.name}</span>
         <input
             id="explicitname"
             name="explicitname"
             class="explicitname"
             type="text"
 			${disable ? " readonly " : " "}
-            value="${data.explicitname ?? actorToTransformLi.data.name}"></input>
+            value="${data.explicitname ?? actorToTransformLi.name}"></input>
         <select class="anim-dropdown" ${disable ? " disabled " : " "}>
             ${this.getAnimations(data.animation)}
         </select>
@@ -565,8 +565,8 @@ export class PolymorpherManager extends FormApplication {
       let updatesForRevert: any = {};
       if (!this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT)) {
         updatesForRevert = {
-          tokenData: this.token.data,
-          actorData: this.actor.data,
+          tokenData: this.token,
+          actorData: this.actor,
         };
       } else {
         updatesForRevert = this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT);
@@ -574,14 +574,14 @@ export class PolymorpherManager extends FormApplication {
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
       */
 
-		const updatesForRevert = <TokenData[]>(
+		const updatesForRevert = <TokenDocument[]>(
 			this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 		)
-			? <TokenData[]>(
+			? <TokenDocument[]>(
 					this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			  )
-			: <TokenData[]>[];
-		updatesForRevert.push(this.token.data);
+			: <TokenDocument[]>[];
+		updatesForRevert.push(this.token.document);
 		await this.actor?.setFlag(
 			CONSTANTS.MODULE_NAME,
 			PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,

@@ -8,7 +8,7 @@ import type { PropertiesToSource } from "@league-of-foundry-developers/foundry-v
 import { ANIMATIONS } from "../animations";
 import { PolymorpherData, PolymorpherFlags, TransformOptionsGeneric } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
-import { debug, i18n, info, log, transferPermissionsActor, wait, warn } from "../lib/lib";
+import { debug, i18n, info, log, transferPermissionsActorInner, wait, warn } from "../lib/lib";
 
 export default {
 	/**
@@ -116,7 +116,8 @@ export default {
 		}
 
 		const targetActorImages = await targetActor.getTokenImages();
-		const sourceEffects = sourceToken.actor ? sourceToken.actor.effects : sourceToken.data.effects;
+		//@ts-ignore
+		const sourceEffects = sourceToken.actor ? sourceToken.actor.effects : sourceToken.effects;
 
 		const d = await this.prepareDataFromTransformOptions(
 			originalActorData,
@@ -154,22 +155,24 @@ export default {
 		if (!sourceToken.actor) {
 			setProperty(sourceToken, `actor`, {});
 		}
-		if (!sourceToken.actor?.data) {
-			setProperty(<any>sourceToken.actor, `data`, {});
+		//@ts-ignore
+		if (!sourceToken.actor?.flags) {
+			setProperty(<any>sourceToken.actor, `flags`, {});
 		}
-		if (!sourceToken.actor?.data.flags) {
-			setProperty(<any>sourceToken.actor?.data, `flags`, {});
-		}
-		if (!sourceToken.actor?.data.flags[CONSTANTS.MODULE_NAME]) {
-			setProperty(<any>sourceToken.actor?.data.flags, `${CONSTANTS.MODULE_NAME}`, {});
+		//@ts-ignore
+		if (!sourceToken.actor?.flags[CONSTANTS.MODULE_NAME]) {
+			//@ts-ignore
+			setProperty(<any>sourceToken.actor?.flags, `${CONSTANTS.MODULE_NAME}`, {});
 		}
 		setProperty(
 			d.flags,
 			`${CONSTANTS.MODULE_NAME}`,
-			getProperty(<any>sourceToken.actor?.data.flags, `${CONSTANTS.MODULE_NAME}`)
+			//@ts-ignore
+			getProperty(<any>sourceToken.actor?.flags, `${CONSTANTS.MODULE_NAME}`)
 		);
-		//setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`, getProperty(actorThis.data.flags, `${CONSTANTS.MODULE_NAME}`));
-		mergeObject(d.flags, sourceActor.data.flags);
+		//setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`, getProperty(actorThis.flags, `${CONSTANTS.MODULE_NAME}`));
+		//@ts-ignore
+		mergeObject(d.flags, sourceActor.flags);
 		if (
 			!sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
 			!getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
@@ -179,16 +182,16 @@ export default {
 		setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 
 		let previousTokenData =
-			<TokenData[]>(
+			<TokenDocument[]>(
 				sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			) || [];
 		// const currentTokenData = await sourceActor.getTokenData();
-		const currentTokenData = sourceToken.data;
+		const currentTokenData = sourceToken.document;
 
-		if (currentTokenData._id && previousTokenData.filter((z) => z._id === currentTokenData._id).length <= 0) {
+		if (currentTokenData.id && previousTokenData.filter((z) => z.id === currentTokenData.id).length <= 0) {
 			previousTokenData.push(currentTokenData);
 			previousTokenData = previousTokenData.filter(
-				(value, index, self) => index === self.findIndex((t) => t._id === null || t._id === value._id)
+				(value, index, self) => index === self.findIndex((t) => t.id === null || t.id === value.id)
 			);
 		}
 		setProperty(
@@ -238,7 +241,7 @@ export default {
 			delete proto.y;
 
 			/* overwrite any fields of the original with fields from the new proto */
-			// proto = mergeObject(sourceToken.data.toObject(), proto, {inplace:false});
+			// proto = mergeObject(sourceToken.toObject(), proto, {inplace:false});
 			//@ts-ignore
 			proto = mergeObject(proto, d, { inplace: false });
 			//proto = mergeObject(d, proto, {inplace:false});
@@ -255,7 +258,7 @@ export default {
 			// START _getRootActorData
 
 			/* returns the actor data sans ALL embedded collections */
-			const newRootActorData = newActor.data.toObject();
+			const newRootActorData = newActor.toObject();
 
 			// Transfer flags module from token to actor
 			if (!getProperty(newRootActorData, `flags`)) {
@@ -311,7 +314,7 @@ export default {
 			//   actor: <any>newActorData
 			// }
 
-			delete newActorData.data.token;
+			delete newActorData.token;
 
 			/* default is 0,0 -- let's stay where we are */
 			// delete newActorData.token.x;
@@ -335,20 +338,20 @@ export default {
 				},
 			};
 
-			delete updates.token.data.token;
-			delete updates.token.actor.data.token;
+			delete updates.token.document.token;
+			delete updates.token.actor.document.token;
 
 			/*
 			 * Protects the actor a bit more, but requires you
 			 * to close and repon the sheet after reverting.
 			 */
-			updates.token.data.actorLink = false;
+			updates.token.document.actorLink = false;
 
 			/* leave the actor link unchanged for a more seamless mutation */
-			delete updates.token.data.actorLink;
+			delete updates.token.document.actorLink;
 
 			/* we want to keep our source actor, not swap to a new one entirely */
-			delete updates.token.data.actorId;
+			delete updates.token.document.actorId;
 
 			/* default is 0,0 -- let's stay where we are */
 			// delete updates.token.x;
@@ -381,22 +384,22 @@ export default {
 				);
 				// NEDDED FOR WARPGATE ????
 				//@ts-ignore
-				if (!updates.actor.data.flags) {
-					setProperty(updates.actor.data, `flags`, {});
+				if (!updates.actor.flags) {
+					setProperty(updates.actor, `flags`, {});
 				}
 				setProperty(
 					//@ts-ignore
-					updates.actor.data.flags,
+					updates.actor.flags,
 					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
 					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
 				);
 				setProperty(
 					//@ts-ignore
-					updates.actor.data.flags,
+					updates.actor.flags,
 					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
 					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`)
 				);
-				setProperty(updates.actor.data, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+				setProperty(updates.actor, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 				// ======================================================================================
 
 				// TODO show on chat ?
@@ -411,9 +414,7 @@ export default {
 						//comparisonKeys:{ ActiveEffect: 'label'}
 						delta: {
 							token: updates.token,
-							actor: {
-								data: updates.actor.data,
-							},
+							actor: updates.actor,
 							embedded: {},
 						},
 					}
@@ -424,7 +425,6 @@ export default {
 			const tokens = sourceActor.getActiveTokens(true);
 			tokens.map(async (t: Token) => {
 				const newTokenData = <any>foundry.utils.deepClone(updates);
-				//newTokenData.token._id = t.data._id;
 
 				// ======================================================================================
 				// SETTING FLAGS
@@ -447,29 +447,25 @@ export default {
 					arrayMutationNames
 				);
 				// NEDDED FOR WARPGATE ????
-				if (!newTokenData.actor.data) {
-					setProperty(newTokenData.actor, `data`, {});
+				if (!newTokenData.actor) {
+					setProperty(newTokenData, `actor`, {});
 				}
-				if (!newTokenData.actor.data.flags) {
-					setProperty(newTokenData.actor.data, `flags`, {});
+				if (!newTokenData.actor.flags) {
+					setProperty(newTokenData.actor, `flags`, {});
 				}
 				setProperty(
 					//@ts-ignore
-					newTokenData.actor.data.flags,
+					newTokenData.actor.flags,
 					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
 					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
 				);
 				setProperty(
 					//@ts-ignore
-					newTokenData.actor.data.flags,
+					newTokenData.actor.flags,
 					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
 					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`)
 				);
-				setProperty(
-					newTokenData.actor.data,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`,
-					true
-				);
+				setProperty(newTokenData.actor, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 				// =======================================================================================================
 
 				// TODO show on chat ?
@@ -484,9 +480,7 @@ export default {
 						//comparisonKeys:{ ActiveEffect: 'label'}
 						delta: {
 							token: updates.token,
-							actor: {
-								data: updates.actor.data,
-							},
+							actor: updates.actor,
 							embedded: {},
 						},
 					}
@@ -531,7 +525,7 @@ export default {
 			if (!originalActor) {
 				originalActor = sourceActor;
 			}
-			await transferPermissionsActor(originalActor, newActor);
+			await transferPermissionsActorInner(originalActor, newActor, <User>game.user);
 
 			// Update placed Token instances
 			// if (!transformTokens) {
@@ -544,8 +538,6 @@ export default {
 					tokens = sourceActor.getActiveTokens();
 				}
 				const tokensTmp = tokens.filter((t) => {
-					//return actorUpdates.token.id === t.data._id;
-					//return targetActorData._id === t.actor?.id;
 					return sourceActor.id === t.actor?.id;
 				});
 				tokens = tokensTmp;
@@ -554,7 +546,7 @@ export default {
 			}
 			const updates = tokens.map((t) => {
 				const newTokenData = <TokenData>foundry.utils.deepClone(d.token);
-				newTokenData._id = t.data._id;
+				newTokenData._id = t.document.id;
 				newTokenData.actorId = <string>newActor.id;
 				newTokenData.actorLink = true;
 				if (!newTokenData.flags) {
@@ -615,7 +607,7 @@ export default {
 		 */
 		Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, sourceActor, renderSheet);
 
-		const previousOriginalActorTokenData = <TokenData[]>(
+		const previousOriginalActorTokenData = <TokenDocument[]>(
 			sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 		);
 		let isTheOriginalActor = false;
@@ -696,7 +688,7 @@ export default {
 				if (!game.settings.get(CONSTANTS.MODULE_NAME, "doNotDeleteTmpActors")) {
 					const idsToDelete = <string[]>[];
 					idsToDelete.push(<string>sourceActor.id);
-					const othersActorsToDelete = <TokenData[]>(
+					const othersActorsToDelete = <TokenDocument[]>(
 						sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 					);
 					if (
@@ -707,11 +699,16 @@ export default {
 						othersActorsToDelete.reverse();
 						for (const td of othersActorsToDelete) {
 							if (
+								//@ts-ignore
 								td.actorId &&
+								//@ts-ignore
 								!idsToDelete.includes(td.actorId) &&
+								//@ts-ignore
 								td.actorId != original.id &&
+								//@ts-ignore
 								game.actors?.get(td.actorId)
 							) {
+								//@ts-ignore
 								idsToDelete.push(td.actorId);
 							}
 						}
@@ -1020,12 +1017,12 @@ export default {
 		for (const effect of newEffectsOri) {
 			let originS = "";
 			let effectS = undefined;
-			if (effect.value?.data && Object.prototype.hasOwnProperty.call(effect.value?.data, "origin")) {
-				originS = effect.value.data.origin;
-				effectS = effect.value.data;
-			} else if (effect.data && Object.prototype.hasOwnProperty.call(effect.data, "origin")) {
-				originS = effect.data.origin;
-				effectS = effect.data;
+			if (effect.value && Object.prototype.hasOwnProperty.call(effect.value, "origin")) {
+				originS = effect.value.origin;
+				effectS = effect.value;
+			} else if (effect && Object.prototype.hasOwnProperty.call(effect, "origin")) {
+				originS = effect.origin;
+				effectS = effect;
 			} else if (effect.origin && Object.prototype.hasOwnProperty.call(effect, "origin")) {
 				originS = effect.origin;
 				effectS = effect;
@@ -1039,7 +1036,7 @@ export default {
 		d = {
 			type: originalActorData.type, // Remain the same actor type
 			name: explicitName ? explicitName : `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
-			data: keepSelf ? originalActorData.data : targetActorData.data, // Get the data model of your new form
+			data: keepSelf ? originalActorData : targetActorData, // Get the data model of your new form
 			items: keepSelf ? originalActorData.items : targetActorData.items, // Get the items of your new form
 			effects: keepSelf
 				? newEffects
@@ -1054,7 +1051,7 @@ export default {
 			flags: originalActorData.flags, // Use the original actor flags
 			// x: sourceToken.x,
 			// y: sourceToken.y,
-			// token: sourceToken.data.toObject()
+			// token: sourceToken.toObject()
 			width: targetActorData.token.width,
 			height: targetActorData.token.height,
 			scale: targetActorData.token.scale,
@@ -1062,37 +1059,37 @@ export default {
 
 		// Specifically delete some data attributes
 		//@ts-ignore
-		delete d.data.resources; // Don't change your resource pools
+		delete d.system.resources; // Don't change your resource pools
 		//@ts-ignore
-		delete d.data.currency; // Don't lose currency
+		delete d.system.currency; // Don't lose currency
 		//@ts-ignore
-		delete d.data.bonuses; // Don't lose global bonuses
+		delete d.system.bonuses; // Don't lose global bonuses
 
 		// Specific additional adjustments
 		//@ts-ignore
-		if (originalActorData.data.details?.alignment) {
+		if (originalActorData.system.details?.alignment) {
 			//@ts-ignore
-			d.data.details.alignment = originalActorData.data.details.alignment; // Don't change alignment
+			d.system.details.alignment = originalActorData.system.details.alignment; // Don't change alignment
 		}
 		//@ts-ignore
-		if (originalActorData.data.attributes.exhaustion) {
+		if (originalActorData.system.attributes.exhaustion) {
 			//@ts-ignore
-			d.data.attributes.exhaustion = originalActorData.data.attributes.exhaustion; // Keep your prior exhaustion level
+			d.system.attributes.exhaustion = originalActorData.system.attributes.exhaustion; // Keep your prior exhaustion level
 		}
 		//@ts-ignore
-		if (originalActorData.data.attributes.inspiration) {
+		if (originalActorData.system.attributes.inspiration) {
 			//@ts-ignore
-			d.data.attributes.inspiration = originalActorData.data.attributes.inspiration; // Keep inspiration
+			d.system.attributes.inspiration = originalActorData.system.attributes.inspiration; // Keep inspiration
 		}
 		//@ts-ignore
-		if (originalActorData.data.spells) {
+		if (originalActorData.system.spells) {
 			//@ts-ignore
-			d.data.spells = originalActorData.data.spells; // Keep spell slots
+			d.system.spells = originalActorData.system.spells; // Keep spell slots
 		}
 		//@ts-ignore
-		if (targetActorData.data.attributes.ac) {
+		if (targetActorData.system.attributes.ac) {
 			//@ts-ignore
-			d.data.attributes.ac.flat = targetActorData.data.attributes.ac.value; // Override AC
+			d.system.attributes.ac.flat = targetActorData.system.attributes.ac.value; // Override AC
 		}
 
 		// Token appearance updates
@@ -1115,15 +1112,15 @@ export default {
 			// Transfer ability scores
 			if (
 				//@ts-ignore
-				originalActorData.data.abilities &&
+				originalActorData.system.abilities &&
 				//@ts-ignore
-				(originalActorData.data.abilities.length > 0 || originalActorData.data.abilities.size > 0)
+				(originalActorData.system.abilities.length > 0 || originalActorData.system.abilities.size > 0)
 			) {
 				//@ts-ignore
-				const abilities = d.data.abilities;
+				const abilities = d.system.abilities;
 				for (const k of Object.keys(abilities)) {
 					//@ts-ignore
-					const oa = originalActorData.data.abilities[k];
+					const oa = originalActorData.system.abilities[k];
 					const prof = abilities[k].proficient;
 					if (keepPhysical && ["str", "dex", "con"].includes(k)) abilities[k] = oa;
 					else if (keepMental && ["int", "wis", "cha"].includes(k)) abilities[k] = oa;
@@ -1136,19 +1133,19 @@ export default {
 			//@ts-ignore
 			if (
 				//@ts-ignore
-				originalActorData.data.skills &&
+				originalActorData.system.skills &&
 				//@ts-ignore
-				(originalActorData.data.skills.length > 0 || originalActorData.data.skills.size > 0)
+				(originalActorData.system.skills.length > 0 || originalActorData.system.skills.size > 0)
 			) {
 				if (keepSkills) {
 					//@ts-ignore
-					d.data.skills = originalActorData.data.skills;
+					d.system.skills = originalActorData.system.skills;
 				} else if (mergeSkills) {
-					if (d.data.skills && (d.data.skills.length > 0 || d.data.skills.size > 0)) {
+					if (d.system.skills && (d.system.skills.length > 0 || d.system.skills.size > 0)) {
 						// eslint-disable-next-line prefer-const
-						for (let [k, s] of Object.entries(d.data.skills)) {
+						for (let [k, s] of Object.entries(d.system.skills)) {
 							//@ts-ignore
-							s.value = Math.max(<number>(<any>s).value, originalActorData.data.skills[k].value);
+							s.value = Math.max(<number>(<any>s).value, originalActorData.system.skills[k].value);
 						}
 					}
 				}
@@ -1171,50 +1168,52 @@ export default {
 				);
 			}
 			// Transfer classes for NPCs
-			if (!keepClass && d.data.details.cr) {
+			if (!keepClass && d.system.details.cr) {
 				d.items.push({
 					type: "class",
 					name: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphTmpClass`),
-					data: { levels: d.data.details.cr },
+					data: { levels: d.system.details.cr },
 				});
 			}
 
 			// Keep biography
 			//@ts-ignore
-			if (originalActorData.data.details.biography) {
+			if (originalActorData.system.details.biography) {
 				if (keepBio) {
 					//@ts-ignore
-					d.data.details.biography = originalActorData.data.details.biography;
+					d.system.details.biography = originalActorData.system.details.biography;
 				}
 			}
 
 			// Keep senses
-			if (d.data.traits) {
-				if (!d.data.traits.senses) {
-					d.data.traits.senses = [];
-				} else if (typeof d.data.traits.senses === "string" || d.data.traits.senses instanceof String) {
-					d.data.traits.senses = [
+			if (d.system.traits) {
+				if (!d.system.traits.senses) {
+					d.system.traits.senses = [];
+				} else if (typeof d.system.traits.senses === "string" || d.system.traits.senses instanceof String) {
+					d.system.traits.senses = [
 						{
-							value: d.data.traits.senses,
+							value: d.system.traits.senses,
 						},
 					];
 				} else if (
-					typeof d.data.traits.senses === "object" &&
-					!Array.isArray(d.data.traits.senses) &&
-					d.data.traits.senses !== null
+					typeof d.system.traits.senses === "object" &&
+					!Array.isArray(d.system.traits.senses) &&
+					d.system.traits.senses !== null
 				) {
-					d.data.traits.senses = [d.data.traits.senses];
+					d.system.traits.senses = [d.system.traits.senses];
 				}
 
 				if (
 					//@ts-ignore
-					originalActorData.data.traits.senses &&
+					originalActorData.system.traits.senses &&
 					//@ts-ignore
-					(originalActorData.data.traits.senses.length > 0 || originalActorData.data.traits.senses.size > 0)
+					(originalActorData.system.traits.senses.length > 0 ||
+						//@ts-ignore
+						originalActorData.system.traits.senses.size > 0)
 				) {
 					if (keepVision) {
 						//@ts-ignore
-						d.data.traits.senses = originalActorData.data.traits.senses;
+						d.system.traits.senses = originalActorData.system.traits.senses;
 					}
 				}
 			}
@@ -1231,12 +1230,12 @@ export default {
 					for (const effect of tokenEffects) {
 						let originS = "";
 						let effectS = undefined;
-						if (effect.value?.data && Object.prototype.hasOwnProperty.call(effect.value?.data, "origin")) {
-							originS = effect.value.data.origin;
-							effectS = effect.value.data;
-						} else if (effect.data && Object.prototype.hasOwnProperty.call(effect.data, "origin")) {
-							originS = effect.data.origin;
-							effectS = effect.data;
+						if (effect.value && Object.prototype.hasOwnProperty.call(effect.value, "origin")) {
+							originS = effect.value.origin;
+							effectS = effect.value;
+						} else if (effect && Object.prototype.hasOwnProperty.call(effect, "origin")) {
+							originS = effect.origin;
+							effectS = effect;
 						} else if (effect.origin && Object.prototype.hasOwnProperty.call(effect, "origin")) {
 							originS = effect.origin;
 							effectS = effect;

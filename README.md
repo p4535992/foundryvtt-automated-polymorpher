@@ -59,7 +59,7 @@ I don't have time for check every system attributes and skill need help from the
 where usually as common values i use these:
 ```
 const targetActorImages = await targetActor.getTokenImages();
-const sourceEffects = sourceToken.actor ? sourceToken.actor.effects : sourceToken.data.effects;
+const sourceEffects = sourceToken.actor ? sourceToken.actor.effects : sourceToken.effects;
 const transformOptions = {
   keepPhysical = false;
   keepMental = false;

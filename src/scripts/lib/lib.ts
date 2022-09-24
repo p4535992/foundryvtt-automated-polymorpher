@@ -273,8 +273,10 @@ export function retrieveActorFromToken(sourceToken: Token): Actor | undefined {
 	//   return sourceToken.actor;
 	// }
 	let actor: Actor | undefined = undefined;
-	if (sourceToken.data.actorLink) {
-		actor = <Actor>game.actors?.get(<string>sourceToken.data.actorId);
+	//@ts-ignore
+	if (sourceToken.document.actorLink) {
+		//@ts-ignore
+		actor = <Actor>game.actors?.get(<string>sourceToken.document.actorId);
 	}
 	// DO NOT NEED THIS
 	// if(!actor){
@@ -331,7 +333,7 @@ export function retrieveActorFromToken(sourceToken: Token): Actor | undefined {
 
 /* returns the actor data sans ALL embedded collections */
 export function _getRootActorData(actorDoc: Actor) {
-	const actorData = actorDoc.data.toObject();
+	const actorData = actorDoc.toObject();
 
 	/* get the key NAME of the embedded document type.
 	 * ex. not 'ActiveEffect' (the class name), 'effect' the collection's field name
@@ -371,33 +373,33 @@ export function transferItemsActor(
 		let stacked = false; // will be true if a stack of item has been found and items have been stacked in it
 		if (stackItems) {
 			const potentialStacks = <Item[]>(
-				targetActor?.data.items.filter(
-					(i) =>
-						i.name == originalItem.name && diffObject(createdItem, i) && i.data._id !== createdItem.data._id
+				targetActor?.items.filter(
+					(i) => i.name == originalItem.name && diffObject(createdItem, i) && i.id !== createdItem.id
 				)
 			);
 			if (potentialStacks.length >= 1) {
 				//@ts-ignore
-				const newQuantity = <number>potentialStacks[0].data.data.quantity + transferedQuantity;
-				potentialStacks[0]?.update({ "data.quantity": newQuantity });
-				// deleteItemIfZero(targetSheet, <string>createdItem.data._id);
+				const newQuantity = <number>potentialStacks[0].system.quantity + transferedQuantity;
+				potentialStacks[0]?.update({ "system.quantity": newQuantity });
+				// deleteItemIfZero(targetSheet, <string>createdItem.id);
 				stacked = true;
 			}
 		}
 
-		originalItem.update({ "data.quantity": newOriginalQuantity }).then((i: Item | undefined) => {
+		originalItem.update({ "system.quantity": newOriginalQuantity }).then((i: Item | undefined) => {
 			if (i) {
 				const sh = <FormApplication<FormApplicationOptions, FormApplication.Data<{}, FormApplicationOptions>>>(
 					i.actor?.sheet
 				);
 				//@ts-ignore
-				deleteItemIfZero(<ActorSheet>sh, <string>i.data._id);
+				deleteItemIfZero(<ActorSheet>sh, <string>i.id);
 			}
 		});
 		if (stacked === false) {
 			//@ts-ignore
-			createdItem.data.data.quantity = transferedQuantity;
-			targetActor?.createEmbeddedDocuments("Item", [<any>createdItem.data]);
+			createdItem.system.quantity = transferedQuantity;
+			//@ts-ignore
+			targetActor?.createEmbeddedDocuments("Item", [<any>createdItem]);
 		}
 	} else {
 		error("could not transfer " + transferedQuantity + " items", true);
@@ -522,7 +524,7 @@ export async function rollFromString(rollString, actor) {
 	return myvalue;
 }
 
-export async function transferPermissionsActorInner(sourceActor, targetActor, user) {
+export async function transferPermissionsActorInner(sourceActor: Actor, targetActor: Actor, user: User) {
 	// if (!game.user.isGM) throw new Error("You do not have the ability to configure permissions.");
 
 	// let sourceActor = //actor to copy the permissions from

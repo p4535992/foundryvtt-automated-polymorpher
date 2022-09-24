@@ -107,8 +107,8 @@ export default {
 
     /* add in deletes for items that we added via powerMorph */
     token.document.actor.items.forEach( (item) => {
-        if (getProperty(item.data, 'flags.warpgate.powerMorph.delete')){
-            powerMorphStack.delta.embedded.Item[item.data._id] = warpgate.CONST.DELETE;
+        if (getProperty(item, 'flags.warpgate.powerMorph.delete')){
+            powerMorphStack.delta.embedded.Item[item.id] = warpgate.CONST.DELETE;
         }
     } );
 

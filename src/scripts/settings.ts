@@ -286,13 +286,13 @@ class ResetSettingsDialog extends FormApplication<FormApplicationOptions, object
 
 async function applyDefaultSettings() {
 	const settings = defaultSettings(true);
-	for (const [name, data] of Object.entries(settings)) {
-		await game.settings.set(CONSTANTS.MODULE_NAME, name, data.default);
+	for (const [settingName, settingValue] of Object.entries(settings)) {
+		await game.settings.set(CONSTANTS.MODULE_NAME, settingName, settingValue.default);
 	}
 	const settings2 = otherSettings(true);
-	for (const [name, data] of Object.entries(settings2)) {
+	for (const [settingName, settingValue] of Object.entries(settings2)) {
 		//@ts-ignore
-		await game.settings.set(CONSTANTS.MODULE_NAME, name, data.default);
+		await game.settings.set(CONSTANTS.MODULE_NAME, settingName, settingValue.default);
 	}
 }
 
@@ -413,6 +413,14 @@ function otherSettings(apply = false) {
 			config: true,
 			type: Boolean,
 			default: false,
+		},
+		disableSettingsForNoGM: {
+			name: i18n(`${CONSTANTS.MODULE_NAME}.settings.disableSettingsForNoGM.title`),
+			hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.disableSettingsForNoGM.hint`),
+			scope: "world",
+			config: true,
+			type: Boolean,
+			default: true,
 		},
 		restrictOwned: {
 			name: i18n(`${CONSTANTS.MODULE_NAME}.settings.restrictOwned.title`),

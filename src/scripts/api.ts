@@ -138,7 +138,7 @@ const API = {
 			// REVERT TO ORIGINAL FORM
 			// =====================================
 
-			const updatesForRevert = <TokenData[]>(
+			const updatesForRevert = <TokenDocument[]>(
 				currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			);
 			if (!updatesForRevert || updatesForRevert.length <= 0) {
