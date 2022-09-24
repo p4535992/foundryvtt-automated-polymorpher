@@ -112,15 +112,3 @@ export function getSocket() {
 	const data = game.modules.get(CONSTANTS.MODULE_NAME) as unknown as AutomatedPolymorpherModuleData;
 	return data.socket;
 }
-
-Hooks.once("libChangelogsReady", function () {
-	//@ts-ignore
-	libChangelogs.register(
-		CONSTANTS.MODULE_NAME,
-		`
-    - Merge de.json file for language
-    - Bug fix: [Doesn't work in v9 latest](https://github.com/p4535992/foundryvtt-automated-polymorpher/issues/5)
-    `,
-		"minor"
-	);
-});
