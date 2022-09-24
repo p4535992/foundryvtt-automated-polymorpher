@@ -209,10 +209,10 @@ export default {
 			previousTokenData
 		);
 
-		if (!d.token.flags) {
-			d.token.flags = {};
+		if (!d.prototypeToken.flags) {
+			d.prototypeToken.flags = {};
 		}
-		mergeObject(d.token.flags, d.flags);
+		mergeObject(d.prototypeToken.flags, d.flags);
 
 		// Step up the array of mutation names
 		let arrayMutationNames: string[] = <string[]>(
@@ -227,7 +227,7 @@ export default {
 			arrayMutationNames.push(mutationNameOriginalToken);
 		}
 		setProperty(
-			d.token.flags,
+			d.prototypeToken.flags,
 			`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
 			arrayMutationNames
 		);
@@ -277,7 +277,7 @@ export default {
 				setProperty(newRootActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
 			}
 			//@ts-ignore
-			mergeObject(newRootActorData.flags[CONSTANTS.MODULE_NAME], d.token.flags[CONSTANTS.MODULE_NAME]);
+			mergeObject(newRootActorData.flags[CONSTANTS.MODULE_NAME], d.prototypeToken.flags[CONSTANTS.MODULE_NAME]);
 
 			/* get the key NAME of the embedded document type.
 			 * ex. not 'ActiveEffect' (the class name), 'effect' the collection's field name
@@ -315,7 +315,7 @@ export default {
 				setProperty(newActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
 			}
 			//@ts-ignore
-			mergeObject(newActorData.flags[CONSTANTS.MODULE_NAME], d.token.flags[CONSTANTS.MODULE_NAME]);
+			mergeObject(newActorData.flags[CONSTANTS.MODULE_NAME], d.prototypeToken.flags[CONSTANTS.MODULE_NAME]);
 
 			/* form the update */
 			// const updates = {
@@ -501,7 +501,7 @@ export default {
 
 			// Update unlinked Tokens in place since they can simply be re-dropped from the base actor
 			if (sourceActor.isToken) {
-				const tokenData = d.token;
+				const tokenData = d.prototypeToken;
 				// tokenData.actorData = d;
 				setProperty(tokenData, `actorData`, d);
 				//@ts-ignore
@@ -512,7 +512,7 @@ export default {
 
 			// Some info like height and weight of the token are reset to default
 			// after the constructor of the actor is invoked solved with a backup of the info of the token
-			const tokenBackup = duplicate(d.token);
+			const tokenBackup = duplicate(d.prototypeToken);
 			// Create new Actor with transformed data
 			//@ts-ignore
 			const newActor = await sourceActor.constructor.create(d, { renderSheet: renderSheet });
@@ -523,7 +523,7 @@ export default {
 				PolymorpherFlags.ORIGINAL_ACTOR,
 				getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
 			);
-			mergeObject(d.token, tokenBackup);
+			mergeObject(d.prototypeToken, tokenBackup);
 
 			let originalActor = <Actor>(
 				game.actors?.get(<string>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
@@ -1104,10 +1104,7 @@ export default {
 
 		// Token appearance updates
 		//@ts-ignore
-		d.token = <PrototypeTokenData>{ name: d.name, texture: {} };
-		// for (const k of ["width", "height", "scale", "img", "mirrorX", "mirrorY", "tint", "alpha", "lockRotation"]) {
-		// 	d.token[k] = targetActorData.token[k];
-		// }
+		d.prototypeToken = <PrototypeTokenData>{ name: d.name, texture: {} };
 		for (const k of ["width", "height", "alpha", "lockRotation"]) {
 			//@ts-ignore
 			d.prototypeToken[k] = targetActorData.prototypeToken[k];
