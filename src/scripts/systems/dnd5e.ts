@@ -1275,9 +1275,6 @@ export default {
 						} else if (effect && Object.prototype.hasOwnProperty.call(effect, "origin")) {
 							originS = effect.origin;
 							effectS = effect;
-						} else if (effect.origin && Object.prototype.hasOwnProperty.call(effect, "origin")) {
-							originS = effect.origin;
-							effectS = effect;
 						}
 						//@ts-ignore
 						if (effectS && originS && !originS.toLowerCase().includes("item.")) {
@@ -1288,6 +1285,15 @@ export default {
 				}
 			}
 		}
+		// Strange bug with fvtt10
+		const tokenEffectsCleaned: any[] = [];
+		for (const effect of d.effects) {
+			const effectTmp = effect.toObject();
+			//@ts-ignore
+			delete effectTmp._id;
+			tokenEffectsCleaned.push(effectTmp);
+		}
+		d.effects = tokenEffectsCleaned;		
 
 		// =====================================
 		// END SPECIFIC MANAGEMENT FOR SYSTEM

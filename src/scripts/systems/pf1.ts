@@ -1272,6 +1272,15 @@ export default {
 				}
 			}
 		}
+		// Strange bug with fvtt10
+		const tokenEffectsCleaned: any[] = [];
+		for (const effect of d.effects) {
+			const effectTmp = effect.toObject();
+			//@ts-ignore
+			delete effectTmp._id;
+			tokenEffectsCleaned.push(effectTmp);
+		}
+		d.effects = tokenEffectsCleaned;		
 
 		// =====================================
 		// END SPECIFIC MANAGEMENT FOR SYSTEM
