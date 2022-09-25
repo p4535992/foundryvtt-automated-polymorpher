@@ -1,3 +1,8 @@
+### 1.1.2
+
+- Fix polymorph for npc
+- Fix AC is missing on polymorph
+
 ### 1.1.0-1
 
 - Update to fvtt10

@@ -365,11 +365,23 @@ const API = {
 			renderSheet,
 		] = inAttributes;
 
-		const sourceToken = canvas.tokens?.placeables.find((t) => {
+		const sourceToken = <Token>canvas.tokens?.placeables.find((t) => {
 			return t.id === sourceTokenId;
 		});
+		if (!sourceToken) {
+			warn(`No source token found with reference '${sourceTokenId}'`, true);
+			return;
+		}
 
-		const sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
+		let sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
+		//@ts-ignore
+		if (!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME)) {
+			sourceActor = <Actor>retrieveActorFromToken(sourceToken);
+		}
+		if (!sourceActor) {
+			warn(`No source actor found with reference '${sourceTokenId}'`, true);
+			return;
+		}
 
 		const polymoprhers: PolymorpherData[] =
 			<PolymorpherData[]>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS) || [];
@@ -396,15 +408,6 @@ const API = {
 			currentPolymorph?.compendiumid,
 			false
 		);
-
-		if (!sourceToken) {
-			warn(`No source token found with reference '${sourceTokenId}'`, true);
-			return;
-		}
-		if (!sourceActor) {
-			warn(`No source actor found with reference '${sourceTokenId}'`, true);
-			return;
-		}
 		if (!targetActor) {
 			warn(`No target actor found with reference '${sourceTokenId}'`, true);
 			return;
@@ -438,15 +441,18 @@ const API = {
 		}
 		const [sourceTokenId, sourceActorId, sourceActorName, renderSheet] = inAttributes;
 
-		const sourceToken = canvas.tokens?.placeables.find((t) => {
+		const sourceToken = <Token>canvas.tokens?.placeables.find((t) => {
 			return t.id === sourceTokenId;
 		});
-
-		const sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "", false);
-
 		if (!sourceToken) {
 			warn(`No source token found with reference '${sourceTokenId}'`, true);
 			return;
+		}
+
+		let sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
+		//@ts-ignore
+		if (!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME)) {
+			sourceActor = <Actor>retrieveActorFromToken(sourceToken);
 		}
 		if (!sourceActor) {
 			warn(`No source actor found with reference '${sourceTokenId}'`, true);

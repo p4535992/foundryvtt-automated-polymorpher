@@ -111,6 +111,8 @@ export default {
 			// TODO strange bug toJson is undefined ?
 			originalActorData = sourceActor.toObject();
 		}
+		//@ts-ignore
+		mergeObject(originalActorData.system, sourceActor.system);
 		/* get the full actor data */
 		let targetActorData;
 		try {
@@ -119,6 +121,8 @@ export default {
 			// TODO strange bug toJson is undefined ?
 			targetActorData = targetActor.toObject();
 		}
+		//@ts-ignore
+		mergeObject(targetActorData.system, targetActor.system);
 
 		const targetActorImages = await targetActor.getTokenImages();
 		//@ts-ignore
@@ -511,15 +515,16 @@ export default {
 			// ===========================================
 
 			// Update unlinked Tokens in place since they can simply be re-dropped from the base actor
-			if (sourceActor.isToken) {
-				const tokenData = d.prototypeToken;
-				// tokenData.actorData = d;
-				setProperty(tokenData, `actorData`, d);
-				//@ts-ignore
-				delete tokenData.actorData.token;
+			// TODO SEEM NOT WORKING ???
+			// if (sourceActor.isToken) {
+			// 	const tokenData = d.prototypeToken;
+			// 	// tokenData.actorData = d;
+			// 	setProperty(tokenData, `actorData`, d);
+			// 	//@ts-ignore
+			// 	delete tokenData.actorData.token;
 
-				return sourceActor.token?.update(tokenData);
-			}
+			// 	return sourceActor.token?.update(tokenData);
+			// }
 
 			// Some info like height and weight of the token are reset to default
 			// after the constructor of the actor is invoked solved with a backup of the info of the token
@@ -1120,7 +1125,8 @@ export default {
 		//@ts-ignore
 		if (targetActorData.system.attributes.ac) {
 			//@ts-ignore
-			d.system.attributes.ac.flat = targetActorData.system.attributes.ac.value; // Override AC
+			// d.system.attributes.ac.flat = targetActorData.system.attributes.ac.value; // Override AC
+			d.system.attributes.ac = targetActorData.system.attributes.ac;
 		}
 
 		// Token appearance updates
