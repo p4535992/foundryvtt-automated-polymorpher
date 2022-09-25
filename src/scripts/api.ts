@@ -10,6 +10,7 @@ import CONSTANTS from "./constants";
 import {
 	error,
 	info,
+	isEmptyObject,
 	retrieveActorFromData,
 	retrieveActorFromToken,
 	transferPermissionsActorInner,
@@ -373,10 +374,12 @@ const API = {
 			return;
 		}
 
-		let sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
+		let sourceActor = <Actor>retrieveActorFromToken(sourceToken);
 		//@ts-ignore
-		if (!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME)) {
-			sourceActor = <Actor>retrieveActorFromToken(sourceToken);
+		if (!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME) ||
+			//@ts-ignore
+			isEmptyObject(getProperty(sourceActor.flags, CONSTANTS.MODULE_NAME))) {
+			sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
 		}
 		if (!sourceActor) {
 			warn(`No source actor found with reference '${sourceTokenId}'`, true);
@@ -449,10 +452,12 @@ const API = {
 			return;
 		}
 
-		let sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
+		let sourceActor = <Actor>retrieveActorFromToken(sourceToken);
 		//@ts-ignore
-		if (!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME)) {
-			sourceActor = <Actor>retrieveActorFromToken(sourceToken);
+		if (!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME) ||
+			//@ts-ignore
+			isEmptyObject(getProperty(sourceActor.flags, CONSTANTS.MODULE_NAME))) {
+			sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
 		}
 		if (!sourceActor) {
 			warn(`No source actor found with reference '${sourceTokenId}'`, true);

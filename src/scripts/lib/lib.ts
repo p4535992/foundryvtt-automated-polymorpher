@@ -9,6 +9,18 @@ import type { ActorData } from "@league-of-foundry-developers/foundry-vtt-types/
 // Module Generic function
 // =============================
 
+export function isEmptyObject(obj: any) {
+    // because Object.keys(new Date()).length === 0;
+    // we have to do some additional check
+    if (obj === null || obj === undefined) {
+      return true;
+    }
+    const result =
+      obj && // null and undefined check
+      Object.keys(obj).length === 0; // || Object.getPrototypeOf(obj) === Object.prototype);
+    return result;
+}
+
 export function is_real_number(inNumber) {
 	return !isNaN(inNumber) && typeof inNumber === "number" && isFinite(inNumber);
 }
