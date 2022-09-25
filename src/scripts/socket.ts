@@ -29,9 +29,7 @@ export function registerSocket() {
 	automatedPolymorpherSocket.register("revertOriginalForm", (...args) => API.revertOriginalFormArr(...args));
 
 	automatedPolymorpherSocket.register("cleanUpTokenSelected", (...args) => API.cleanUpTokenSelectedArr(...args));
-	automatedPolymorpherSocket.register("transferPermissionsActor", (...args) =>
-		API.transferPermissionsActorArr(...args)
-	);
+
 	automatedPolymorpherSocket.register("retrieveAndPrepareActor", (...args) =>
 		API.retrieveAndPrepareActorArr(...args)
 	);

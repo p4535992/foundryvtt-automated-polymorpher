@@ -1,4 +1,4 @@
-### 1.1.2-3
+### 1.1.2-3-4
 
 - Fix polymorph for npc
 - Fix AC is missing on polymorph

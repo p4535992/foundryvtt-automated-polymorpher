@@ -65,7 +65,8 @@ export default {
 		sourceActor: Actor,
 		targetActor: Actor,
 		transformOptions: TransformOptionsGeneric | undefined = undefined,
-		renderSheet = true
+		renderSheet = true,
+		externalUserId = <string>game.user?.id
 	): Promise<any> {
 		const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
 		const transformTokens = transformOptions?.transformTokens || true;
@@ -515,7 +516,7 @@ export default {
 			if (!originalActor) {
 				originalActor = sourceActor;
 			}
-			await transferPermissionsActorInner(originalActor, newActor, <User>game.user);
+			// await transferPermissionsActorInner(originalActor, newActor, externalUserId);
 
 			// Update placed Token instances
 			// if (!transformTokens) {
@@ -562,6 +563,7 @@ export default {
 					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
 				);
 			}
+			await transferPermissionsActorInner(originalActor, newActor, externalUserId);
 			return tokensFinal;
 		}
 
@@ -832,7 +834,8 @@ export default {
 								sourceActor,
 								targetActor,
 								rememberOptions(html),
-								false
+								false,
+								<string>game.user?.id
 							);
 						},
 					},
@@ -868,7 +871,8 @@ export default {
 									transformTokens: rememberOptions(html).transformTokens,
 									explicitName: explicitName,
 								},
-								false
+								false,
+								<string>game.user?.id
 							);
 						},
 					},
@@ -899,7 +903,8 @@ export default {
 									transformTokens: rememberOptions(html).transformTokens,
 									explicitName: explicitName,
 								},
-								false
+								false,
+								<string>game.user?.id
 							);
 						},
 					},
@@ -916,7 +921,8 @@ export default {
 									transformTokens: rememberOptions(html).transformTokens,
 									explicitName: explicitName,
 								},
-								false
+								false,
+								<string>game.user?.id
 							),
 					},
 					cancel: {

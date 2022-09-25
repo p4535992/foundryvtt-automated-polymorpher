@@ -644,7 +644,8 @@ export class PolymorpherManager extends FormApplication {
 					transformTokens: true,
 					explicitName: aExplicitName,
 				},
-				false
+				false,
+				<string>game.user?.id
 			);
 		} else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphWildShape`) {
 			if (tokenFromTransform) {
@@ -681,7 +682,8 @@ export class PolymorpherManager extends FormApplication {
 					transformTokens: true,
 					explicitName: aExplicitName,
 				},
-				false
+				false,
+				<string>game.user?.id
 			);
 		} else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorph`) {
 			if (tokenFromTransform) {
@@ -725,7 +727,8 @@ export class PolymorpherManager extends FormApplication {
 					transformTokens: true,
 					explicitName: aExplicitName,
 				},
-				false
+				false,
+				<string>game.user?.id
 			);
 		} else if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphSelf`) {
 			if (tokenFromTransform) {
@@ -758,7 +761,8 @@ export class PolymorpherManager extends FormApplication {
 					transformTokens: true,
 					explicitName: aExplicitName,
 				},
-				false
+				false,
+				<string>game.user?.id
 			);
 		} else {
 			warn(

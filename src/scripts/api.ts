@@ -301,20 +301,6 @@ const API = {
 		}
 	},
 
-	async transferPermissionsActorArr(...inAttributes) {
-		if (!Array.isArray(inAttributes)) {
-			throw error("transferPermissionsActorArr | inAttributes must be of type array");
-		}
-		const [sourceActorId, targetActorId, userId] = inAttributes;
-		const sourceActor = game.actors?.get(sourceActorId);
-		const targetActor = game.actors?.get(targetActorId);
-		const user = game.users?.get(userId);
-		const result = await this.transferPermissionsActor(sourceActor, targetActor, user);
-		return result.id;
-	},
-	async transferPermissionsActor(sourceActor, targetActor, user) {
-		return await transferPermissionsActorInner(sourceActor, targetActor, user);
-	},
 	async retrieveAndPrepareActorArr(...inAttributes) {
 		if (!Array.isArray(inAttributes)) {
 			throw error("retrieveAndPrepareActorArr | inAttributes must be of type array");
@@ -335,14 +321,9 @@ const API = {
 		const targetActor = await retrieveActorFromData(aId, aName, currentCompendium, createOnWorld);
 		const sourceActor = await retrieveActorFromData(sourceActorId, undefined, undefined, false);
 		const user = <User>game.users?.get(userId);
-		if (!user.isGM) {
+		if (!user.isGM && game.user?.isGM) {
 			if (sourceActor && targetActor) {
-				//this.transferPermissionsActor(sourceActor,targetActor);
-				// Set ownership
-				const ownershipLevels = {};
-				ownershipLevels[userId] = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
-				// Update a single Document
-				targetActor.update({ ownership: ownershipLevels }, { diff: false, recursive: false, noHook: true });
+				transferPermissionsActorInner(sourceActor, targetActor, <string>user.id);
 			}
 		}
 		return targetActor;
@@ -364,6 +345,7 @@ const API = {
 			targetActorName,
 			transformOptions,
 			renderSheet,
+			externalUserId,
 		] = inAttributes;
 
 		const sourceToken = <Token>canvas.tokens?.placeables.find((t) => {
@@ -375,10 +357,12 @@ const API = {
 		}
 
 		let sourceActor = <Actor>retrieveActorFromToken(sourceToken);
-		//@ts-ignore
-		if (!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME) ||
+		if (
 			//@ts-ignore
-			isEmptyObject(getProperty(sourceActor.flags, CONSTANTS.MODULE_NAME))) {
+			!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME) ||
+			//@ts-ignore
+			isEmptyObject(getProperty(sourceActor.flags, CONSTANTS.MODULE_NAME))
+		) {
 			sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
 		}
 		if (!sourceActor) {
@@ -416,7 +400,14 @@ const API = {
 			return;
 		}
 
-		return this.transformIntoImpl(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
+		return this.transformIntoImpl(
+			sourceToken,
+			sourceActor,
+			targetActor,
+			transformOptions,
+			renderSheet,
+			externalUserId
+		);
 	},
 
 	async transformInto(
@@ -424,7 +415,8 @@ const API = {
 		sourceActor: Actor,
 		targetActor: Actor,
 		transformOptions: TransformOptionsGeneric,
-		renderSheet: boolean
+		renderSheet: boolean,
+		externalUserId: string
 	): Promise<any> {
 		return automatedPolymorpherSocket.executeAsGM(
 			"transformInto",
@@ -434,7 +426,8 @@ const API = {
 			targetActor.id,
 			targetActor.name,
 			transformOptions,
-			renderSheet
+			renderSheet,
+			externalUserId
 		);
 	},
 
@@ -453,10 +446,12 @@ const API = {
 		}
 
 		let sourceActor = <Actor>retrieveActorFromToken(sourceToken);
-		//@ts-ignore
-		if (!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME) ||
+		if (
 			//@ts-ignore
-			isEmptyObject(getProperty(sourceActor.flags, CONSTANTS.MODULE_NAME))) {
+			!hasProperty(sourceActor.flags, CONSTANTS.MODULE_NAME) ||
+			//@ts-ignore
+			isEmptyObject(getProperty(sourceActor.flags, CONSTANTS.MODULE_NAME))
+		) {
 			sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
 		}
 		if (!sourceActor) {
@@ -482,7 +477,8 @@ const API = {
 		sourceActor: Actor,
 		targetActor: Actor,
 		transformOptions: TransformOptionsGeneric,
-		renderSheet: boolean
+		renderSheet: boolean,
+		externalUserId: string
 	): Promise<any> {
 		if (!sourceToken) {
 			warn(`No source token is been passed`, true);
@@ -506,17 +502,54 @@ const API = {
 		// }
 
 		if (game.system.id === "D35E") {
-			return D35E.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
+			return D35E.transformInto(
+				sourceToken,
+				sourceActor,
+				targetActor,
+				transformOptions,
+				renderSheet,
+				externalUserId
+			);
 		} else if (game.system.id === "dnd5e") {
-			return dnd5e.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
+			return dnd5e.transformInto(
+				sourceToken,
+				sourceActor,
+				targetActor,
+				transformOptions,
+				renderSheet,
+				externalUserId
+			);
 		} else if (game.system.id === "pf1") {
-			return pf1.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
+			return pf1.transformInto(
+				sourceToken,
+				sourceActor,
+				targetActor,
+				transformOptions,
+				renderSheet,
+				externalUserId
+			);
 		} else if (game.system.id === "pf2e") {
-			return pf2e.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
+			return (
+				pf2e.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet), externalUserId
+			);
 		} else if (game.system.id === "swade") {
-			return swade.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
+			return swade.transformInto(
+				sourceToken,
+				sourceActor,
+				targetActor,
+				transformOptions,
+				renderSheet,
+				externalUserId
+			);
 		} else {
-			return generic.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet);
+			return generic.transformInto(
+				sourceToken,
+				sourceActor,
+				targetActor,
+				transformOptions,
+				renderSheet,
+				externalUserId
+			);
 		}
 	},
 

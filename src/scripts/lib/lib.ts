@@ -10,15 +10,15 @@ import type { ActorData } from "@league-of-foundry-developers/foundry-vtt-types/
 // =============================
 
 export function isEmptyObject(obj: any) {
-    // because Object.keys(new Date()).length === 0;
-    // we have to do some additional check
-    if (obj === null || obj === undefined) {
-      return true;
-    }
-    const result =
-      obj && // null and undefined check
-      Object.keys(obj).length === 0; // || Object.getPrototypeOf(obj) === Object.prototype);
-    return result;
+	// because Object.keys(new Date()).length === 0;
+	// we have to do some additional check
+	if (obj === null || obj === undefined) {
+		return true;
+	}
+	const result =
+		obj && // null and undefined check
+		Object.keys(obj).length === 0; // || Object.getPrototypeOf(obj) === Object.prototype);
+	return result;
 }
 
 export function is_real_number(inNumber) {
@@ -536,7 +536,7 @@ export async function rollFromString(rollString, actor) {
 	return myvalue;
 }
 
-export async function transferPermissionsActorInner(sourceActor: Actor, targetActor: Actor, user: User) {
+export async function transferPermissionsActorInner(sourceActor: Actor, targetActor: Actor, externalUserId: string) {
 	// if (!game.user.isGM) throw new Error("You do not have the ability to configure permissions.");
 
 	// let sourceActor = //actor to copy the permissions from
@@ -546,20 +546,25 @@ export async function transferPermissionsActorInner(sourceActor: Actor, targetAc
 	// which ensures that any undefined parts of the permissions object
 	// are not filled in by the existing permissions on the target actor
 	// const user = game.users.get(userId);
-
-	// Set ownership
-	// const ownershipLevels = {};
-	// ownershipLevels[userId] = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
-	// // Update a single Document
-	// targetActor.update({ ownership: ownershipLevels }, { diff: false, recursive: false, noHook: true });
+	// if (externalUserId) {
+	// 	// Set ownership
+	// 	const ownershipLevels = {};
+	// 	ownershipLevels[externalUserId] = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+	// 	// Update a single Document
+	// 	await targetActor.update({ ownership: ownershipLevels }, { diff: false, recursive: false, noHook: true });
+	// }
 
 	// For a straight duplicate of permissions, you should be able to just do:
-	return await targetActor.update({ permission: _getHandPermission(sourceActor) }, { diff: false, recursive: false });
+	// return await targetActor.update({ permission: _getHandPermission(sourceActor) }, { diff: false, recursive: false, noHook: true });
+	return await targetActor.update(
+		{ ownership: _getHandPermission(sourceActor, externalUserId) },
+		{ diff: false, recursive: false, noHook: true }
+	);
 }
 
 //this method is on the actor, so "this" is the actor document
-function _getHandPermission(actor) {
-	const handPermission = duplicate(actor.permission);
+function _getHandPermission(actor, externalUserId) {
+	const handPermission = duplicate(actor.ownership); // actor.permission
 	for (const key of Object.keys(handPermission)) {
 		//remove any permissions that are not owner
 		if (handPermission[key] < CONST.DOCUMENT_PERMISSION_LEVELS.OWNER) {
@@ -567,6 +572,9 @@ function _getHandPermission(actor) {
 		}
 		//set default permission to none/limited/observer
 		handPermission.default = CONST.DOCUMENT_PERMISSION_LEVELS.NONE; // CONST.DOCUMENT_PERMISSION_LEVELS.OBSERVER
+	}
+	if (!handPermission[externalUserId] || handPermission[externalUserId] < CONST.DOCUMENT_PERMISSION_LEVELS.OWNER) {
+		handPermission[externalUserId] = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
 	}
 	return handPermission;
 }
