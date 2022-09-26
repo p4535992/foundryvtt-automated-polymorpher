@@ -9,6 +9,31 @@ import type { ActorData } from "@league-of-foundry-developers/foundry-vtt-types/
 // Module Generic function
 // =============================
 
+// return true or false if you, the user, should run the scripts on this actor.
+export function should_I_run_this(actor: Actor) {
+	let user;
+	//@ts-ignore
+	const { OWNER } = CONST.DOCUMENT_OWNERSHIP_LEVELS;
+
+	// find a non-GM who is active and owner of the actor.
+	user = game.users?.find((i) => {
+		const a = !i.isGM;
+		const b = i.active;
+		const c = actor.testUserPermission(i, OWNER);
+		return a && b && c;
+	});
+	if (user) {
+		return user === game.user;
+	}
+	// find a GM who is active and owner of the actor.
+	user = game.users?.find((i) => {
+		const a = i.isGM;
+		const b = i.active;
+		return a && b;
+	});
+	return user === game.user;
+}
+
 export function isEmptyObject(obj: any) {
 	// because Object.keys(new Date()).length === 0;
 	// we have to do some additional check
@@ -455,7 +480,7 @@ export async function retrieveActorFromData(
 				}
 			}
 		}
-		if (actorToTransformLi && createOnWorld) {
+		if (actorToTransformLi && createOnWorld && (game.user?.isGM || should_I_run_this(actorToTransformLi))) {
 			// Create actor from compendium
 			const collection = <any>game.collections.get(pack.documentName);
 			const id = actorToTransformLi.id; // li.data("document-id");

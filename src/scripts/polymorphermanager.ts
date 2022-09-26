@@ -8,7 +8,7 @@ import {
 	TokenRevertData,
 } from "./automatedPolymorpherModels";
 import CONSTANTS from "./constants";
-import { error, i18n, info, retrieveActorFromData, wait, warn } from "./lib/lib";
+import { error, i18n, info, retrieveActorFromData, should_I_run_this, wait, warn } from "./lib/lib";
 import { automatedPolymorpherSocket } from "./socket";
 
 export class PolymorpherManager extends FormApplication {
@@ -24,7 +24,19 @@ export class PolymorpherManager extends FormApplication {
 		this.summons = summonData ? summonData : <PolymorpherData[]>[];
 		// this.spellLevel = spellLevel;
 		this.actor = actor;
-		this.token = token;
+
+		if (!token) {
+			const tokens = actor.getActiveTokens() || [];
+			if (tokens.length > 0) {
+				this.token = <Token>tokens[0];
+			} else {
+				//@ts-ignore
+				this.token = actor.prototypeToken;
+			}
+		} else {
+			//@ts-ignore
+			this.token = token.document ? token : token.object;
+		}
 	}
 
 	static get defaultOptions() {
@@ -185,23 +197,27 @@ export class PolymorpherManager extends FormApplication {
 	}
 
 	async _onSummonPolymorpher(event) {
-		this.minimize();
+		this.close(); // this.minimize();
 		const animation = <string>$(event.currentTarget.parentElement.parentElement).find(".anim-dropdown").val();
 		const aId = event.currentTarget.dataset.aid;
 		const aName = event.currentTarget.dataset.aname;
 		const aCompendiumId = event.currentTarget.dataset.acompendiumid;
 		const aExplicitName = event.currentTarget.dataset.aexplicitname;
-		// const actorToTransform = await retrieveActorFromData(aId, aName, aCompendiumId, true);
-		const actorToTransformId = await automatedPolymorpherSocket.executeAsGM(
-			"retrieveAndPrepareActor",
-			aId,
-			aName,
-			aCompendiumId,
-			true,
-			this.actor.id,
-			game.user?.id
-		);
-		const actorToTransform = await retrieveActorFromData(actorToTransformId, undefined, undefined, false);
+		let actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
+		if (actorToTransform && should_I_run_this(actorToTransform)) {
+			// DO NOTHING
+		} else {
+			const actorToTransformId = await automatedPolymorpherSocket.executeAsGM(
+				"retrieveAndPrepareActor",
+				aId,
+				aName,
+				aCompendiumId,
+				true,
+				this.actor.id,
+				game.user?.id
+			);
+			actorToTransform = <Actor>await retrieveActorFromData(actorToTransformId, undefined, undefined, false);
+		}
 		if (!actorToTransform) {
 			warn(
 				`The actor you try to polimorphing not exists anymore, please set up again the actor on the polymorpher manager`,
@@ -516,23 +532,27 @@ export class PolymorpherManager extends FormApplication {
 		polymorpherData: PolymorpherData,
 		animationExternal = { sequence: undefined, timeToWait: 0 }
 	) {
-		this.minimize();
+		this.close(); // this.minimize();
 		const animation = polymorpherData.animation;
 		const aId = polymorpherData.id;
 		const aName = polymorpherData.name;
 		const aCompendiumId = polymorpherData.compendiumid;
 		const aExplicitName = polymorpherData.explicitname;
-		// const actorToTransform = await retrieveActorFromData(aId, aName, aCompendiumId, true);
-		const actorToTransformId = await automatedPolymorpherSocket.executeAsGM(
-			"retrieveAndPrepareActor",
-			aId,
-			aName,
-			aCompendiumId,
-			true,
-			this.actor.id,
-			game.user?.id
-		);
-		const actorToTransform = await retrieveActorFromData(actorToTransformId, undefined, undefined, false);
+		let actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
+		if (actorToTransform && should_I_run_this(actorToTransform)) {
+			// DO NOTHING
+		} else {
+			const actorToTransformId = await automatedPolymorpherSocket.executeAsGM(
+				"retrieveAndPrepareActor",
+				aId,
+				aName,
+				aCompendiumId,
+				true,
+				this.actor.id,
+				game.user?.id
+			);
+			actorToTransform = <Actor>await retrieveActorFromData(actorToTransformId, undefined, undefined, false);
+		}
 		if (!actorToTransform) {
 			warn(
 				`The actor you try to polymorphism not exists anymore, please set up again the actor on the polymorpher manager`,

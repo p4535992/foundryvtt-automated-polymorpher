@@ -10,7 +10,8 @@
 	<div>
 		<label class="text" for="explicitName">
 			<input type="text" id="explicitName" name="explicitName" placeholder="{{content.targetActorName}}"
-				value="{{content.targetActorName}}">
+				value="{{content.targetActorName}}" 
+				onchange="$(this).attr('value', this.value);" onkeyup="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();">
 			{{localize "automated-polymorpher.polymorphExplicitName"}}
 		</label>
 	</div>

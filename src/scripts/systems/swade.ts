@@ -902,7 +902,7 @@ export default {
 									mergeSaves: true,
 									mergeSkills: true,
 									transformTokens: rememberOptions(html).transformTokens,
-									explicitName: explicitName,
+									explicitName: rememberOptions(html).explicitName,
 								},
 								false,
 								<string>game.user?.id
@@ -934,7 +934,7 @@ export default {
 								targetActor,
 								{
 									transformTokens: rememberOptions(html).transformTokens,
-									explicitName: explicitName,
+									explicitName: rememberOptions(html).explicitName,
 								},
 								false,
 								<string>game.user?.id
@@ -944,7 +944,7 @@ export default {
 					self: {
 						icon: '<i class="fas fa-eye"></i>',
 						label: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphSelf`),
-						callback: (html) =>
+						callback: async (html) => {
 							this.transformInto(
 								sourceToken,
 								sourceActor,
@@ -952,11 +952,12 @@ export default {
 								{
 									keepSelf: true,
 									transformTokens: rememberOptions(html).transformTokens,
-									explicitName: explicitName,
+									explicitName: rememberOptions(html).explicitName,
 								},
 								false,
 								<string>game.user?.id
-							),
+							);
+						},
 					},
 					cancel: {
 						icon: '<i class="fas fa-times"></i>',
