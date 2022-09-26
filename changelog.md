@@ -1,3 +1,7 @@
+### 1.1.5
+
+- [[BUG] Latest release not working on newly upgraded server](https://github.com/p4535992/foundryvtt-automated-polymorpher/issues/23)
+
 ### 1.1.2-3-4
 
 - Fix polymorph for npc
@@ -14,8 +18,7 @@
 - Many bug fix
 - Add text field 'explicitName' on the dialog config custom
 
-### 1.0.42
-
+### 1.0.
 - Add header sheet button and context option for revert the transformation
 - Add code for transfer permission when create the new tmp actor
 - Add module setting for customize the color of the new 'Restore Transformation' button

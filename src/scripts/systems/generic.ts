@@ -1032,7 +1032,7 @@ export default {
 		}
 
 		// Prepare new data to merge from the source
-		d = {
+		mergeObject(d, {
 			type: originalActorData.type, // Remain the same actor type
 			name: explicitName ? explicitName : `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
 			//@ts-ignore
@@ -1065,43 +1065,7 @@ export default {
 				//@ts-ignore
 				scaleY: targetActorData.prototypeToken.texture.scaleY,
 			},
-		};
-
-		// Specifically delete some data attributes
-		//@ts-ignore
-		delete d.system.resources; // Don't change your resource pools
-		//@ts-ignore
-		delete d.system.currency; // Don't lose currency
-		//@ts-ignore
-		delete d.system.bonuses; // Don't lose global bonuses
-
-		// Specific additional adjustments
-		//@ts-ignore
-		if (originalActorData.system.details?.alignment) {
-			//@ts-ignore
-			d.system.details.alignment = originalActorData.system.details.alignment; // Don't change alignment
-		}
-		//@ts-ignore
-		if (originalActorData.system.attributes.exhaustion) {
-			//@ts-ignore
-			d.system.attributes.exhaustion = originalActorData.system.attributes.exhaustion; // Keep your prior exhaustion level
-		}
-		//@ts-ignore
-		if (originalActorData.system.attributes.inspiration) {
-			//@ts-ignore
-			d.system.attributes.inspiration = originalActorData.system.attributes.inspiration; // Keep inspiration
-		}
-		//@ts-ignore
-		if (originalActorData.system.spells) {
-			//@ts-ignore
-			d.system.spells = originalActorData.system.spells; // Keep spell slots
-		}
-		//@ts-ignore
-		if (targetActorData.system.attributes.ac) {
-			//@ts-ignore
-			// d.system.attributes.ac.flat = targetActorData.system.attributes.ac.value; // Override AC
-			d.system.attributes.ac = targetActorData.system.attributes.ac;
-		}
+		});
 
 		// Token appearance updates
 		//@ts-ignore
@@ -1123,6 +1087,42 @@ export default {
 		}
 
 		if (!keepSelf) {
+			// Specifically delete some data attributes
+			//@ts-ignore
+			delete d.system.resources; // Don't change your resource pools
+			//@ts-ignore
+			delete d.system.currency; // Don't lose currency
+			//@ts-ignore
+			delete d.system.bonuses; // Don't lose global bonuses
+
+			// Specific additional adjustments
+			//@ts-ignore
+			if (originalActorData.system.details?.alignment) {
+				//@ts-ignore
+				d.system.details.alignment = originalActorData.system.details.alignment; // Don't change alignment
+			}
+			//@ts-ignore
+			if (originalActorData.system.attributes.exhaustion) {
+				//@ts-ignore
+				d.system.attributes.exhaustion = originalActorData.system.attributes.exhaustion; // Keep your prior exhaustion level
+			}
+			//@ts-ignore
+			if (originalActorData.system.attributes.inspiration) {
+				//@ts-ignore
+				d.system.attributes.inspiration = originalActorData.system.attributes.inspiration; // Keep inspiration
+			}
+			//@ts-ignore
+			if (originalActorData.system.spells) {
+				//@ts-ignore
+				d.system.spells = originalActorData.system.spells; // Keep spell slots
+			}
+			//@ts-ignore
+			if (targetActorData.system.attributes.ac) {
+				//@ts-ignore
+				// d.system.attributes.ac.flat = targetActorData.system.attributes.ac.value; // Override AC
+				d.system.attributes.ac = targetActorData.system.attributes.ac;
+			}
+
 			//@ts-ignore
 			const vision = keepVision ? originalActorData.prototypeToken : targetActorData.prototypeToken;
 			for (const k of ["dimSight", "brightSight", "dimLight", "brightLight", "vision", "sightAngle"]) {
