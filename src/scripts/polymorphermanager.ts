@@ -205,7 +205,7 @@ export class PolymorpherManager extends FormApplication {
 		const aExplicitName = event.currentTarget.dataset.aexplicitname;
 		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
 		const cloneFlagsBase = getProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`);
-		let actorToTransform:Actor|undefined = undefined;
+		let actorToTransform: Actor | undefined = undefined;
 		actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
 		if (actorToTransform && should_I_run_this(actorToTransform)) {
 			// DO NOTHING
@@ -551,7 +551,7 @@ export class PolymorpherManager extends FormApplication {
 		const aExplicitName = polymorpherData.explicitname;
 		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
 		const cloneFlagsBase = getProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`);
-		let actorToTransform:Actor|undefined = undefined;
+		let actorToTransform: Actor | undefined = undefined;
 		actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
 		if (actorToTransform && should_I_run_this(actorToTransform)) {
 			// DO NOTHING

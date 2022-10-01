@@ -49,13 +49,13 @@ export const readyHooks = async () => {
 
 		const actor = app.object;
 		let token = app.token ? app.token : app.object.token;
-		if(!token) {
+		if (!token) {
 			const tokens = actor.getActiveTokens() || [];
-			if(tokens.length > 0){
+			if (tokens.length > 0) {
 				token = tokens[0];
 			}
 		}
-		if(!token){
+		if (!token) {
 			token = canvas.tokens?.placeables.find((t) => {
 				//@ts-ignore
 				return t.document.actorId === actor.id;
@@ -92,7 +92,7 @@ export const readyHooks = async () => {
 				onclick: function restoreTransformation(event) {
 					const random = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
 					const ordered = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
-					if(token){
+					if (token) {
 						API._invokePolymorpherManagerInner(token, actor, true, ordered, random, undefined);
 					} else {
 						warn(`No token is founded checkout the logs`, true);
@@ -147,14 +147,14 @@ export const readyHooks = async () => {
 				},
 				callback: (li) => {
 					const actor = <Actor>game.actors?.get(li.data("documentId"));
-					let token:Token|undefined = undefined;
-					if(!token) {
+					let token: Token | undefined = undefined;
+					if (!token) {
 						const tokens = actor.getActiveTokens() || [];
-						if(tokens.length > 0){
+						if (tokens.length > 0) {
 							token = tokens[0];
 						}
 					}
-					if(!token){
+					if (!token) {
 						token = canvas.tokens?.placeables.find((t) => {
 							//@ts-ignore
 							return t.document.actorId === actor.id;

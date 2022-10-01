@@ -346,7 +346,7 @@ const API = {
 			transformOptions,
 			renderSheet,
 			externalUserId,
-			cloneFlags
+			cloneFlags,
 		] = inAttributes;
 
 		const sourceToken = <Token>canvas.tokens?.placeables.find((t) => {
@@ -371,7 +371,7 @@ const API = {
 			return;
 		}
 
-		if(cloneFlags) {
+		if (cloneFlags) {
 			setProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
 			setProperty(<Actor>sourceToken?.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
 		}
@@ -406,7 +406,7 @@ const API = {
 			return;
 		}
 
-		if(cloneFlags) {
+		if (cloneFlags) {
 			setProperty(targetActor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
 		}
 
@@ -474,7 +474,7 @@ const API = {
 			return;
 		}
 
-		if(cloneFlags) {
+		if (cloneFlags) {
 			setProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
 			setProperty(<Actor>sourceToken?.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
 		}
@@ -483,25 +483,27 @@ const API = {
 		return originalActor?.id;
 	},
 
-	async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean):Promise<string> {
+	async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean): Promise<string> {
 		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
 		const cloneFlags = getProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`);
-		let actorOriginalId = <string>await automatedPolymorpherSocket.executeAsGM(
-			"revertOriginalForm",
-			sourceToken.id,
-			sourceActor.id,
-			sourceActor.name,
-			renderSheet,
-			cloneFlags
+		let actorOriginalId = <string>(
+			await automatedPolymorpherSocket.executeAsGM(
+				"revertOriginalForm",
+				sourceToken.id,
+				sourceActor.id,
+				sourceActor.name,
+				renderSheet,
+				cloneFlags
+			)
 		);
-		if(!actorOriginalId){
+		if (!actorOriginalId) {
 			warn(`NO actor id returned from revert polymorph action. Check out the logs`, true);
 		}
 		const actorOriginal = <Actor>game.actors?.get(actorOriginalId);
-		if(!actorOriginal){
+		if (!actorOriginal) {
 			warn(`NO actor returned from revert polymorph action with id ${actorOriginalId}. Check out the logs`, true);
 		}
-		if(cloneFlags) {
+		if (cloneFlags) {
 			setProperty(actorOriginal, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
 		}
 		return <string>actorOriginal?.id;
@@ -537,7 +539,7 @@ const API = {
 		// }
 
 		if (game.system.id === "D35E") {
-			return await  D35E.transformInto(
+			return await D35E.transformInto(
 				sourceToken,
 				sourceActor,
 				targetActor,
@@ -565,11 +567,11 @@ const API = {
 			);
 		} else if (game.system.id === "pf2e") {
 			return await pf2e.transformInto(
-				sourceToken, 
-				sourceActor, 
-				targetActor, 
-				transformOptions, 
-				renderSheet, 
+				sourceToken,
+				sourceActor,
+				targetActor,
+				transformOptions,
+				renderSheet,
 				externalUserId
 			);
 		} else if (game.system.id === "swade") {
@@ -600,7 +602,11 @@ const API = {
 	 * @param {boolean} [renderSheet] Render Sheet after revert the transformation.
 	 * @returns {Promise<Actor>|null}  Original actor if it was reverted.
 	 */
-	async revertOriginalFormImpl(sourceToken: Token, sourceActor: Actor, renderSheet: boolean):Promise<Actor|undefined> {
+	async revertOriginalFormImpl(
+		sourceToken: Token,
+		sourceActor: Actor,
+		renderSheet: boolean
+	): Promise<Actor | undefined> {
 		if (game.system.id === "D35E") {
 			return await D35E.revertOriginalForm(sourceToken, sourceActor, renderSheet);
 		} else if (game.system.id === "dnd5e") {

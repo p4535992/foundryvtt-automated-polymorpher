@@ -714,21 +714,41 @@ export default {
 				}
 			}
 		} finally {
-			if(original && hasProperty(original,`flags.${CONSTANTS.MODULE_NAME}`)){
+			if (original && hasProperty(original, `flags.${CONSTANTS.MODULE_NAME}`)) {
 				// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
 				const cloneFlags = getProperty(original, `flags.${CONSTANTS.MODULE_NAME}`);
-				
+
 				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
 				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
 				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
 				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
-				
+
 				// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.COMPENDIUM}`, cloneFlags[PolymorpherFlags.COMPENDIUM]);
-				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORDERED}`, cloneFlags[PolymorpherFlags.ORDERED]);
-				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.POLYMORPHERS}`, cloneFlags[PolymorpherFlags.POLYMORPHERS]);
-				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.RANDOM}`, cloneFlags[PolymorpherFlags.RANDOM]);
-				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`, cloneFlags[PolymorpherFlags.TRANSFORMER_OPTIONS]);
+				setProperty(
+					original,
+					`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.COMPENDIUM}`,
+					cloneFlags[PolymorpherFlags.COMPENDIUM]
+				);
+				setProperty(
+					original,
+					`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORDERED}`,
+					cloneFlags[PolymorpherFlags.ORDERED]
+				);
+				setProperty(
+					original,
+					`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.POLYMORPHERS}`,
+					cloneFlags[PolymorpherFlags.POLYMORPHERS]
+				);
+				setProperty(
+					original,
+					`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.RANDOM}`,
+					cloneFlags[PolymorpherFlags.RANDOM]
+				);
+				setProperty(
+					original,
+					`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`,
+					cloneFlags[PolymorpherFlags.TRANSFORMER_OPTIONS]
+				);
 			}
 		}
 		if (isRendered && renderSheet) {
