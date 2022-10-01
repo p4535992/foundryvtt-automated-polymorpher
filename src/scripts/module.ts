@@ -48,7 +48,19 @@ export const readyHooks = async () => {
 		}
 
 		const actor = app.object;
-		const token = app.token ? app.token : app.object.token;
+		let token = app.token ? app.token : app.object.token;
+		if(!token) {
+			const tokens = actor.getActiveTokens() || [];
+			if(tokens.length > 0){
+				token = tokens[0];
+			}
+		}
+		if(!token){
+			token = canvas.tokens?.placeables.find((t) => {
+				//@ts-ignore
+				return t.document.actorId === actor.id;
+			});
+		}
 		const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
 		const isPolymorphedF = actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
 
@@ -80,7 +92,11 @@ export const readyHooks = async () => {
 				onclick: function restoreTransformation(event) {
 					const random = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
 					const ordered = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
-					API._invokePolymorpherManagerInner(token, actor, true, ordered, random, undefined);
+					if(token){
+						API._invokePolymorpherManagerInner(token, actor, true, ordered, random, undefined);
+					} else {
+						warn(`No token is founded checkout the logs`, true);
+					}
 				},
 			});
 		}
@@ -131,12 +147,25 @@ export const readyHooks = async () => {
 				},
 				callback: (li) => {
 					const actor = <Actor>game.actors?.get(li.data("documentId"));
-
+					let token:Token|undefined = undefined;
+					if(!token) {
+						const tokens = actor.getActiveTokens() || [];
+						if(tokens.length > 0){
+							token = tokens[0];
+						}
+					}
+					if(!token){
+						token = canvas.tokens?.placeables.find((t) => {
+							//@ts-ignore
+							return t.document.actorId === actor.id;
+						});
+					}
 					const random = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
 					const ordered = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
-					const tokens = actor.getActiveTokens() || [];
-					if (tokens.length > 0) {
-						API._invokePolymorpherManagerInner(<Token>tokens[0], actor, true, ordered, random, undefined);
+					if (token) {
+						API._invokePolymorpherManagerInner(<Token>token, actor, true, ordered, random, undefined);
+					} else {
+						warn(`No token is founded checkout the logs`, true);
 					}
 				},
 			});

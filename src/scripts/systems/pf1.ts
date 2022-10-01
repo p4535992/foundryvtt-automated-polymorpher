@@ -105,25 +105,8 @@ export default {
 		const transformTokens = transformOptions?.transformTokens || true;
 
 		// Get the original Actor data and the new source data
-		let originalActorData;
-		try {
-			originalActorData = sourceActor.toJSON();
-		} catch (e) {
-			// TODO strange bug toJson is undefined ?
-			originalActorData = sourceActor.toObject();
-		}
-		//@ts-ignore
-		mergeObject(originalActorData.system, sourceActor.system);
-		/* get the full actor data */
-		let targetActorData;
-		try {
-			targetActorData = targetActor.toJSON();
-		} catch (e) {
-			// TODO strange bug toJson is undefined ?
-			targetActorData = targetActor.toObject();
-		}
-		//@ts-ignore
-		mergeObject(targetActorData.system, targetActor.system);
+		const originalActorData = sourceActor.toObject(false);
+		const targetActorData = targetActor.toObject(false);
 
 		const targetActorImages = await targetActor.getTokenImages();
 		//@ts-ignore
@@ -656,6 +639,10 @@ export default {
 				return;
 			}
 		}
+		const isRendered = sourceActor.sheet?.rendered;
+		if (isRendered) {
+			sourceActor.sheet?.close();
+		}
 		try {
 			if (useWarpGate) {
 				// =============================================
@@ -755,46 +742,31 @@ export default {
 								}
 							}
 						}
-						Actor.deleteDocuments(idsActorToDelete);
+						await Actor.deleteDocuments(idsActorToDelete);
 					}
 				}
 			}
-
-			const isRendered = sourceActor.sheet?.rendered;
-			if (isRendered) {
-				sourceActor.sheet?.close();
-			}
-			if (isRendered && renderSheet) {
-				original.sheet?.render(isRendered);
-			}
 		} finally {
-			await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
-			await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
-			await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-			await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
-
-			await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
-			await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
-			await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-			await sourceActor.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
-
-			await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
-			await sourceToken.document.unsetFlag(
-				CONSTANTS.MODULE_NAME,
-				PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
-			);
-			await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-			await sourceToken.document.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
-
-			await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
-			await sourceToken.actor?.unsetFlag(
-				CONSTANTS.MODULE_NAME,
-				PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
-			);
-			await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-			await sourceToken.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+			if(original && hasProperty(original,`flags.${CONSTANTS.MODULE_NAME}`)){
+				// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
+				const cloneFlags = getProperty(original, `flags.${CONSTANTS.MODULE_NAME}`);
+				
+				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+				
+				// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
+				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.COMPENDIUM}`, cloneFlags[PolymorpherFlags.COMPENDIUM]);
+				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORDERED}`, cloneFlags[PolymorpherFlags.ORDERED]);
+				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.POLYMORPHERS}`, cloneFlags[PolymorpherFlags.POLYMORPHERS]);
+				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.RANDOM}`, cloneFlags[PolymorpherFlags.RANDOM]);
+				setProperty(original, `flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`, cloneFlags[PolymorpherFlags.TRANSFORMER_OPTIONS]);
+			}
 		}
-
+		if (isRendered && renderSheet) {
+			original.sheet?.render(isRendered);
+		}
 		return original;
 	},
 

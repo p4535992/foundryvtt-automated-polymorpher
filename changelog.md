@@ -1,3 +1,7 @@
+### 1.1.6
+
+- Many bug fix, strange reset of the flags whet set or unset flags on the same namespace ?
+
 ### 1.1.5
 
 - [[BUG] Latest release not working on newly upgraded server](https://github.com/p4535992/foundryvtt-automated-polymorpher/issues/23)
