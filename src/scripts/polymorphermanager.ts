@@ -203,7 +203,10 @@ export class PolymorpherManager extends FormApplication {
 		const aName = event.currentTarget.dataset.aname;
 		const aCompendiumId = event.currentTarget.dataset.acompendiumid;
 		const aExplicitName = event.currentTarget.dataset.aexplicitname;
-		let actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
+		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
+		const cloneFlagsBase = getProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`);
+		let actorToTransform:Actor|undefined = undefined;
+		actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
 		if (actorToTransform && should_I_run_this(actorToTransform)) {
 			// DO NOTHING
 		} else {
@@ -225,6 +228,7 @@ export class PolymorpherManager extends FormApplication {
 			);
 			return;
 		}
+		setProperty(actorToTransform, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlagsBase);
 
 		let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
 				return t.actor?.id === this.actor.id;
@@ -545,7 +549,10 @@ export class PolymorpherManager extends FormApplication {
 		const aName = polymorpherData.name;
 		const aCompendiumId = polymorpherData.compendiumid;
 		const aExplicitName = polymorpherData.explicitname;
-		let actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
+		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
+		const cloneFlagsBase = getProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`);
+		let actorToTransform:Actor|undefined = undefined;
+		actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
 		if (actorToTransform && should_I_run_this(actorToTransform)) {
 			// DO NOTHING
 		} else {
@@ -567,6 +574,8 @@ export class PolymorpherManager extends FormApplication {
 			);
 			return;
 		}
+		setProperty(actorToTransform, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlagsBase);
+
 		//@ts-ignore
 		const tokenDataToTransform = <TokenDocument>await actorToTransform.getTokenDocument();
 

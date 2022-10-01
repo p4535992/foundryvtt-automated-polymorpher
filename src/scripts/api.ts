@@ -31,7 +31,7 @@ const API = {
 		if (!Array.isArray(inAttributes)) {
 			throw error("invokePolymorpherManagerFromActorArr | inAttributes must be of type array");
 		}
-		const [sourceActorIdOrName, removePolymorpher, ordered, random, animationExternal] = inAttributes;
+		const [sourceActorIdOrName, removePolymorpher, ordered, random, animationExternal, cloneFlags] = inAttributes;
 		const result = await (this as typeof API).invokePolymorpherManagerFromActor(
 			sourceActorIdOrName,
 			removePolymorpher,
@@ -69,7 +69,7 @@ const API = {
 		if (!Array.isArray(inAttributes)) {
 			throw error("invokePolymorpherManagerArr | inAttributes must be of type array");
 		}
-		const [sourceTokenIdOrName, removePolymorpher, ordered, random, animationExternal] = inAttributes;
+		const [sourceTokenIdOrName, removePolymorpher, ordered, random, animationExternal, cloneFlags] = inAttributes;
 		const result = await (this as typeof API).invokePolymorpherManager(
 			sourceTokenIdOrName,
 			removePolymorpher,
@@ -305,7 +305,7 @@ const API = {
 		if (!Array.isArray(inAttributes)) {
 			throw error("retrieveAndPrepareActorArr | inAttributes must be of type array");
 		}
-		const [aId, aName, currentCompendium, createOnWorld, sourceActorId, userId] = inAttributes;
+		const [aId, aName, currentCompendium, createOnWorld, sourceActorId, userId, cloneFlags] = inAttributes;
 		const result = await this.retrieveAndPrepareActor(
 			aId,
 			aName,
@@ -346,6 +346,7 @@ const API = {
 			transformOptions,
 			renderSheet,
 			externalUserId,
+			cloneFlags
 		] = inAttributes;
 
 		const sourceToken = <Token>canvas.tokens?.placeables.find((t) => {
@@ -368,6 +369,11 @@ const API = {
 		if (!sourceActor) {
 			warn(`No source actor found with reference '${sourceTokenId}'`, true);
 			return;
+		}
+
+		if(cloneFlags) {
+			setProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
+			setProperty(<Actor>sourceToken?.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
 		}
 
 		const polymoprhers: PolymorpherData[] =
@@ -400,7 +406,11 @@ const API = {
 			return;
 		}
 
-		return this.transformIntoImpl(
+		if(cloneFlags) {
+			setProperty(targetActor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
+		}
+
+		const something = await this.transformIntoImpl(
 			sourceToken,
 			sourceActor,
 			targetActor,
@@ -408,6 +418,7 @@ const API = {
 			renderSheet,
 			externalUserId
 		);
+		return something;
 	},
 
 	async transformInto(
@@ -418,7 +429,9 @@ const API = {
 		renderSheet: boolean,
 		externalUserId: string
 	): Promise<any> {
-		return automatedPolymorpherSocket.executeAsGM(
+		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
+		const cloneFlags = getProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`);
+		const something = await automatedPolymorpherSocket.executeAsGM(
 			"transformInto",
 			sourceToken.id,
 			sourceActor.id,
@@ -427,15 +440,17 @@ const API = {
 			targetActor.name,
 			transformOptions,
 			renderSheet,
-			externalUserId
+			externalUserId,
+			cloneFlags
 		);
+		return something;
 	},
 
 	async revertOriginalFormArr(...inAttributes) {
 		if (!Array.isArray(inAttributes)) {
 			throw error("revertOriginalFormArr | inAttributes must be of type array");
 		}
-		const [sourceTokenId, sourceActorId, sourceActorName, renderSheet] = inAttributes;
+		const [sourceTokenId, sourceActorId, sourceActorName, renderSheet, cloneFlags] = inAttributes;
 
 		const sourceToken = <Token>canvas.tokens?.placeables.find((t) => {
 			return t.id === sourceTokenId;
@@ -459,17 +474,37 @@ const API = {
 			return;
 		}
 
-		this.revertOriginalFormImpl(sourceToken, sourceActor, renderSheet);
+		if(cloneFlags) {
+			setProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
+			setProperty(<Actor>sourceToken?.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
+		}
+
+		const originalActor = <Actor>await this.revertOriginalFormImpl(sourceToken, sourceActor, renderSheet);
+		return originalActor?.id;
 	},
 
-	async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean) {
-		return automatedPolymorpherSocket.executeAsGM(
+	async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean):Promise<string> {
+		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
+		const cloneFlags = getProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`);
+		let actorOriginalId = <string>await automatedPolymorpherSocket.executeAsGM(
 			"revertOriginalForm",
 			sourceToken.id,
 			sourceActor.id,
 			sourceActor.name,
-			renderSheet
+			renderSheet,
+			cloneFlags
 		);
+		if(!actorOriginalId){
+			warn(`NO actor id returned from revert polymorph action. Check out the logs`, true);
+		}
+		const actorOriginal = <Actor>game.actors?.get(actorOriginalId);
+		if(!actorOriginal){
+			warn(`NO actor returned from revert polymorph action with id ${actorOriginalId}. Check out the logs`, true);
+		}
+		if(cloneFlags) {
+			setProperty(actorOriginal, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
+		}
+		return <string>actorOriginal?.id;
 	},
 
 	async transformIntoImpl(
@@ -502,7 +537,7 @@ const API = {
 		// }
 
 		if (game.system.id === "D35E") {
-			return D35E.transformInto(
+			return await  D35E.transformInto(
 				sourceToken,
 				sourceActor,
 				targetActor,
@@ -511,7 +546,7 @@ const API = {
 				externalUserId
 			);
 		} else if (game.system.id === "dnd5e") {
-			return dnd5e.transformInto(
+			return await dnd5e.transformInto(
 				sourceToken,
 				sourceActor,
 				targetActor,
@@ -520,7 +555,7 @@ const API = {
 				externalUserId
 			);
 		} else if (game.system.id === "pf1") {
-			return pf1.transformInto(
+			return await pf1.transformInto(
 				sourceToken,
 				sourceActor,
 				targetActor,
@@ -529,11 +564,16 @@ const API = {
 				externalUserId
 			);
 		} else if (game.system.id === "pf2e") {
-			return (
-				pf2e.transformInto(sourceToken, sourceActor, targetActor, transformOptions, renderSheet), externalUserId
+			return await pf2e.transformInto(
+				sourceToken, 
+				sourceActor, 
+				targetActor, 
+				transformOptions, 
+				renderSheet, 
+				externalUserId
 			);
 		} else if (game.system.id === "swade") {
-			return swade.transformInto(
+			return await swade.transformInto(
 				sourceToken,
 				sourceActor,
 				targetActor,
@@ -542,7 +582,7 @@ const API = {
 				externalUserId
 			);
 		} else {
-			return generic.transformInto(
+			return await generic.transformInto(
 				sourceToken,
 				sourceActor,
 				targetActor,
@@ -560,7 +600,7 @@ const API = {
 	 * @param {boolean} [renderSheet] Render Sheet after revert the transformation.
 	 * @returns {Promise<Actor>|null}  Original actor if it was reverted.
 	 */
-	async revertOriginalFormImpl(sourceToken: Token, sourceActor: Actor, renderSheet: boolean) {
+	async revertOriginalFormImpl(sourceToken: Token, sourceActor: Actor, renderSheet: boolean):Promise<Actor|undefined> {
 		if (game.system.id === "D35E") {
 			return await D35E.revertOriginalForm(sourceToken, sourceActor, renderSheet);
 		} else if (game.system.id === "dnd5e") {

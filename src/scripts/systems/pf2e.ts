@@ -100,7 +100,7 @@ export default {
 		transformOptions: TransformOptionsGeneric | undefined = undefined,
 		renderSheet = true,
 		externalUserId = <string>game.user?.id
-	): Promise<any> {
+	): Promise<TokenDocument | undefined> {
 		const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
 		const transformTokens = transformOptions?.transformTokens || true;
 
@@ -424,7 +424,7 @@ export default {
 						},
 					}
 				);
-				return;
+				return tokensMutate;
 			}
 
 			const tokens = sourceActor.getActiveTokens(true);
@@ -488,7 +488,7 @@ export default {
 						},
 					}
 				);
-				return newTokenData;
+				return tokensMutate;
 			});
 		} else {
 			// =============================================
@@ -577,11 +577,11 @@ export default {
 				);
 			}
 			await transferPermissionsActorInner(originalActor, newActor, externalUserId);
-			return tokensFinal;
+			/* run mutation and label it 'powermorph' */
+			info(`${sourceToken.name} mutate into a ${targetActor.name}`);
+			return tokensFinal[0];
 		}
-
-		/* run mutation and label it 'powermorph' */
-		info(`${sourceToken.name} mutate into a ${targetActor.name}`);
+		return undefined;
 	},
 
 	/**
@@ -633,7 +633,7 @@ export default {
 					}),
 					true
 				);
-				return;
+				return undefined;
 			}
 		}
 		const isRendered = sourceActor.sheet?.rendered;
