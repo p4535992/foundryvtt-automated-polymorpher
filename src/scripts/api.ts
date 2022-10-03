@@ -317,7 +317,7 @@ const API = {
 		return result.id;
 	},
 
-	async retrieveAndPrepareActor(aId, aName, currentCompendium, createOnWorld, sourceActorId, userId) {
+	async retrieveAndPrepareActor(aId:string, aName:string, currentCompendium:string, createOnWorld:boolean, sourceActorId:string, userId:string):Promise<Actor|null> {
 		const targetActor = await retrieveActorFromData(aId, aName, currentCompendium, createOnWorld);
 		const sourceActor = await retrieveActorFromData(sourceActorId, undefined, undefined, false);
 		const user = <User>game.users?.get(userId);
@@ -333,7 +333,7 @@ const API = {
 		return <TransformOptionsGeneric>game.settings.get(CONSTANTS.MODULE_NAME, "polymorphSetting");
 	},
 
-	async transformIntoArr(...inAttributes) {
+	async transformIntoArr(...inAttributes):Promise<any> {
 		if (!Array.isArray(inAttributes)) {
 			throw error("transformIntoArr | inAttributes must be of type array");
 		}
@@ -354,7 +354,7 @@ const API = {
 		});
 		if (!sourceToken) {
 			warn(`No source token found with reference '${sourceTokenId}'`, true);
-			return;
+			return undefined;
 		}
 
 		let sourceActor = <Actor>retrieveActorFromToken(sourceToken);
@@ -368,7 +368,7 @@ const API = {
 		}
 		if (!sourceActor) {
 			warn(`No source actor found with reference '${sourceTokenId}'`, true);
-			return;
+			return undefined;
 		}
 
 		if (cloneFlags) {
@@ -446,7 +446,7 @@ const API = {
 		return something;
 	},
 
-	async revertOriginalFormArr(...inAttributes) {
+	async revertOriginalFormArr(...inAttributes): Promise<string|undefined> {
 		if (!Array.isArray(inAttributes)) {
 			throw error("revertOriginalFormArr | inAttributes must be of type array");
 		}
@@ -457,7 +457,7 @@ const API = {
 		});
 		if (!sourceToken) {
 			warn(`No source token found with reference '${sourceTokenId}'`, true);
-			return;
+			return undefined;
 		}
 
 		let sourceActor = <Actor>retrieveActorFromToken(sourceToken);
@@ -471,7 +471,7 @@ const API = {
 		}
 		if (!sourceActor) {
 			warn(`No source actor found with reference '${sourceTokenId}'`, true);
-			return;
+			return undefined;
 		}
 
 		if (cloneFlags) {
@@ -480,10 +480,10 @@ const API = {
 		}
 
 		const originalActor = <Actor>await this.revertOriginalFormImpl(sourceToken, sourceActor, renderSheet);
-		return originalActor?.id;
+		return <string>originalActor?.id;
 	},
 
-	async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean): Promise<string> {
+	async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean): Promise<string|undefined> {
 		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
 		const cloneFlags = getProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`);
 		let actorOriginalId = <string>(
@@ -498,15 +498,21 @@ const API = {
 		);
 		if (!actorOriginalId) {
 			warn(`NO actor id returned from revert polymorph action. Check out the logs`, true);
+            return undefined;
 		}
 		const actorOriginal = <Actor>game.actors?.get(actorOriginalId);
 		if (!actorOriginal) {
 			warn(`NO actor returned from revert polymorph action with id ${actorOriginalId}. Check out the logs`, true);
+            return undefined;
 		}
-		if (cloneFlags) {
-			setProperty(actorOriginal, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-		}
-		return <string>actorOriginal?.id;
+        // bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
+        const cloneFlagsOriginal = <any[]>actorOriginal.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS);
+        if(!cloneFlagsOriginal || cloneFlagsOriginal.length === 0){
+            if (cloneFlags) {
+                setProperty(actorOriginal, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
+            }
+        }
+        return <string>actorOriginal?.id;
 	},
 
 	async transformIntoImpl(
@@ -519,19 +525,19 @@ const API = {
 	): Promise<any> {
 		if (!sourceToken) {
 			warn(`No source token is been passed`, true);
-			return;
+			return undefined;
 		}
 		if (!sourceActor) {
 			warn(`No source actor is been passed`, true);
-			return;
+			return undefined;
 		}
 		if (!targetActor) {
 			warn(`No target actor is been passed`, true);
-			return;
+			return undefined;
 		}
 		if (!game.actors?.get(<string>sourceActor.id)) {
 			warn(`No source actor is been found`, true);
-			return;
+			return undefined;
 		}
 		// if(!game.actors?.get(<string>targetActor.id)){
 		//   warn(`No target actor is been found`, true);
