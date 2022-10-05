@@ -175,30 +175,6 @@ export const registerSettings = function () {
 		default: false,
 	});
 
-	// // Polymorph Settings
-	// game.settings.register(CONSTANTS.MODULE_NAME, 'polymorphSettingsUser', {
-	//   scope: "client",
-	//   config: false,
-	//   default: {
-	//     keepPhysical: false,
-	//     keepMental: false,
-	//     keepSaves: false,
-	//     keepSkills: false,
-	//     mergeSaves: false,
-	//     mergeSkills: false,
-	//     keepClass: false,
-	//     keepFeats: false,
-	//     keepSpells: false,
-	//     keepItems: false,
-	//     keepBio: false,
-	//     keepVision: true,
-	//     keepSelf: false,
-	//     removeAE: false,
-	//     keepAEOnlyOriginNotEquipment: false,
-	//     transformTokens: true
-	//   }
-	// });
-
 	// ========================================================================
 
 	game.settings.register(CONSTANTS.MODULE_NAME, "debug", {
@@ -519,30 +495,6 @@ function otherSettings(apply = false) {
 			type: Boolean,
 			default: false,
 		},
-
-		// Polymorph Settings
-		// polymorphSettings: {
-		//   scope: "client",
-		//   config: false,
-		//   default: {
-		//     keepPhysical: false,
-		//     keepMental: false,
-		//     keepSaves: false,
-		//     keepSkills: false,
-		//     mergeSaves: false,
-		//     mergeSkills: false,
-		//     keepClass: false,
-		//     keepFeats: false,
-		//     keepSpells: false,
-		//     keepItems: false,
-		//     keepBio: false,
-		//     keepVision: true,
-		//     keepSelf: false,
-		//     removeAE: false,
-		//     keepAEOnlyOriginNotEquipment: false,
-		//     transformTokens: true
-		//   }
-		// }
 	};
 }
 

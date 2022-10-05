@@ -77,6 +77,7 @@ export class TransformOptionsGeneric {
 	keepVision = false;
 	keepSelf = false;
     removeAE = false;
+    // keepAEOnlyOriginNotEquipment = false;
     removeOtherOriginAE = false;
     removeOriginAE = false;
     removeEquipmentAE = false;
