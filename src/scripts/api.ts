@@ -52,7 +52,7 @@ const API = {
 		for (const tokenOnCanvas of <Token[]>canvas.tokens?.placeables) {
 			const actor = retrieveActorFromToken(tokenOnCanvas);
 			if (actor && (actor.id === sourceActorIdOrName || actor.name === sourceActorIdOrName)) {
-				this._invokePolymorpherManagerInner(
+				await this._invokePolymorpherManagerInner(
 					tokenOnCanvas,
 					actor,
 					removePolymorpher,
@@ -99,7 +99,7 @@ const API = {
 			warn(`No actor founded for the token with id/name '${sourceTokenIdOrName}'`, true);
 			return;
 		}
-		this._invokePolymorpherManagerInner(
+		await this._invokePolymorpherManagerInner(
 			sourceToken,
 			sourceActor,
 			removePolymorpher,
@@ -201,7 +201,19 @@ const API = {
 			info(`${currentActor.name} reverts to their original form`);
 			// TODO show on chat ?
 			//await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-			this.revertOriginalForm(currentToken, currentActor, false);
+			const actorOriginalId = await this.revertOriginalForm(currentToken, currentActor, false);
+			if (!actorOriginalId) {
+				warn(`NO actor id returned from revert polymorph action. Check out the logs`, true);
+				return;
+			}
+			const actorOriginal = <Actor>game.actors?.get(actorOriginalId);
+			if (!actorOriginal) {
+				warn(
+					`NO actor returned from revert polymorph action with id ${actorOriginalId}. Check out the logs`,
+					true
+				);
+				return;
+			}
 		} else {
 			// ================================
 			// TRANSFORM INTO

@@ -89,11 +89,11 @@ export const readyHooks = async () => {
 				icon: "fas fa-backward",
 				class: "restore-transformation-pm",
 				label: removeLabelSheetHeader ? "" : i18n(`${CONSTANTS.MODULE_NAME}.polymorphRestoreTransformationBtn`),
-				onclick: function restoreTransformation(event) {
+				onclick: async function restoreTransformation(event) {
 					const random = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
 					const ordered = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
 					if (token) {
-						API._invokePolymorpherManagerInner(token, actor, true, ordered, random, undefined);
+						await API._invokePolymorpherManagerInner(token, actor, true, ordered, random, undefined);
 					} else {
 						warn(`No token is founded checkout the logs`, true);
 					}
@@ -145,7 +145,7 @@ export const readyHooks = async () => {
 						return false;
 					}
 				},
-				callback: (li) => {
+				callback: async (li) => {
 					const actor = <Actor>game.actors?.get(li.data("documentId"));
 					let token: Token | undefined = undefined;
 					if (!token) {
@@ -163,7 +163,7 @@ export const readyHooks = async () => {
 					const random = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.RANDOM) ?? false;
 					const ordered = <boolean>actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORDERED) ?? false;
 					if (token) {
-						API._invokePolymorpherManagerInner(<Token>token, actor, true, ordered, random, undefined);
+						await API._invokePolymorpherManagerInner(<Token>token, actor, true, ordered, random, undefined);
 					} else {
 						warn(`No token is founded checkout the logs`, true);
 					}

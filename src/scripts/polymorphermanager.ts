@@ -464,6 +464,9 @@ export class PolymorpherManager extends FormApplication {
 	}
 
 	async saveData() {
+		if (this.element.parent().length === 0) {
+			return;
+		}
 		let data: PolymorpherData[] = [];
 		for (const polymorpher of this.element.find(".polymorpher-item")) {
 			data.push({

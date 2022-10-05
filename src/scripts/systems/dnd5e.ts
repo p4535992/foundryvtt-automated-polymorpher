@@ -822,6 +822,37 @@ export default {
 				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
 				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
 
+				for (const token of original.getActiveTokens()) {
+					if (token.actor) {
+						if (token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) != undefined) {
+							await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+						}
+						if (
+							token.actor.getFlag(
+								CONSTANTS.MODULE_NAME,
+								PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
+							) != undefined
+						) {
+							await token.actor?.unsetFlag(
+								CONSTANTS.MODULE_NAME,
+								PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
+							);
+						}
+						if (
+							token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) !=
+							undefined
+						) {
+							await token.actor?.unsetFlag(
+								CONSTANTS.MODULE_NAME,
+								PolymorpherFlags.MUTATION_NAMES_FOR_REVERT
+							);
+						}
+						if (token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR) != undefined) {
+							await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+						}
+					}
+				}
+
 				// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
 				setProperty(
 					original,
@@ -1098,7 +1129,7 @@ export default {
 
 		// Get the original Actor data and the new source data
 		// const originalActorData = <any>sourceActor.toJSON();
-		//originalActorData.flags.dnd5e = o.flags.dnd5e || {};
+		//originalActorData.flags.dnd5e = originalActorData.flags.dnd5e || {};
 		//originalActorData.flags.dnd5e.transformOptions = {mergeSkills, mergeSaves};
 		if (!getProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`)) {
 			setProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
@@ -1261,7 +1292,7 @@ export default {
 
 		for (const k of ["bar1", "bar2", "displayBars", "displayName", "disposition", "rotation", "elevation"]) {
 			//@ts-ignore
-			d.prototypeToken.texture[k] = o.prototypeToken.texture[k];
+			d.prototypeToken.texture[k] = originalActorData.prototypeToken.texture[k];
 		}
 
 		if (!keepSelf) {
