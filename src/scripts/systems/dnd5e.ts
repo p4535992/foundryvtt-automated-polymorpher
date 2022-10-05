@@ -77,11 +77,24 @@ export default {
 		keepBio: `${CONSTANTS.MODULE_NAME}.polymorphKeepBio`,
 		keepVision: `${CONSTANTS.MODULE_NAME}.polymorphKeepVision`,
 		keepSelf: `${CONSTANTS.MODULE_NAME}.polymorphKeepSelf`,
-		removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
-		keepAEOnlyOriginNotEquipment: `${CONSTANTS.MODULE_NAME}.polymorphKeepAEOnlyOriginNotEquipment`,
 		transformTokens: `${CONSTANTS.MODULE_NAME}.polymorphTransformTokens`,
 		explicitName: `${CONSTANTS.MODULE_NAME}.polymorphExplicitName`,
 	},
+
+    /**
+     * Settings to configure how actors are effects are merged when polymorphing is applied.
+     * @enum {string}
+     */
+    i18nPolymorphEffectSettings: {
+        removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
+        removeOtherOriginAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveOtherOriginAE`,
+        removeOriginAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveOriginAE`,
+        removeEquipmentAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveEquipmentAE`,
+        removeFeatAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveFeatureAE`,
+        removeSpellAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveSpellAE`,
+        removeClassAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveClassAE`,
+        removeBackgroundAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveBackgroundAE`
+    },
 
 	/**
 	 * Transform this Actor into another one.
@@ -839,6 +852,12 @@ export default {
 			i18nPolymorphSettingsTmp[key] = value;
 		}
 
+        const i18nPolymorphEffectSettingsTmp: any = {};
+		for (const key in this.i18nPolymorphEffectSettings) {
+			const value = i18n(this.i18nPolymorphEffectSettings[key]);
+			i18nPolymorphEffectSettingsTmp[key] = value;
+		}
+
 		// Create and render the Dialog
 		return new Dialog(
 			{
@@ -847,6 +866,8 @@ export default {
 				content: {
 					options: this.polymorphSettings,
 					i18n: i18nPolymorphSettingsTmp,
+                    settings: i18nPolymorphSettingsTmp,
+                    effectSettings: i18nPolymorphEffectSettingsTmp,
 					isToken: sourceActor.isToken,
 					targetActorName: explicitName ?? targetActor.name,
 				},
@@ -909,7 +930,15 @@ export default {
 									keepMental: true,
 									mergeSaves: true,
 									mergeSkills: true,
-									transformTokens: rememberOptions(html).transformTokens,
+                                    transformTokens: rememberOptions(html).transformTokens,
+                                    removeAE: rememberOptions(html).removeAE,
+                                    removeOriginAE: rememberOptions(html).removeOriginAE,
+                                    removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
+                                    removeFeatAE: rememberOptions(html).removeFeatAE,
+                                    removeSpellAE: rememberOptions(html).removeSpellAE,
+                                    removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
+                                    removeClassAE: rememberOptions(html).removeClassAE,
+                                    removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 									explicitName: rememberOptions(html).explicitName,
 								},
 								false,
@@ -941,7 +970,15 @@ export default {
 								sourceActor,
 								targetActor,
 								{
-									transformTokens: rememberOptions(html).transformTokens,
+                                    transformTokens: rememberOptions(html).transformTokens,
+                                    removeAE: rememberOptions(html).removeAE,
+                                    removeOriginAE: rememberOptions(html).removeOriginAE,
+                                    removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
+                                    removeFeatAE: rememberOptions(html).removeFeatAE,
+                                    removeSpellAE: rememberOptions(html).removeSpellAE,
+                                    removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
+                                    removeClassAE: rememberOptions(html).removeClassAE,
+                                    removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 									explicitName: rememberOptions(html).explicitName,
 								},
 								false,
@@ -958,8 +995,16 @@ export default {
 								sourceActor,
 								targetActor,
 								{
-									keepSelf: true,
-									transformTokens: rememberOptions(html).transformTokens,
+                                    keepSelf: true,
+                                    transformTokens: rememberOptions(html).transformTokens,
+                                    removeAE: rememberOptions(html).removeAE,
+                                    removeOriginAE: rememberOptions(html).removeOriginAE,
+                                    removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
+                                    removeFeatAE: rememberOptions(html).removeFeatAE,
+                                    removeSpellAE: rememberOptions(html).removeSpellAE,
+                                    removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
+                                    removeClassAE: rememberOptions(html).removeClassAE,
+                                    removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 									explicitName: rememberOptions(html).explicitName,
 								},
 								false,
@@ -1002,7 +1047,7 @@ export default {
 		const keepVision = transformOptions?.keepVision || false;
 		const keepSelf = transformOptions?.keepSelf || false;
 		const removeAE = transformOptions?.removeAE || false;
-		const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
+		// const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
 		const transformTokens = transformOptions?.transformTokens || true;
 		const explicitName = transformOptions?.explicitName || "";
 

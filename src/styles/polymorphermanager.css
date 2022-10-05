@@ -136,3 +136,25 @@
 	color: darkgoldenrod;
 	text-shadow: 0 0 8px darkgoldenrod;
 }
+
+
+/* ----------------------------------------- */
+/*  Polymorph Features                       */
+/* ----------------------------------------- */
+.automated-polymorpher  {
+    /* ----------------------------------------- */
+    /*  Two Column Configurations                */
+    /* ----------------------------------------- */
+  }
+  .automated-polymorpher .two-column {
+    display: grid;
+    grid-template-columns: var(--grid-two-column-left-size) var(--grid-two-column-right-size);
+    grid-template-areas: "left right";
+    grid-gap: 0.4em;
+  }
+  .automated-polymorpher .two-column .left-column {
+    grid-area: left;
+  }
+  .automated-polymorpher .two-column .right-column {
+    grid-area: right;
+  }
