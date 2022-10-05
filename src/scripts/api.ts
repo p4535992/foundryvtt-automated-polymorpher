@@ -317,7 +317,14 @@ const API = {
 		return result.id;
 	},
 
-	async retrieveAndPrepareActor(aId:string, aName:string, currentCompendium:string, createOnWorld:boolean, sourceActorId:string, userId:string):Promise<Actor|null> {
+	async retrieveAndPrepareActor(
+		aId: string,
+		aName: string,
+		currentCompendium: string,
+		createOnWorld: boolean,
+		sourceActorId: string,
+		userId: string
+	): Promise<Actor | null> {
 		const targetActor = await retrieveActorFromData(aId, aName, currentCompendium, createOnWorld);
 		const sourceActor = await retrieveActorFromData(sourceActorId, undefined, undefined, false);
 		const user = <User>game.users?.get(userId);
@@ -333,7 +340,7 @@ const API = {
 		return <TransformOptionsGeneric>game.settings.get(CONSTANTS.MODULE_NAME, "polymorphSetting");
 	},
 
-	async transformIntoArr(...inAttributes):Promise<any> {
+	async transformIntoArr(...inAttributes): Promise<any> {
 		if (!Array.isArray(inAttributes)) {
 			throw error("transformIntoArr | inAttributes must be of type array");
 		}
@@ -446,7 +453,7 @@ const API = {
 		return something;
 	},
 
-	async revertOriginalFormArr(...inAttributes): Promise<string|undefined> {
+	async revertOriginalFormArr(...inAttributes): Promise<string | undefined> {
 		if (!Array.isArray(inAttributes)) {
 			throw error("revertOriginalFormArr | inAttributes must be of type array");
 		}
@@ -483,7 +490,11 @@ const API = {
 		return <string>originalActor?.id;
 	},
 
-	async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet: boolean): Promise<string|undefined> {
+	async revertOriginalForm(
+		sourceToken: Token,
+		sourceActor: Actor,
+		renderSheet: boolean
+	): Promise<string | undefined> {
 		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
 		const cloneFlags = getProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`);
 		let actorOriginalId = <string>(
@@ -498,21 +509,21 @@ const API = {
 		);
 		if (!actorOriginalId) {
 			warn(`NO actor id returned from revert polymorph action. Check out the logs`, true);
-            return undefined;
+			return undefined;
 		}
 		const actorOriginal = <Actor>game.actors?.get(actorOriginalId);
 		if (!actorOriginal) {
 			warn(`NO actor returned from revert polymorph action with id ${actorOriginalId}. Check out the logs`, true);
-            return undefined;
+			return undefined;
 		}
-        // bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-        const cloneFlagsOriginal = <any[]>actorOriginal.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS);
-        if(!cloneFlagsOriginal || cloneFlagsOriginal.length === 0){
-            if (cloneFlags) {
-                setProperty(actorOriginal, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-            }
-        }
-        return <string>actorOriginal?.id;
+		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
+		const cloneFlagsOriginal = <any[]>actorOriginal.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS);
+		if (!cloneFlagsOriginal || cloneFlagsOriginal.length === 0) {
+			if (cloneFlags) {
+				setProperty(actorOriginal, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
+			}
+		}
+		return <string>actorOriginal?.id;
 	},
 
 	async transformIntoImpl(

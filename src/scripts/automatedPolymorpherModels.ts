@@ -76,15 +76,15 @@ export class TransformOptionsGeneric {
 	keepBio = false;
 	keepVision = false;
 	keepSelf = false;
-    removeAE = false;
-    // keepAEOnlyOriginNotEquipment = false;
-    removeOtherOriginAE = false;
-    removeOriginAE = false;
-    removeEquipmentAE = false;
-    removeFeatAE = false;
-    removeSpellAE = false;
-    removeClassAE = false;
-    removeBackgroundAE = false;
+	removeAE = false;
+	// keepAEOnlyOriginNotEquipment = false;
+	removeOtherOriginAE = false;
+	removeOriginAE = false;
+	removeEquipmentAE = false;
+	removeFeatAE = false;
+	removeSpellAE = false;
+	removeClassAE = false;
+	removeBackgroundAE = false;
 	transformTokens = true;
 	explicitName = "";
 }

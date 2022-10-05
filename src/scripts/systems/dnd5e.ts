@@ -21,28 +21,28 @@ export default {
 	 * the target actor.
 	 *
 	 * @typedef {object} TransformationOptions
-    * @property {boolean} [keepPhysical=false]       Keep physical abilities (str, dex, con)
-    * @property {boolean} [keepMental=false]         Keep mental abilities (int, wis, cha)
-    * @property {boolean} [keepSaves=false]          Keep saving throw proficiencies
-    * @property {boolean} [keepSkills=false]         Keep skill proficiencies
-    * @property {boolean} [mergeSaves=false]         Take the maximum of the save proficiencies
-    * @property {boolean} [mergeSkills=false]        Take the maximum of the skill proficiencies
-    * @property {boolean} [keepClass=false]          Keep proficiency bonus
-    * @property {boolean} [keepFeats=false]          Keep features
-    * @property {boolean} [keepSpells=false]         Keep spells
-    * @property {boolean} [keepItems=false]          Keep items
-    * @property {boolean} [keepBio=false]            Keep biography
-    * @property {boolean} [keepVision=false]         Keep vision
-    * @property {boolean} [keepSelf=false]           Keep self
-    * @property {boolean} [removeAE=false]           Remove all effects
-    * @property {boolean} [removeOriginAE=true]      Remove effects which originate on this actor
-    * @property {boolean} [removeOtherOriginAE=true] Remove effects which originate on another actor
-    * @property {boolean} [removeSpellAE=false]      Remove effects which originate from actors spells
-    * @property {boolean} [removeFeatAE=false]       Remove effects which originate from actors features
-    * @property {boolean} [removeEquipmentAE=false]  Remove effects which originate on actors equipment
-    * @property {boolean} [removeClassAE=false]      Remove effects which originate from actors class/subclass
-    * @property {boolean} [removeBackgroundAE=false] Remove effects which originate from actors background
-    * @property {boolean} [transformTokens=true]     Transform linked tokens too
+	 * @property {boolean} [keepPhysical=false]       Keep physical abilities (str, dex, con)
+	 * @property {boolean} [keepMental=false]         Keep mental abilities (int, wis, cha)
+	 * @property {boolean} [keepSaves=false]          Keep saving throw proficiencies
+	 * @property {boolean} [keepSkills=false]         Keep skill proficiencies
+	 * @property {boolean} [mergeSaves=false]         Take the maximum of the save proficiencies
+	 * @property {boolean} [mergeSkills=false]        Take the maximum of the skill proficiencies
+	 * @property {boolean} [keepClass=false]          Keep proficiency bonus
+	 * @property {boolean} [keepFeats=false]          Keep features
+	 * @property {boolean} [keepSpells=false]         Keep spells
+	 * @property {boolean} [keepItems=false]          Keep items
+	 * @property {boolean} [keepBio=false]            Keep biography
+	 * @property {boolean} [keepVision=false]         Keep vision
+	 * @property {boolean} [keepSelf=false]           Keep self
+	 * @property {boolean} [removeAE=false]           Remove all effects
+	 * @property {boolean} [removeOriginAE=true]      Remove effects which originate on this actor
+	 * @property {boolean} [removeOtherOriginAE=true] Remove effects which originate on another actor
+	 * @property {boolean} [removeSpellAE=false]      Remove effects which originate from actors spells
+	 * @property {boolean} [removeFeatAE=false]       Remove effects which originate from actors features
+	 * @property {boolean} [removeEquipmentAE=false]  Remove effects which originate on actors equipment
+	 * @property {boolean} [removeClassAE=false]      Remove effects which originate from actors class/subclass
+	 * @property {boolean} [removeBackgroundAE=false] Remove effects which originate from actors background
+	 * @property {boolean} [transformTokens=true]     Transform linked tokens too
 	 * @property {string} [explicitName]  Explicit name for generated actor
 	 */
 	polymorphSettings: <TransformOptionsGeneric>{
@@ -59,15 +59,15 @@ export default {
 		keepBio: false,
 		keepVision: true,
 		keepSelf: false,
+		removeAE: false,
 		// keepAEOnlyOriginNotEquipment: false,
-        removeAE:false,
-        removeOriginAE:false,
-        removeOtherOriginAE:false,
-        removeSpellAE:false,
-        removeEquipmentAE:false,
-        removeFeatAE:false,
-        removeClassAE:false,
-        removeBackgroundAE:false,
+		removeOriginAE: false,
+		removeOtherOriginAE: false,
+		removeSpellAE: false,
+		removeEquipmentAE: false,
+		removeFeatAE: false,
+		removeClassAE: false,
+		removeBackgroundAE: false,
 		transformTokens: true,
 		explicitName: "",
 	},
@@ -94,20 +94,20 @@ export default {
 		explicitName: `${CONSTANTS.MODULE_NAME}.polymorphExplicitName`,
 	},
 
-    /**
-     * Settings to configure how actors are effects are merged when polymorphing is applied.
-     * @enum {string}
-     */
-    i18nPolymorphEffectSettings: {
-        removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
-        removeOtherOriginAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveOtherOriginAE`,
-        removeOriginAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveOriginAE`,
-        removeEquipmentAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveEquipmentAE`,
-        removeFeatAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveFeatureAE`,
-        removeSpellAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveSpellAE`,
-        removeClassAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveClassAE`,
-        removeBackgroundAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveBackgroundAE`
-    },
+	/**
+	 * Settings to configure how actors are effects are merged when polymorphing is applied.
+	 * @enum {string}
+	 */
+	i18nPolymorphEffectSettings: {
+		removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
+		removeOtherOriginAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveOtherOriginAE`,
+		removeOriginAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveOriginAE`,
+		removeEquipmentAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveEquipmentAE`,
+		removeFeatAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveFeatureAE`,
+		removeSpellAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveSpellAE`,
+		removeClassAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveClassAE`,
+		removeBackgroundAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveBackgroundAE`,
+	},
 
 	/**
 	 * Transform this Actor into another one.
@@ -116,7 +116,7 @@ export default {
 	 * @param {Actor} sourceActor                 The original actor before transformation.
 	 * @param {Actor} targetActor                      The target Actor.
 	 * @param {TransformationOptions} [options={}]  Options that determine how the transformation is performed.
-     * @param {boolean} [renderSheet=true] Render the sheet of the transformed actor after the polymorph
+	 * @param {boolean} [renderSheet=true] Render the sheet of the transformed actor after the polymorph
 	 * @returns {Promise<Array<Token>>|null}        Updated token if the transformation was performed.
 	 */
 	async transformInto(
@@ -171,7 +171,7 @@ export default {
 		// =====================================
 
 		// Set new data flags
-        // TODO FIND A BTTER CODE FOR THIS)
+		// TODO FIND A BTTER CODE FOR THIS)
 		if (!sourceToken.actor) {
 			setProperty(sourceToken, `actor`, {});
 		}
@@ -524,7 +524,7 @@ export default {
 			// =============================================
 			// THIS IS THE DND5E SOLUTION WITh THE CREATION OF ACTOR)
 			// ===========================================
-            /*
+			/*
             // Update unlinked Tokens, and grab a copy of any actorData adjustments to re-apply
             if ( this.isToken ) {
                 const tokenData = d.prototypeToken;
@@ -656,7 +656,7 @@ export default {
 		);
 
 		// If we are reverting an unlinked token, grab the previous actorData, and create a new token
-        /*
+		/*
         if ( this.isToken ) {
             const baseActor = original ? original : game.actors.get(this.token.actorId);
             if ( !baseActor ) {
@@ -889,7 +889,7 @@ export default {
 			i18nPolymorphSettingsTmp[key] = value;
 		}
 
-        const i18nPolymorphEffectSettingsTmp: any = {};
+		const i18nPolymorphEffectSettingsTmp: any = {};
 		for (const key in this.i18nPolymorphEffectSettings) {
 			const value = i18n(this.i18nPolymorphEffectSettings[key]);
 			i18nPolymorphEffectSettingsTmp[key] = value;
@@ -903,8 +903,8 @@ export default {
 				content: {
 					options: this.polymorphSettings,
 					i18n: i18nPolymorphSettingsTmp,
-                    settings: i18nPolymorphSettingsTmp,
-                    effectSettings: i18nPolymorphEffectSettingsTmp,
+					settings: i18nPolymorphSettingsTmp,
+					effectSettings: i18nPolymorphEffectSettingsTmp,
 					isToken: sourceActor.isToken,
 					targetActorName: explicitName ?? targetActor.name,
 				},
@@ -967,15 +967,15 @@ export default {
 									keepMental: true,
 									mergeSaves: true,
 									mergeSkills: true,
-                                    transformTokens: rememberOptions(html).transformTokens,
-                                    removeAE: rememberOptions(html).removeAE,
-                                    removeOriginAE: rememberOptions(html).removeOriginAE,
-                                    removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-                                    removeFeatAE: rememberOptions(html).removeFeatAE,
-                                    removeSpellAE: rememberOptions(html).removeSpellAE,
-                                    removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-                                    removeClassAE: rememberOptions(html).removeClassAE,
-                                    removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
+									transformTokens: rememberOptions(html).transformTokens,
+									removeAE: rememberOptions(html).removeAE,
+									removeOriginAE: rememberOptions(html).removeOriginAE,
+									removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
+									removeFeatAE: rememberOptions(html).removeFeatAE,
+									removeSpellAE: rememberOptions(html).removeSpellAE,
+									removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
+									removeClassAE: rememberOptions(html).removeClassAE,
+									removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 									explicitName: rememberOptions(html).explicitName,
 								},
 								false,
@@ -1007,15 +1007,15 @@ export default {
 								sourceActor,
 								targetActor,
 								{
-                                    transformTokens: rememberOptions(html).transformTokens,
-                                    removeAE: rememberOptions(html).removeAE,
-                                    removeOriginAE: rememberOptions(html).removeOriginAE,
-                                    removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-                                    removeFeatAE: rememberOptions(html).removeFeatAE,
-                                    removeSpellAE: rememberOptions(html).removeSpellAE,
-                                    removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-                                    removeClassAE: rememberOptions(html).removeClassAE,
-                                    removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
+									transformTokens: rememberOptions(html).transformTokens,
+									removeAE: rememberOptions(html).removeAE,
+									removeOriginAE: rememberOptions(html).removeOriginAE,
+									removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
+									removeFeatAE: rememberOptions(html).removeFeatAE,
+									removeSpellAE: rememberOptions(html).removeSpellAE,
+									removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
+									removeClassAE: rememberOptions(html).removeClassAE,
+									removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 									explicitName: rememberOptions(html).explicitName,
 								},
 								false,
@@ -1032,16 +1032,16 @@ export default {
 								sourceActor,
 								targetActor,
 								{
-                                    keepSelf: true,
-                                    transformTokens: rememberOptions(html).transformTokens,
-                                    removeAE: rememberOptions(html).removeAE,
-                                    removeOriginAE: rememberOptions(html).removeOriginAE,
-                                    removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-                                    removeFeatAE: rememberOptions(html).removeFeatAE,
-                                    removeSpellAE: rememberOptions(html).removeSpellAE,
-                                    removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-                                    removeClassAE: rememberOptions(html).removeClassAE,
-                                    removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
+									keepSelf: true,
+									transformTokens: rememberOptions(html).transformTokens,
+									removeAE: rememberOptions(html).removeAE,
+									removeOriginAE: rememberOptions(html).removeOriginAE,
+									removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
+									removeFeatAE: rememberOptions(html).removeFeatAE,
+									removeSpellAE: rememberOptions(html).removeSpellAE,
+									removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
+									removeClassAE: rememberOptions(html).removeClassAE,
+									removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 									explicitName: rememberOptions(html).explicitName,
 								},
 								false,
@@ -1085,16 +1085,16 @@ export default {
 		const keepSelf = transformOptions?.keepSelf || false;
 		const removeAE = transformOptions?.removeAE || false;
 		// const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
-        const removeOriginAE = transformOptions?.removeOriginAE || false;
-        const removeOtherOriginAE = transformOptions?.removeOtherOriginAE || false;
-        const removeSpellAE = transformOptions?.removeSpellAE || false;
-        const removeEquipmentAE = transformOptions?.removeEquipmentAE || false;
-        const removeFeatAE = transformOptions?.removeFeatAE || false;
-        const removeClassAE = transformOptions?.removeClassAE || false;
-        const removeBackgroundAE = transformOptions?.removeBackgroundAE || false;
+		const removeOriginAE = transformOptions?.removeOriginAE || false;
+		const removeOtherOriginAE = transformOptions?.removeOtherOriginAE || false;
+		const removeSpellAE = transformOptions?.removeSpellAE || false;
+		const removeEquipmentAE = transformOptions?.removeEquipmentAE || false;
+		const removeFeatAE = transformOptions?.removeFeatAE || false;
+		const removeClassAE = transformOptions?.removeClassAE || false;
+		const removeBackgroundAE = transformOptions?.removeBackgroundAE || false;
 		const transformTokens = transformOptions?.transformTokens || true;
 		const explicitName = transformOptions?.explicitName || "";
-        // const renderSheet = transformOptions?.renderSheet || true;
+		// const renderSheet = transformOptions?.renderSheet || true;
 
 		// Get the original Actor data and the new source data
 		// const originalActorData = <any>sourceActor.toJSON();
@@ -1119,13 +1119,13 @@ export default {
 			keepSelf,
 			removeAE,
 			// keepAEOnlyOriginNotEquipment,
-            removeOriginAE,
-            removeOtherOriginAE,
-            removeSpellAE,
-            removeEquipmentAE,
-            removeFeatAE,
-            removeClassAE,
-            removeBackgroundAE,
+			removeOriginAE,
+			removeOtherOriginAE,
+			removeSpellAE,
+			removeEquipmentAE,
+			removeFeatAE,
+			removeClassAE,
+			removeBackgroundAE,
 			transformTokens,
 			explicitName,
 		});
@@ -1164,88 +1164,91 @@ export default {
 		}
 
 		// Prepare new data to merge from the source
-		let d = foundry.utils.mergeObject({
-			type: originalActorData.type, // Remain the same actor type
-			name: explicitName ? explicitName : `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
-			//@ts-ignore
-			system: keepSelf ? originalActorData.system : targetActorData.system, // Get the data model of your new form
-			items: keepSelf ? originalActorData.items : targetActorData.items, // Get the items of your new form
-			effects: keepSelf
-				? newEffects
-				: targetActorData.effects
-				? newEffects.concat(targetActorData.effects)
-				: newEffects, // Combine active effects from both forms
-			//@ts-ignore
-			// effects: targetActorData.effects ? originalActorData.effects.concat(targetActorData.effects) : originalActorData.effects,
-			img: targetActorData.img, // New appearance
-			// permission: originalActorData.permission, // Use the original actor permissions
-			//@ts-ignore
-			ownership: originalActorData.ownership, // Use the original actor permissions
-			folder: originalActorData.folder, // Be displayed in the same sidebar folder
-			flags: originalActorData.flags, // Use the original actor flags
-			// x: sourceToken.x,
-			// y: sourceToken.y,
-			// token: sourceToken.toObject()
-			//@ts-ignore
-			width: targetActorData.prototypeToken.width,
-			//@ts-ignore
-			height: targetActorData.prototypeToken.height,
-			// scale: targetActorData.prototypeToken.scale,
-			texture: {
+		let d = foundry.utils.mergeObject(
+			{
+				type: originalActorData.type, // Remain the same actor type
+				name: explicitName ? explicitName : `${originalActorData.name} (${targetActorData.name})`, // Append the new shape to your old name
 				//@ts-ignore
-				scaleX: targetActorData.prototypeToken.texture.scaleX,
+				system: keepSelf ? originalActorData.system : targetActorData.system, // Get the data model of your new form
+				items: keepSelf ? originalActorData.items : targetActorData.items, // Get the items of your new form
+				effects: keepSelf
+					? newEffects
+					: targetActorData.effects
+					? newEffects.concat(targetActorData.effects)
+					: newEffects, // Combine active effects from both forms
 				//@ts-ignore
-				scaleY: targetActorData.prototypeToken.texture.scaleY,
+				// effects: targetActorData.effects ? originalActorData.effects.concat(targetActorData.effects) : originalActorData.effects,
+				img: targetActorData.img, // New appearance
+				// permission: originalActorData.permission, // Use the original actor permissions
+				//@ts-ignore
+				ownership: originalActorData.ownership, // Use the original actor permissions
+				folder: originalActorData.folder, // Be displayed in the same sidebar folder
+				flags: originalActorData.flags, // Use the original actor flags
+				// x: sourceToken.x,
+				// y: sourceToken.y,
+				// token: sourceToken.toObject()
+				//@ts-ignore
+				width: targetActorData.prototypeToken.width,
+				//@ts-ignore
+				height: targetActorData.prototypeToken.height,
+				// scale: targetActorData.prototypeToken.scale,
+				texture: {
+					//@ts-ignore
+					scaleX: targetActorData.prototypeToken.texture.scaleX,
+					//@ts-ignore
+					scaleY: targetActorData.prototypeToken.texture.scaleY,
+				},
 			},
-		}, keepSelf ? originalActorData : {}); // Keeps most of original actor
+			keepSelf ? originalActorData : {}
+		); // Keeps most of original actor
 
-        // Specifically delete some data attributes
-        //@ts-ignore
-        delete d.system.resources; // Don't change your resource pools
-        //@ts-ignore
-        delete d.system.currency; // Don't lose currency
-        //@ts-ignore
-        delete d.system.bonuses; // Don't lose global bonuses
+		// Specifically delete some data attributes
+		//@ts-ignore
+		delete d.system.resources; // Don't change your resource pools
+		//@ts-ignore
+		delete d.system.currency; // Don't lose currency
+		//@ts-ignore
+		delete d.system.bonuses; // Don't lose global bonuses
 
-        // Specific additional adjustments
-        //@ts-ignore
-        if (originalActorData.system.details?.alignment) {
-            //@ts-ignore
-            d.system.details.alignment = originalActorData.system.details.alignment; // Don't change alignment
-        }
-        //@ts-ignore
-        if (originalActorData.system.attributes.exhaustion) {
-            //@ts-ignore
-            d.system.attributes.exhaustion = originalActorData.system.attributes.exhaustion; // Keep your prior exhaustion level
-        }
-        //@ts-ignore
-        if (originalActorData.system.attributes.inspiration) {
-            //@ts-ignore
-            d.system.attributes.inspiration = originalActorData.system.attributes.inspiration; // Keep inspiration
-        }
-        //@ts-ignore
-        if (originalActorData.system.spells) {
-            //@ts-ignore
-            d.system.spells = originalActorData.system.spells; // Keep spell slots
-        }
-        //@ts-ignore
-        if (targetActorData.system.attributes.ac) {
-            //@ts-ignore
-            // d.system.attributes.ac.flat = targetActorData.system.attributes.ac.value; // Override AC
-            d.system.attributes.ac = targetActorData.system.attributes.ac;
-        }
+		// Specific additional adjustments
+		//@ts-ignore
+		if (originalActorData.system.details?.alignment) {
+			//@ts-ignore
+			d.system.details.alignment = originalActorData.system.details.alignment; // Don't change alignment
+		}
+		//@ts-ignore
+		if (originalActorData.system.attributes.exhaustion) {
+			//@ts-ignore
+			d.system.attributes.exhaustion = originalActorData.system.attributes.exhaustion; // Keep your prior exhaustion level
+		}
+		//@ts-ignore
+		if (originalActorData.system.attributes.inspiration) {
+			//@ts-ignore
+			d.system.attributes.inspiration = originalActorData.system.attributes.inspiration; // Keep inspiration
+		}
+		//@ts-ignore
+		if (originalActorData.system.spells) {
+			//@ts-ignore
+			d.system.spells = originalActorData.system.spells; // Keep spell slots
+		}
+		//@ts-ignore
+		if (targetActorData.system.attributes.ac) {
+			//@ts-ignore
+			// d.system.attributes.ac.flat = targetActorData.system.attributes.ac.value; // Override AC
+			d.system.attributes.ac = targetActorData.system.attributes.ac;
+		}
 
-        //@ts-ignore
-        // const vision = keepVision ? originalActorData.prototypeToken : targetActorData.prototypeToken;
-        // for (const k of ["dimSight", "brightSight", "dimLight", "brightLight", "vision", "sightAngle"]) {
-        // 	d.prototypeToken[k] = vision[k];
-        // }
+		//@ts-ignore
+		// const vision = keepVision ? originalActorData.prototypeToken : targetActorData.prototypeToken;
+		// for (const k of ["dimSight", "brightSight", "dimLight", "brightLight", "vision", "sightAngle"]) {
+		// 	d.prototypeToken[k] = vision[k];
+		// }
 
 		// Token appearance updates
-        if ( !hasProperty(d, "prototypeToken.texture.src") ) {
-            //@ts-ignore
-            d.prototypeToken = { name: d.name, texture: {}, sight: {}, detectionModes: [] };
-        }
+		if (!hasProperty(d, "prototypeToken.texture.src")) {
+			//@ts-ignore
+			d.prototypeToken = { name: d.name, texture: {}, sight: {}, detectionModes: [] };
+		}
 
 		for (const k of ["width", "height", "alpha", "lockRotation"]) {
 			//@ts-ignore
@@ -1256,21 +1259,29 @@ export default {
 			d.prototypeToken.texture[k] = targetActorData.prototypeToken.texture[k];
 		}
 
-        for ( const k of ["bar1", "bar2", "displayBars", "displayName", "disposition", "rotation", "elevation"] ) {
-            //@ts-ignore
-            d.prototypeToken.texture[k] = o.prototypeToken.texture[k];
-        }
+		for (const k of ["bar1", "bar2", "displayBars", "displayName", "disposition", "rotation", "elevation"]) {
+			//@ts-ignore
+			d.prototypeToken.texture[k] = o.prototypeToken.texture[k];
+		}
 
-        if ( !keepSelf ) {
-            //@ts-ignore
-            const sightSource = keepVision ? originalActorData.prototypeToken : targetActorData.prototypeToken;
-            for ( const k of ["range", "angle", "visionMode", "color", "attenuation", "brightness", "saturation", "contrast"] ) {
-              //@ts-ignore
-              d.prototypeToken.sight[k] = sightSource.sight[k];
-            }
-            //@ts-ignore
-            d.prototypeToken.detectionModes = sightSource.detectionModes;
-
+		if (!keepSelf) {
+			//@ts-ignore
+			const sightSource = keepVision ? originalActorData.prototypeToken : targetActorData.prototypeToken;
+			for (const k of [
+				"range",
+				"angle",
+				"visionMode",
+				"color",
+				"attenuation",
+				"brightness",
+				"saturation",
+				"contrast",
+			]) {
+				//@ts-ignore
+				d.prototypeToken.sight[k] = sightSource.sight[k];
+			}
+			//@ts-ignore
+			d.prototypeToken.detectionModes = sightSource.detectionModes;
 
 			// Transfer ability scores
 			if (
@@ -1315,10 +1326,10 @@ export default {
 			}
 
 			// Keep specific items from the original data
-            //@ts-ignore
+			//@ts-ignore
 			d.items = d.items ? d.items : [];
 			if (originalActorData.items && originalActorData.items.size > 0) {
-                //@ts-ignore
+				//@ts-ignore
 				d.items = d.items.concat(
 					originalActorData.items.filter((i) => {
 						if (["class", "subclass"].includes(i.type)) {
@@ -1335,7 +1346,7 @@ export default {
 			}
 			// Transfer classes for NPCs
 			if (!keepClass && d.system.details.cr) {
-                //@ts-ignore
+				//@ts-ignore
 				d.items.push({
 					type: "class",
 					name: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphTmpClass`),
@@ -1385,86 +1396,88 @@ export default {
 				}
 			}
 
-            // Remove active effects
-            if ( removeAE ) {
-              d.effects = [];
-            } else if ( removeEquipmentAE || removeFeatAE || removeOriginAE || removeSpellAE ) {
-              const oEffects = duplicate(d.effects);
-              d.effects = [];
-              const originEffectIds = oEffects.filter(effect => {
-                return !effect.origin || effect.origin === this.uuid;
-              }).map(e => e._id);
+			// Remove active effects
+			if (removeAE) {
+				d.effects = [];
+			} else if (removeEquipmentAE || removeFeatAE || removeOriginAE || removeSpellAE) {
+				const oEffects = duplicate(d.effects);
+				d.effects = [];
+				const originEffectIds = oEffects
+					.filter((effect) => {
+						return !effect.origin || effect.origin === this.uuid;
+					})
+					.map((e) => e._id);
 
-              for (const e of oEffects) {
-                const item = <Item>e.origin?.startsWith("Actor") ? <Item>(await fromUuid(e.origin)) : <Item>{};
-                const originIsSelf = item.parent?.uuid === this.uuid;
-                const isOriginEffect = originEffectIds.includes(e._id);
+				for (const e of oEffects) {
+					const item = <Item>e.origin?.startsWith("Actor") ? <Item>await fromUuid(e.origin) : <Item>{};
+					const originIsSelf = item.parent?.uuid === this.uuid;
+					const isOriginEffect = originEffectIds.includes(e._id);
 
-                if ( isOriginEffect ) {
-                  // If effect originates on actor
-                  if (!removeOriginAE) {
-                    d.effects.push(e);
-                  }
-                } else if ( !isOriginEffect && !originIsSelf ) {
-                  // Effect is not from Actor
-                  if ( !removeOtherOriginAE ) {
-                    d.effects.push(e);
-                  }
-                } else {
-                  // Effect is from an item originating on actor
-                  switch (item.type) {
-                    case "spell": {
-                      if ( !removeSpellAE ) {
-                        d.effects.push(e);
-                      }
-                      break;
-                    }
-                    case "feat": {
-                      if ( !removeFeatAE ) {
-                        d.effects.push(e);
-                      }
-                      break;
-                    }
-                    case "subclass":
-                    case "class": {
-                      if ( !removeClassAE ) {
-                        d.effects.push(e);
-                      }
-                      break;
-                    }
-                    case "equipment":
-                    case "weapon":
-                    case "tool":
-                    case "loot":
-                    case "backpack": {
-                      if ( !removeEquipmentAE ) {
-                        d.effects.push(e);
-                      }
-                      break;
-                    }
-                    case "background": {
-                      if ( !removeBackgroundAE ) {
-                        d.effects.push(e);
-                      }
-                      break;
-                    }
-                    default: {
-                      // Unknown type, or origin was not caught by above filters, keep
-                      d.effects.push(e);
-                    }
-                  }
-                }
-              }
-            }
-        }
+					if (isOriginEffect) {
+						// If effect originates on actor
+						if (!removeOriginAE) {
+							d.effects.push(e);
+						}
+					} else if (!isOriginEffect && !originIsSelf) {
+						// Effect is not from Actor
+						if (!removeOtherOriginAE) {
+							d.effects.push(e);
+						}
+					} else {
+						// Effect is from an item originating on actor
+						switch (item.type) {
+							case "spell": {
+								if (!removeSpellAE) {
+									d.effects.push(e);
+								}
+								break;
+							}
+							case "feat": {
+								if (!removeFeatAE) {
+									d.effects.push(e);
+								}
+								break;
+							}
+							case "subclass":
+							case "class": {
+								if (!removeClassAE) {
+									d.effects.push(e);
+								}
+								break;
+							}
+							case "equipment":
+							case "weapon":
+							case "tool":
+							case "loot":
+							case "backpack": {
+								if (!removeEquipmentAE) {
+									d.effects.push(e);
+								}
+								break;
+							}
+							case "background": {
+								if (!removeBackgroundAE) {
+									d.effects.push(e);
+								}
+								break;
+							}
+							default: {
+								// Unknown type, or origin was not caught by above filters, keep
+								d.effects.push(e);
+							}
+						}
+					}
+				}
+			}
+		}
 
-        //@ts-ignore
-        if (targetActorData.prototypeToken.randomImg) {
-            // const images = await target.getTokenImages();
-            const images = targetActorImages;
-            //@ts-ignore
-            d.prototypeToken.texture.src = images[Math.floor(Math.random() * images.length)];
-        }
+		//@ts-ignore
+		if (targetActorData.prototypeToken.randomImg) {
+			// const images = await target.getTokenImages();
+			const images = targetActorImages;
+			//@ts-ignore
+			d.prototypeToken.texture.src = images[Math.floor(Math.random() * images.length)];
+		}
 		// Strange bug with fvtt10
 		const tokenEffectsCleaned: any[] = [];
 		for (const effect of d.effects) {
