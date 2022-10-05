@@ -203,8 +203,6 @@ export class PolymorpherManager extends FormApplication {
 		const aName = event.currentTarget.dataset.aname;
 		const aCompendiumId = event.currentTarget.dataset.acompendiumid;
 		const aExplicitName = event.currentTarget.dataset.aexplicitname;
-		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-		const cloneFlagsBase = getProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`);
 		let actorToTransform: Actor | undefined = undefined;
 		actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
 		if (actorToTransform && should_I_run_this(actorToTransform)) {
@@ -228,7 +226,6 @@ export class PolymorpherManager extends FormApplication {
 			);
 			return;
 		}
-		setProperty(actorToTransform, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlagsBase);
 
 		let tokenFromTransform = <Token>canvas.tokens?.placeables.find((t: Token) => {
 				return t.actor?.id === this.actor.id;
@@ -255,18 +252,11 @@ export class PolymorpherManager extends FormApplication {
 			actorId: <string>this.token.document.actorId,
 			id: <string>this.token.document.id,
 		});
-		// await this.actor?.setFlag(
-		// 	CONSTANTS.MODULE_NAME,
-		// 	PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
-		// 	updatesForRevert
-		// );
-		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-		const cloneFlags = getProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`);
-		cloneFlags[PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR] = updatesForRevert;
-		setProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-		if (this.token.actor) {
-			setProperty(this.token.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-		}
+		await this.actor?.setFlag(
+			CONSTANTS.MODULE_NAME,
+			PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+			updatesForRevert
+		);
 		const dialog = await API.renderDialogTransformOptionsImpl(
 			tokenFromTransform,
 			this.actor,
@@ -552,8 +542,6 @@ export class PolymorpherManager extends FormApplication {
 		const aName = polymorpherData.name;
 		const aCompendiumId = polymorpherData.compendiumid;
 		const aExplicitName = polymorpherData.explicitname;
-		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-		const cloneFlagsBase = getProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`);
 		let actorToTransform: Actor | undefined = undefined;
 		actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
 		if (actorToTransform && should_I_run_this(actorToTransform)) {
@@ -577,7 +565,6 @@ export class PolymorpherManager extends FormApplication {
 			);
 			return;
 		}
-		setProperty(actorToTransform, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlagsBase);
 
 		//@ts-ignore
 		const tokenDataToTransform = <TokenDocument>await actorToTransform.getTokenDocument();
@@ -635,18 +622,11 @@ export class PolymorpherManager extends FormApplication {
 			actorId: <string>this.token.document.actorId,
 			id: <string>this.token.document.id,
 		});
-		// await this.actor?.setFlag(
-		// 	CONSTANTS.MODULE_NAME,
-		// 	PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
-		// 	updatesForRevert
-		// );
-		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-		const cloneFlags = getProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`);
-		cloneFlags[PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR] = updatesForRevert;
-		setProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-		if (this.token.actor) {
-			setProperty(this.token.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-		}
+		await this.actor?.setFlag(
+			CONSTANTS.MODULE_NAME,
+			PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+			updatesForRevert
+		);
 
 		if (polymorpherData.defaultsummontype === `${CONSTANTS.MODULE_NAME}.polymorphAcceptSettings`) {
 			if (tokenFromTransform) {
@@ -668,11 +648,6 @@ export class PolymorpherManager extends FormApplication {
 				}
 			}
 			info(`${this.actor.name} turns into a ${actorToTransform.name}`);
-			// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-			setProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-			if (this.token.actor) {
-				setProperty(this.token.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-			}
 			// TODO show on chat ?
 			//await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
 			await API.transformInto(
@@ -718,11 +693,6 @@ export class PolymorpherManager extends FormApplication {
 				}
 			}
 			info(`${this.actor.name} turns into a ${actorToTransform.name}`);
-			// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-			setProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-			if (this.token.actor) {
-				setProperty(this.token.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-			}
 			// TODO show on chat ?
 			//await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
 			await API.transformInto(
@@ -761,11 +731,6 @@ export class PolymorpherManager extends FormApplication {
 				}
 			}
 			info(`${this.actor.name} turns into a ${actorToTransform.name}`);
-			// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-			setProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-			if (this.token.actor) {
-				setProperty(this.token.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-			}
 			// TODO show on chat ?
 			//await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
 			await API.transformInto(
@@ -811,11 +776,6 @@ export class PolymorpherManager extends FormApplication {
 				}
 			}
 			info(`${this.actor.name} turns into a ${actorToTransform.name}`);
-			// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-			setProperty(this.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-			if (this.token.actor) {
-				setProperty(this.token.actor, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-			}
 			// TODO show on chat ?
 			//await ChatMessage.create({content: `${this.actor.name} turns into a ${actorToTransform.name}`, speaker:{alias: this.actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
 			await API.transformInto(

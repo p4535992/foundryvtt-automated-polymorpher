@@ -223,19 +223,11 @@ function addToPolymorphButton(html, sourceToken: Token) {
 		for (const targetToken of <Token[]>canvas.tokens?.controlled) {
 			// Do somethign with right click
 			const targetActor = <Actor>retrieveActorFromToken(targetToken);
-			// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-			const cloneFlagsBase = getProperty(targetActor, `flags.${CONSTANTS.MODULE_NAME}`);
 			const originalActorId = <string>targetActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
 			const originalActor = <Actor>game.actors?.get(originalActorId);
 			if (targetActor) {
 				await API._invokePolymorpherManagerInner(targetToken, targetActor, true, ordered, random, undefined);
 			}
-			await wait(5);
-			await originalActor.setFlag(
-				CONSTANTS.MODULE_NAME,
-				PolymorpherFlags.POLYMORPHERS,
-				cloneFlagsBase[PolymorpherFlags.POLYMORPHERS]
-			);
 		}
 	});
 }

@@ -448,8 +448,6 @@ const API = {
 		renderSheet: boolean,
 		externalUserId: string
 	): Promise<any> {
-		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-		const cloneFlags = getProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`);
 		const something = await automatedPolymorpherSocket.executeAsGM(
 			"transformInto",
 			sourceToken.id,
@@ -459,8 +457,7 @@ const API = {
 			targetActor.name,
 			transformOptions,
 			renderSheet,
-			externalUserId,
-			cloneFlags
+			externalUserId
 		);
 		return something;
 	},
@@ -507,16 +504,13 @@ const API = {
 		sourceActor: Actor,
 		renderSheet: boolean
 	): Promise<string | undefined> {
-		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-		const cloneFlags = getProperty(sourceActor, `flags.${CONSTANTS.MODULE_NAME}`);
 		let actorOriginalId = <string>(
 			await automatedPolymorpherSocket.executeAsGM(
 				"revertOriginalForm",
 				sourceToken.id,
 				sourceActor.id,
 				sourceActor.name,
-				renderSheet,
-				cloneFlags
+				renderSheet
 			)
 		);
 		if (!actorOriginalId) {
@@ -527,13 +521,6 @@ const API = {
 		if (!actorOriginal) {
 			warn(`NO actor returned from revert polymorph action with id ${actorOriginalId}. Check out the logs`, true);
 			return undefined;
-		}
-		// bug 2022-10-01 the setFlag of PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR reset the polymorphers flags ??????
-		const cloneFlagsOriginal = <any[]>actorOriginal.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.POLYMORPHERS);
-		if (!cloneFlagsOriginal || cloneFlagsOriginal.length === 0) {
-			if (cloneFlags) {
-				setProperty(actorOriginal, `flags.${CONSTANTS.MODULE_NAME}`, cloneFlags);
-			}
 		}
 		return <string>actorOriginal?.id;
 	},
