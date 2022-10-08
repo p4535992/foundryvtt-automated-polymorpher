@@ -47,6 +47,7 @@ export enum PolymorpherFlags {
 }
 
 export class PolymorpherData {
+	uuid: string;
 	id: string;
 	name: string;
 	animation: string;

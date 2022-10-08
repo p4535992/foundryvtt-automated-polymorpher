@@ -1,4 +1,4 @@
-### 1.1.6-7-8-9
+### 1.1.6-7-8-9-10
 
 - Many bug fix, strange reset of the flags whet set or unset flags on the same namespace ?
 

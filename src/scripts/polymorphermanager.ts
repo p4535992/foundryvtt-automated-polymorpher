@@ -170,17 +170,22 @@ export class PolymorpherManager extends FormApplication {
 				target.before($(li));
 			}
 		}
-		if (!data?.type) return;
+		if (!data?.type) {
+			return;
+		}
 		//@ts-ignore
-		if (!data.type === "Actor") return;
-		const actorId = data.uuid ? data.uuid.replace("Actor.", "") : undefined;
-		const actorToTransformLi = await retrieveActorFromData(actorId, "", "", false);
+		if (!data.type === "Actor") {
+			return;
+		}
+		const actorId = data.uuid ? data.uuid.split(".").pop() : undefined;
+		const actorToTransformLi = await retrieveActorFromData(data.uuid, actorId, "", "", false);
 		if (actorToTransformLi) {
 			this.element.find("#polymorpher-list").append(
 				this.generateLi(
 					{
-						id: data.id,
-						name: data.name,
+						uuid: actorToTransformLi.uuid,
+						id: <string>actorToTransformLi.id,
+						name: <string>actorToTransformLi.name,
 						animation: "",
 						number: 0,
 						defaultsummontype: "",
@@ -199,17 +204,19 @@ export class PolymorpherManager extends FormApplication {
 	async _onSummonPolymorpher(event) {
 		this.close(); // this.minimize();
 		const animation = <string>$(event.currentTarget.parentElement.parentElement).find(".anim-dropdown").val();
+		const aUuid = event.currentTarget.dataset.auuid;
 		const aId = event.currentTarget.dataset.aid;
 		const aName = event.currentTarget.dataset.aname;
 		const aCompendiumId = event.currentTarget.dataset.acompendiumid;
 		const aExplicitName = event.currentTarget.dataset.aexplicitname;
 		let actorToTransform: Actor | undefined = undefined;
-		actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
+		actorToTransform = <Actor>await retrieveActorFromData(aUuid, aId, aName, aCompendiumId, true);
 		if (actorToTransform && should_I_run_this(actorToTransform)) {
 			// DO NOTHING
 		} else {
 			const actorToTransformId = await automatedPolymorpherSocket.executeAsGM(
 				"retrieveAndPrepareActor",
+				aUuid,
 				aId,
 				aName,
 				aCompendiumId,
@@ -217,7 +224,9 @@ export class PolymorpherManager extends FormApplication {
 				this.actor.id,
 				game.user?.id
 			);
-			actorToTransform = <Actor>await retrieveActorFromData(actorToTransformId, undefined, undefined, false);
+			actorToTransform = <Actor>(
+				await retrieveActorFromData(actorToTransformId, undefined, undefined, false, aUuid)
+			);
 		}
 		if (!actorToTransform) {
 			warn(
@@ -289,10 +298,11 @@ export class PolymorpherManager extends FormApplication {
 
 	async _onOpenSheet(event) {
 		const aId = event.currentTarget.parentElement.dataset.aid;
+		const aUuid = event.currentTarget.parentElement.dataset.auuid;
 		const aName = event.currentTarget.parentElement.dataset.aname;
 		const aCompendiumId = event.currentTarget.dataset.acompendiumid;
 		const aExplicitName = event.currentTarget.dataset.aexplicitname;
-		const actorFromTransform = await retrieveActorFromData(aId, aName, aCompendiumId, false);
+		const actorFromTransform = await retrieveActorFromData(aUuid, aId, aName, aCompendiumId, false);
 		if (actorFromTransform) {
 			actorFromTransform.sheet?.render(true);
 		}
@@ -329,6 +339,7 @@ export class PolymorpherManager extends FormApplication {
 							namesAlreadyImportedFromCompendium.push(<string>actorComp.name);
 						} else {
 							const polydata = <PolymorpherData>{
+								uuid: actorComp.uuid,
 								id: actorComp.id,
 								name: actorComp.name,
 								animation: "",
@@ -346,11 +357,12 @@ export class PolymorpherManager extends FormApplication {
 
 		if (data) {
 			for (const polymorpher of data) {
+				const aUuid = polymorpher.uuid;
 				const aId = polymorpher.id;
 				const aName = polymorpher.name;
 				const aCompendiumId = polymorpher.compendiumid;
 				const aExplicitName = polymorpher.explicitname;
-				const actorToTransformLi = await retrieveActorFromData(aId, aName, aCompendiumId, false);
+				const actorToTransformLi = await retrieveActorFromData(aUuid, aId, aName, aCompendiumId, false);
 				if (!actorToTransformLi) {
 					warn(`No actor founded for the token with id/name '${polymorpher.name}'`, true);
 					continue;
@@ -372,6 +384,7 @@ export class PolymorpherManager extends FormApplication {
 		const $li = $(`
 	    <li id="polymorpher"
         class="polymorpher-item"
+		data-auuid="${actorToTransformLi.uuid}"
         data-aid="${actorToTransformLi.id}"
         data-aname="${actorToTransformLi.name}"
         data-acompendiumid="${data.compendiumid ?? ""}"
@@ -386,6 +399,7 @@ export class PolymorpherManager extends FormApplication {
           <div
             class="warpgate-btn"
             id="summon-polymorpher"
+			data-auuid="${actorToTransformLi.uuid}"
             data-aid="${actorToTransformLi.id}"
             data-aname="${actorToTransformLi.name}"
             data-acompendiumid="${data.compendiumid}"
@@ -460,6 +474,7 @@ export class PolymorpherManager extends FormApplication {
 		let data: PolymorpherData[] = [];
 		for (const polymorpher of this.element.find(".polymorpher-item")) {
 			data.push({
+				uuid: <string>polymorpher.dataset.auuid,
 				id: <string>polymorpher.dataset.aid,
 				name: <string>polymorpher.dataset.aname,
 				animation: <string>$(polymorpher).find(".anim-dropdown").val(),
@@ -501,8 +516,9 @@ export class PolymorpherManager extends FormApplication {
 					const polymorpher = <Actor>shapeOption;
 					// TODO we can add some filter
 					data.push({
-						id: <string>polymorpher.data._id,
-						name: <string>polymorpher.data.name,
+						uuid: <string>polymorpher.uuid,
+						id: <string>polymorpher.id,
+						name: <string>polymorpher.name,
 						animation: <string>$(polymorpher).find(".anim-dropdown").val(),
 						number: <number>$(polymorpher).find("#polymorpher-number-val").val(),
 						defaultsummontype: <string>$(polymorpher).find(".defaultSummonType").val(),
@@ -538,17 +554,19 @@ export class PolymorpherManager extends FormApplication {
 	) {
 		this.close(); // this.minimize();
 		const animation = polymorpherData.animation;
+		const aUuid = polymorpherData.uuid;
 		const aId = polymorpherData.id;
 		const aName = polymorpherData.name;
 		const aCompendiumId = polymorpherData.compendiumid;
 		const aExplicitName = polymorpherData.explicitname;
 		let actorToTransform: Actor | undefined = undefined;
-		actorToTransform = <Actor>await retrieveActorFromData(aId, aName, aCompendiumId, true);
+		actorToTransform = <Actor>await retrieveActorFromData(aUuid, aId, aName, aCompendiumId, true);
 		if (actorToTransform && should_I_run_this(actorToTransform)) {
 			// DO NOTHING
 		} else {
 			const actorToTransformId = await automatedPolymorpherSocket.executeAsGM(
 				"retrieveAndPrepareActor",
+				aUuid,
 				aId,
 				aName,
 				aCompendiumId,
@@ -556,7 +574,9 @@ export class PolymorpherManager extends FormApplication {
 				this.actor.id,
 				game.user?.id
 			);
-			actorToTransform = <Actor>await retrieveActorFromData(actorToTransformId, undefined, undefined, false);
+			actorToTransform = <Actor>(
+				await retrieveActorFromData(aUuid, actorToTransformId, undefined, undefined, false)
+			);
 		}
 		if (!actorToTransform) {
 			warn(
@@ -813,10 +833,11 @@ export class SimplePolymorpherManager extends PolymorpherManager {
 
 	async activateListeners(html) {
 		for (const summon of this.summons) {
+			const aUuid = summon.uuid;
 			const aId = summon.id;
 			const aName = summon.name;
 			const aCompendiumId = summon.compendiumid;
-			const actorToTransformLi = await retrieveActorFromData(aId, aName, aCompendiumId, false);
+			const actorToTransformLi = await retrieveActorFromData(aUuid, aId, aName, aCompendiumId, false);
 			if (actorToTransformLi) {
 				this.element.find("#polymorpher-list").append(this.generateLi(summon, actorToTransformLi));
 			} else {

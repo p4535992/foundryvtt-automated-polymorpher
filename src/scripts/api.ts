@@ -317,8 +317,9 @@ const API = {
 		if (!Array.isArray(inAttributes)) {
 			throw error("retrieveAndPrepareActorArr | inAttributes must be of type array");
 		}
-		const [aId, aName, currentCompendium, createOnWorld, sourceActorId, userId, cloneFlags] = inAttributes;
+		const [aUuid, aId, aName, currentCompendium, createOnWorld, sourceActorId, userId, cloneFlags] = inAttributes;
 		const result = await this.retrieveAndPrepareActor(
+			aUuid,
 			aId,
 			aName,
 			currentCompendium,
@@ -330,6 +331,7 @@ const API = {
 	},
 
 	async retrieveAndPrepareActor(
+		aUuid: string,
 		aId: string,
 		aName: string,
 		currentCompendium: string,
@@ -337,8 +339,8 @@ const API = {
 		sourceActorId: string,
 		userId: string
 	): Promise<Actor | null> {
-		const targetActor = await retrieveActorFromData(aId, aName, currentCompendium, createOnWorld);
-		const sourceActor = await retrieveActorFromData(sourceActorId, undefined, undefined, false);
+		const targetActor = await retrieveActorFromData(aUuid, aId, aName, currentCompendium, createOnWorld);
+		const sourceActor = await retrieveActorFromData(aUuid, sourceActorId, undefined, undefined, false);
 		const user = <User>game.users?.get(userId);
 		if (!user.isGM && game.user?.isGM) {
 			if (sourceActor && targetActor) {
@@ -383,7 +385,7 @@ const API = {
 			//@ts-ignore
 			isEmptyObject(getProperty(sourceActor.flags, CONSTANTS.MODULE_NAME))
 		) {
-			sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
+			sourceActor = <Actor>await retrieveActorFromData(undefined, sourceActorId, "", "", false);
 		}
 		if (!sourceActor) {
 			warn(`No source actor found with reference '${sourceTokenId}'`, true);
@@ -415,6 +417,7 @@ const API = {
 		}
 
 		const targetActor = await retrieveActorFromData(
+			currentPolymorph?.uuid,
 			currentPolymorph?.id,
 			currentPolymorph?.name,
 			currentPolymorph?.compendiumid,
@@ -483,7 +486,7 @@ const API = {
 			//@ts-ignore
 			isEmptyObject(getProperty(sourceActor.flags, CONSTANTS.MODULE_NAME))
 		) {
-			sourceActor = <Actor>await retrieveActorFromData(sourceActorId, "", "");
+			sourceActor = <Actor>await retrieveActorFromData(undefined, sourceActorId, "", "", false);
 		}
 		if (!sourceActor) {
 			warn(`No source actor found with reference '${sourceTokenId}'`, true);

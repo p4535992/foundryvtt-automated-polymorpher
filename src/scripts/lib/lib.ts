@@ -446,14 +446,22 @@ export function transferItemsActor(
 }
 
 export async function retrieveActorFromData(
+	aUuid,
 	aId,
 	aName,
 	currentCompendium,
-	createOnWorld = false
+	createOnWorld: boolean
 ): Promise<Actor | null> {
 	let actorToTransformLi: Actor | null = null;
 	if (!aId && !aName) {
 		return null;
+	}
+	if (aUuid) {
+		//@ts-ignore
+		actorToTransformLi = await Actor.implementation.fromDropData({ type: "Actor", uuid: aUuid });
+		if (actorToTransformLi) {
+			return actorToTransformLi;
+		}
 	}
 	actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
 		return a.id === aId || a.name === aName;
