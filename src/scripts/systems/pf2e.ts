@@ -1478,7 +1478,12 @@ export default {
 		// Strange bug with fvtt10
 		const tokenEffectsCleaned: any[] = [];
 		for (const effect of d.effects) {
-			const effectTmp = effect.toObject();
+			let effectTmp = undefined;
+			try {
+				effectTmp = effect.toObject(false);
+			} catch (e) {
+				effectTmp = effect.toJSON();
+			}
 			//@ts-ignore
 			delete effectTmp._id;
 			tokenEffectsCleaned.push(effectTmp);
