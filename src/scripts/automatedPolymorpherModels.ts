@@ -82,13 +82,14 @@ export class TransformOptionsGeneric {
 	keepAE = false;
 	// removeAE = false;
 	// keepAEOnlyOriginNotEquipment = false;
-	removeOtherOriginAE = false;
-	removeOriginAE = false;
-	removeEquipmentAE = false;
-	removeFeatAE = false;
-	removeSpellAE = false;
-	removeClassAE = false;
-	removeBackgroundAE = false;
+	keepOtherOriginAE = true;
+	keepOriginAE = true;
+	keepEquipmentAE = true;
+	keepFeatAE = true;
+	keepSpellAE = true;
+	keepClassAE = true;
+	keepBackgroundAE = true;
+	//
 	transformTokens = true;
 	explicitName = "";
 }

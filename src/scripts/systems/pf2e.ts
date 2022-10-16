@@ -35,14 +35,14 @@ export default {
 	 * @property {boolean} [keepBio=false]            Keep biography
 	 * @property {boolean} [keepVision=false]         Keep vision
 	 * @property {boolean} [keepSelf=false]           Keep self
-	 * @property {boolean} [keepAE=false]           Remove all effects
-	 * @property {boolean} [removeOriginAE=true]      Remove effects which originate on this actor
-	 * @property {boolean} [removeOtherOriginAE=true] Remove effects which originate on another actor
-	 * @property {boolean} [removeSpellAE=false]      Remove effects which originate from actors spells
-	 * @property {boolean} [removeFeatAE=false]       Remove effects which originate from actors features
-	 * @property {boolean} [removeEquipmentAE=false]  Remove effects which originate on actors equipment
-	 * @property {boolean} [removeClassAE=false]      Remove effects which originate from actors class/subclass
-	 * @property {boolean} [removeBackgroundAE=false] Remove effects which originate from actors background
+	 * @property {boolean} [keepAE=false]             Keep all effects
+	 * @property {boolean} [keepOriginAE=true]        Keep effects which originate on this actor
+	 * @property {boolean} [keepOtherOriginAE=true]   Keep effects which originate on another actor
+	 * @property {boolean} [keepSpellAE=true]         Keep effects which originate from actors spells
+	 * @property {boolean} [keepFeatAE=true]          Keep effects which originate from actors features
+	 * @property {boolean} [keepEquipmentAE=true]     Keep effects which originate on actors equipment
+	 * @property {boolean} [keepClassAE=true]         Keep effects which originate from actors class/subclass
+	 * @property {boolean} [keepBackgroundAE=true]    Keep effects which originate from actors background
 	 * @property {boolean} [transformTokens=true]     Transform linked tokens too
 	 * @property {string} [explicitName]  Explicit name for generated actor
 	 */
@@ -63,13 +63,14 @@ export default {
 		keepAE: false,
 		// removeAE: false,
 		// keepAEOnlyOriginNotEquipment: false,
-		removeOriginAE: false,
-		removeOtherOriginAE: false,
-		removeSpellAE: false,
-		removeEquipmentAE: false,
-		removeFeatAE: false,
-		removeClassAE: false,
-		removeBackgroundAE: false,
+		keepOriginAE: true,
+		keepOtherOriginAE: true,
+		keepSpellAE: true,
+		keepEquipmentAE: true,
+		keepFeatAE: true,
+		keepClassAE: true,
+		keepBackgroundAE: true,
+		//
 		transformTokens: true,
 		explicitName: "",
 	},
@@ -1095,13 +1096,14 @@ export default {
 		const keepAE = transformOptions?.keepAE || false;
 		// const removeAE = transformOptions?.removeAE || false;
 		// const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
-		const removeOriginAE = transformOptions?.removeOriginAE || false;
-		const removeOtherOriginAE = transformOptions?.removeOtherOriginAE || false;
-		const removeSpellAE = transformOptions?.removeSpellAE || false;
-		const removeEquipmentAE = transformOptions?.removeEquipmentAE || false;
-		const removeFeatAE = transformOptions?.removeFeatAE || false;
-		const removeClassAE = transformOptions?.removeClassAE || false;
-		const removeBackgroundAE = transformOptions?.removeBackgroundAE || false;
+		const keepOriginAE = transformOptions?.keepOriginAE || true;
+		const keepOtherOriginAE = transformOptions?.keepOtherOriginAE || true;
+		const keepSpellAE = transformOptions?.keepSpellAE || true;
+		const keepEquipmentAE = transformOptions?.keepEquipmentAE || true;
+		const keepFeatAE = transformOptions?.keepFeatAE || true;
+		const keepClassAE = transformOptions?.keepClassAE || true;
+		const keepBackgroundAE = transformOptions?.keepBackgroundAE || true;
+		//
 		const transformTokens = transformOptions?.transformTokens || true;
 		const explicitName = transformOptions?.explicitName || "";
 		// const renderSheet = transformOptions?.renderSheet || true;
@@ -1130,13 +1132,14 @@ export default {
 			keepAE,
 			// removeAE,
 			// keepAEOnlyOriginNotEquipment,
-			removeOriginAE,
-			removeOtherOriginAE,
-			removeSpellAE,
-			removeEquipmentAE,
-			removeFeatAE,
-			removeClassAE,
-			removeBackgroundAE,
+			keepOriginAE,
+			keepOtherOriginAE,
+			keepSpellAE,
+			keepEquipmentAE,
+			keepFeatAE,
+			keepClassAE,
+			keepBackgroundAE,
+			//
 			transformTokens,
 			explicitName,
 		});
@@ -1430,32 +1433,32 @@ export default {
 
 					if (isOriginEffect) {
 						// If effect originates on actor
-						if (!removeOriginAE) {
+						if (keepOriginAE) {
 							d.effects.push(e);
 						}
 					} else if (!isOriginEffect && !originIsSelf) {
 						// Effect is not from Actor
-						if (!removeOtherOriginAE) {
+						if (keepOtherOriginAE) {
 							d.effects.push(e);
 						}
 					} else {
 						// Effect is from an item originating on actor
 						switch (origin.type) {
 							case "spell": {
-								if (!removeSpellAE) {
+								if (keepSpellAE) {
 									d.effects.push(e);
 								}
 								break;
 							}
 							case "feat": {
-								if (!removeFeatAE) {
+								if (keepFeatAE) {
 									d.effects.push(e);
 								}
 								break;
 							}
 							case "subclass":
 							case "class": {
-								if (!removeClassAE) {
+								if (keepClassAE) {
 									d.effects.push(e);
 								}
 								break;
@@ -1465,13 +1468,13 @@ export default {
 							case "tool":
 							case "loot":
 							case "backpack": {
-								if (!removeEquipmentAE) {
+								if (keepEquipmentAE) {
 									d.effects.push(e);
 								}
 								break;
 							}
 							case "background": {
-								if (!removeBackgroundAE) {
+								if (keepBackgroundAE) {
 									d.effects.push(e);
 								}
 								break;

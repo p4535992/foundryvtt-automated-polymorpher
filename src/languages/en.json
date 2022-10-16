@@ -140,6 +140,7 @@
 		"polymorphEffectTransformation": "Effect Transformation",
 		"polymorphKeepBio": "Keep biography",
 		"polymorphKeepClass": "Keep proficiency bonus (leaves class items in sheet)",
+		"polymorphKeepAE": "Keep all effects (overrides other effect retention options).",
 		"polymorphKeepBackgroundAE": "Keep effects that originate from your background?",
 		"polymorphKeepClassAE": "Keep effects that originate from your class or subclass?",
 		"polymorphKeepEquipmentAE": "Keep effects that originate from your equipment?",
@@ -178,6 +179,6 @@
 		"polymorphRemoveFeatureAE": "Remove effects that originate from your features?",
 		"polymorphRemoveOriginAE": "Remove effects that originate on the actor i.e. effects not attached to features/items/spells",
 		"polymorphRemoveOtherOriginAE": "Remove effects that originate on a different actor i.e. spells/items/features from opponents",
-		"polymorphRemoveSpellAE": "Remove effects that originate from your spells?",
+		"polymorphRemoveSpellAE": "Remove effects that originate from your spells?"
 	}
 }
