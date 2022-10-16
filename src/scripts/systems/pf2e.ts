@@ -545,6 +545,8 @@ export default {
 			// Create new Actor with transformed data
 			//@ts-ignore
 			const newActor = await sourceActor.constructor.create(d, { renderSheet: renderSheet });
+			//@ts-ignore
+			// const newActor = await Actor.implementation.create(d, { renderSheet: renderSheet });
 			// Force this to be true
 			await newActor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
 			await newActor.setFlag(
@@ -604,8 +606,8 @@ export default {
 				//@ts-ignore
 				const token = await TokenDocument.implementation.create(tokenUpdate, {
 					parent: canvas.scene,
-					keepId: true,
-					render: true,
+					keepId: false, // MOD 4535992 on dnd5e is true
+					render: false, // MOD 4535992 on dnd5e is true
 				});
 				tokensFinal.push(token);
 			}
