@@ -1,3 +1,7 @@
+### 1.1.11-12-13
+
+- Synchronization with dnd5e pr from mr primate
+
 ### 1.1.6-7-8-9-10-11
 
 - Many bug fix, strange reset of the flags whet set or unset flags on the same namespace ?

@@ -2,7 +2,7 @@
   "name": "automated-polymorpher",
   "title": "Automated Polymorpher",
   "description": "[BETA] A user interface to manage polymorpher with summoning animations and automated summoning for spells",
-  "version": "1.1.12",
+  "version": "1.1.13",
   "main": "automated-polymorpher.js",
   "scripts": {
     "publish": "gulp publish --update",

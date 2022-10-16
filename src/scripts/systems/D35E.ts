@@ -549,6 +549,7 @@ export default {
 			//@ts-ignore
 			const newActor = await sourceActor.constructor.create(d, { renderSheet: renderSheet });
 			//@ts-ignore
+			// TODO Understand why is not working work like on dnd5e
 			// const newActor = await Actor.implementation.create(d, { renderSheet: renderSheet });
 			// Force this to be true
 			await newActor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
@@ -603,17 +604,18 @@ export default {
 				return newTokenData;
 			});
 			//@ts-ignore
-			// const tokensFinal = <TokenDocument[]>await canvas.scene?.updateEmbeddedDocuments("Token", updates);
-			const tokensFinal = <TokenDocument[]>[];
-			for (const tokenUpdate of updates) {
-				//@ts-ignore
-				const token = await TokenDocument.implementation.create(tokenUpdate, {
-					parent: canvas.scene,
-					keepId: false, // MOD 4535992 on dnd5e is true
-					render: false, // MOD 4535992 on dnd5e is true
-				});
-				tokensFinal.push(token);
-			}
+			const tokensFinal = <TokenDocument[]>await canvas.scene?.updateEmbeddedDocuments("Token", updates);
+			// TODO Understand why is not working work like on dnd5e
+			// const tokensFinal = <TokenDocument[]>[];
+			// for (const tokenUpdate of updates) {
+			// 	//@ts-ignore
+			// 	const token = await TokenDocument.implementation.create(tokenUpdate, {
+			// 		parent: canvas.scene,
+			// 		keepId: false, // MOD 4535992 on dnd5e is true
+			// 		render: false, // MOD 4535992 on dnd5e is true
+			// 	});
+			// 	tokensFinal.push(token);
+			// }
 			for (const tokenFinal of tokensFinal) {
 				// Force this to be true
 				await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
