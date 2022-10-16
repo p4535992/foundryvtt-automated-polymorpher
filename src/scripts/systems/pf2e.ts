@@ -10,6 +10,7 @@ import {
 	PolymorpherData,
 	PolymorpherFlags,
 	TokenRevertData,
+	transformationPresets,
 	TransformOptionsGeneric,
 } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
@@ -118,7 +119,8 @@ export default {
 	 * @param {Actor} sourceActor                 The original actor before transformation.
 	 * @param {Actor} targetActor                      The target Actor.
 	 * @param {TransformationOptions} [options={}]  Options that determine how the transformation is performed.
-	 * @param {boolean} [renderSheet=true] Render the sheet of the transformed actor after the polymorph
+	 * @param {object} [options]
+	 * @param {boolean} [options.renderSheet=true]  Render the sheet of the transformed actor after the polymorph
 	 * @returns {Promise<Array<Token>>|null}        Updated token if the transformation was performed.
 	 */
 	async transformInto(
@@ -528,7 +530,7 @@ export default {
             if ( this.isToken ) {
                 const tokenData = d.prototypeToken;
                 delete d.prototypeToken;
-                d.flags.dnd5e.previousActorData = duplicate(this.token.actorData);
+                d.flags.dnd5e.previousActorData = this.token.toObject().actorData;
                 tokenData.actorData = d;
                 await this.sheet?.close();
                 const update = await this.token.update(tokenData);
@@ -595,7 +597,17 @@ export default {
 				return newTokenData;
 			});
 			//@ts-ignore
-			const tokensFinal = <TokenDocument[]>await canvas.scene?.updateEmbeddedDocuments("Token", updates);
+			// const tokensFinal = <TokenDocument[]>await canvas.scene?.updateEmbeddedDocuments("Token", updates);
+			const tokensFinal = <TokenDocument[]>[];
+			for (const tokenUpdate of updates) {
+				//@ts-ignore
+				const token = await TokenDocument.implementation.create(tokenUpdate, {
+					parent: canvas.scene,
+					keepId: true,
+					render: true,
+				});
+				tokensFinal.push(token);
+			}
 			for (const tokenFinal of tokensFinal) {
 				// Force this to be true
 				await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
@@ -665,7 +677,7 @@ export default {
             }
             const prototypeTokenData = await baseActor.getTokenDocument();
             const actorData = foundry.utils.getProperty(this, "flags.dnd5e.previousActorData");
-            const tokenUpdate = duplicate(this.token);
+            const tokenUpdate = this.token.toObject();
             tokenUpdate.actorData = actorData ? actorData : {};
 
             for ( const k of ["width", "height", "alpha", "lockRotation", "name"] ) {
@@ -679,14 +691,16 @@ export default {
 
             await this.sheet.close();
             await canvas.scene?.deleteEmbeddedDocuments("Token", [this.token._id]);
-            const results = await canvas.scene?.createEmbeddedDocuments("Token", [tokenUpdate], { keepId: true, render: true });
+            const token = await TokenDocument.implementation.create(tokenUpdate, {
+				parent: canvas.scene, keepId: true, render: true
+			});
             const actor = results.find(r => r._id === tokenUpdate._id).actor;
             if ( isOriginalActor ) {
                 await this.unsetFlag("dnd5e", "isPolymorphed");
                 await this.unsetFlag("dnd5e", "previousActorIds");
             }
-            if ( isRendered && renderSheet ) actor.sheet?.render(true);
-            return actor;
+            if ( isRendered && renderSheet ) token.actor.sheet?.render(true);
+            return token;
             }
         */
 
@@ -806,7 +820,9 @@ export default {
 								}
 							}
 						}
-						await Actor.deleteDocuments(idsActorToDelete);
+						// await Actor.deleteDocuments(idsActorToDelete);
+						//@ts-ignore
+						await Actor.implementation.deleteDocuments(idsActorToDelete);
 					}
 				}
 			}
@@ -938,8 +954,8 @@ export default {
 						},
 					},
 					wildshape: {
-						icon: '<i class="fas fa-paw"></i>',
-						label: i18n(`${CONSTANTS.MODULE_NAME}.polymorphWildShape`),
+						icon: transformationPresets.wildshape.icon,
+						label: i18n(transformationPresets.wildshape.label),
 						callback: async (html) => {
 							if (sourceToken) {
 								if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
@@ -960,32 +976,26 @@ export default {
 								sourceToken,
 								sourceActor,
 								targetActor,
-								{
-									keepBio: true,
-									keepClass: true,
-									keepMental: true,
-									mergeSaves: true,
-									mergeSkills: true,
+								foundry.utils.mergeObject(transformationPresets.wildshape.options, {
 									transformTokens: rememberOptions(html).transformTokens,
-									keepAE: rememberOptions(html).keepAE,
-									// removeAE: rememberOptions(html).removeAE,
-									removeOriginAE: rememberOptions(html).removeOriginAE,
-									removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-									removeFeatAE: rememberOptions(html).removeFeatAE,
-									removeSpellAE: rememberOptions(html).removeSpellAE,
-									removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-									removeClassAE: rememberOptions(html).removeClassAE,
-									removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
-									explicitName: rememberOptions(html).explicitName,
-								},
+									// keepAE: rememberOptions(html).keepAE,
+									// //removeAE: rememberOptions(html).removeAE,
+									// removeOriginAE: rememberOptions(html).removeOriginAE,
+									// removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
+									// removeFeatAE: rememberOptions(html).removeFeatAE,
+									// removeSpellAE: rememberOptions(html).removeSpellAE,
+									// removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
+									// removeClassAE: rememberOptions(html).removeClassAE,
+									// removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
+								}),
 								false,
 								<string>game.user?.id
 							);
 						},
 					},
 					polymorph: {
-						icon: '<i class="fas fa-pastafarianism"></i>',
-						label: i18n(`${CONSTANTS.MODULE_NAME}.polymorph`),
+						icon: transformationPresets.polymorph.icon,
+						label: i18n(transformationPresets.polymorph.label),
 						callback: async (html) => {
 							if (sourceToken) {
 								if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
@@ -1006,46 +1016,43 @@ export default {
 								sourceToken,
 								sourceActor,
 								targetActor,
-								{
+								foundry.utils.mergeObject(transformationPresets.polymorph.options, {
 									transformTokens: rememberOptions(html).transformTokens,
-									keepAE: rememberOptions(html).keepAE,
-									// removeAE: rememberOptions(html).removeAE,
-									removeOriginAE: rememberOptions(html).removeOriginAE,
-									removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-									removeFeatAE: rememberOptions(html).removeFeatAE,
-									removeSpellAE: rememberOptions(html).removeSpellAE,
-									removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-									removeClassAE: rememberOptions(html).removeClassAE,
-									removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
-									explicitName: rememberOptions(html).explicitName,
-								},
+									// keepAE: rememberOptions(html).keepAE,
+									// //removeAE: rememberOptions(html).removeAE,
+									// removeOriginAE: rememberOptions(html).removeOriginAE,
+									// removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
+									// removeFeatAE: rememberOptions(html).removeFeatAE,
+									// removeSpellAE: rememberOptions(html).removeSpellAE,
+									// removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
+									// removeClassAE: rememberOptions(html).removeClassAE,
+									// removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
+								}),
 								false,
 								<string>game.user?.id
 							);
 						},
 					},
 					self: {
-						icon: '<i class="fas fa-eye"></i>',
-						label: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphSelf`),
+						icon: transformationPresets.polymorphSelf.icon,
+						label: i18n(transformationPresets.polymorphSelf.label),
 						callback: async (html) => {
 							await this.transformInto(
 								sourceToken,
 								sourceActor,
 								targetActor,
-								{
-									keepSelf: true,
+								foundry.utils.mergeObject(transformationPresets.polymorphSelf.options, {
 									transformTokens: rememberOptions(html).transformTokens,
-									keepAE: rememberOptions(html).keepAE,
-									// removeAE: rememberOptions(html).removeAE,
-									removeOriginAE: rememberOptions(html).removeOriginAE,
-									removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-									removeFeatAE: rememberOptions(html).removeFeatAE,
-									removeSpellAE: rememberOptions(html).removeSpellAE,
-									removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-									removeClassAE: rememberOptions(html).removeClassAE,
-									removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
-									explicitName: rememberOptions(html).explicitName,
-								},
+									// keepAE: rememberOptions(html).keepAE,
+									// //removeAE: rememberOptions(html).removeAE,
+									// removeOriginAE: rememberOptions(html).removeOriginAE,
+									// removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
+									// removeFeatAE: rememberOptions(html).removeFeatAE,
+									// removeSpellAE: rememberOptions(html).removeSpellAE,
+									// removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
+									// removeClassAE: rememberOptions(html).removeClassAE,
+									// removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
+								}),
 								false,
 								<string>game.user?.id
 							);
@@ -1059,7 +1066,7 @@ export default {
 			},
 			{
 				classes: ["dialog", `${CONSTANTS.MODULE_NAME}`],
-				width: 600,
+				width: 900,
 				template: `modules/${CONSTANTS.MODULE_NAME}/templates/polymorph-prompt.hbs`,
 			}
 		);
@@ -1188,7 +1195,12 @@ export default {
 				ownership: originalActorData.ownership, // Use the original actor permissions
 				folder: originalActorData.folder, // Be displayed in the same sidebar folder
 				flags: originalActorData.flags, // Use the original actor flags
-				prototypeToken: { name: `${originalActorData.name} (${targetActorData.name})`, texture: {}, sight: {}, detectionModes: [] }, // Set a new empty token
+				prototypeToken: {
+					name: `${originalActorData.name} (${targetActorData.name})`,
+					texture: {},
+					sight: {},
+					detectionModes: [],
+				}, // Set a new empty token
 				//@ts-ignore
 				width: targetActorData.prototypeToken.width,
 				//@ts-ignore
@@ -1278,7 +1290,7 @@ export default {
 				"brightness",
 				"saturation",
 				"contrast",
-				"enabled"
+				"enabled",
 			]) {
 				//@ts-ignore
 				d.prototypeToken.sight[k] = sightSource.sight[k];
@@ -1403,7 +1415,7 @@ export default {
 			if (removeAE) {
 				d.effects = [];
 			} else if (removeEquipmentAE || removeFeatAE || removeOriginAE || removeSpellAE) {
-				const oEffects = duplicate(d.effects);
+				const oEffects = foundry.utils.deepClone(d.effects);
 				d.effects = [];
 				const originEffectIds = oEffects
 					.filter((effect) => {
@@ -1412,8 +1424,8 @@ export default {
 					.map((e) => e._id);
 
 				for (const e of oEffects) {
-					const item = <Item>e.origin?.startsWith("Actor") ? <Item>await fromUuid(e.origin) : <Item>{};
-					const originIsSelf = item.parent?.uuid === this.uuid;
+					const origin = <any>await fromUuid(e.origin);
+					const originIsSelf = origin.parent?.uuid === this.uuid;
 					const isOriginEffect = originEffectIds.includes(e._id);
 
 					if (isOriginEffect) {
@@ -1428,7 +1440,7 @@ export default {
 						}
 					} else {
 						// Effect is from an item originating on actor
-						switch (item.type) {
+						switch (origin.type) {
 							case "spell": {
 								if (!removeSpellAE) {
 									d.effects.push(e);

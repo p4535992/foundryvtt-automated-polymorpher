@@ -725,6 +725,7 @@ export class PolymorpherManager extends FormApplication {
 					keepMental: true,
 					mergeSaves: true,
 					mergeSkills: true,
+					keepEquipmentAE: false,
 					transformTokens: true,
 					explicitName: aExplicitName,
 				},

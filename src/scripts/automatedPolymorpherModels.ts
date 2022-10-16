@@ -1,3 +1,5 @@
+import CONSTANTS from "./constants";
+
 export class SystemCreatures {
 	[key: string]: { [key: string]: Creature[] | Function };
 }
@@ -119,3 +121,39 @@ export class TransformOptionsGeneric {
 
 // // "darkvision, scent (imprecise) 60 feet"
 // export const SENSE_ACUITIES_Pf2e = ["precise", "imprecise", "vague"];
+
+/**
+ * Settings to configure how actors are merged when preset polymorphing is applied.
+ * @enum {object}
+ */
+export const transformationPresets = {
+	wildshape: {
+		icon: '<i class="fas fa-paw"></i>',
+		label: `${CONSTANTS.MODULE_NAME}.polymorphWildShape`,
+		options: {
+			keepBio: true,
+			keepClass: true,
+			keepMental: true,
+			mergeSaves: true,
+			mergeSkills: true,
+			keepEquipmentAE: false
+		},
+	},
+	polymorph: {
+		icon: '<i class="fas fa-pastafarianism"></i>',
+		label: `${CONSTANTS.MODULE_NAME}.polymorph`,
+		options: {
+			keepEquipmentAE: false,
+			keepClassAE: false,
+			keepFeatAE: false,
+			keepBackgroundAE: false
+		}
+	},
+	polymorphSelf: {
+		icon: '<i class="fas fa-eye"></i>',
+		label: `${CONSTANTS.MODULE_NAME}.polymorphSelf`,
+		options: {
+			keepSelf: true,
+		},
+	},
+};
