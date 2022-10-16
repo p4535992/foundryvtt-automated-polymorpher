@@ -137,7 +137,7 @@ export const transformationPresets = {
 			keepMental: true,
 			mergeSaves: true,
 			mergeSkills: true,
-			keepEquipmentAE: false
+			keepEquipmentAE: false,
 		},
 	},
 	polymorph: {
@@ -147,8 +147,8 @@ export const transformationPresets = {
 			keepEquipmentAE: false,
 			keepClassAE: false,
 			keepFeatAE: false,
-			keepBackgroundAE: false
-		}
+			keepBackgroundAE: false,
+		},
 	},
 	polymorphSelf: {
 		icon: '<i class="fas fa-eye"></i>',

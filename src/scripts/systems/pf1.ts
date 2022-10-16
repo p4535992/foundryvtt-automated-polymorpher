@@ -680,7 +680,7 @@ export default {
                 return;
             }
             const prototypeTokenData = await baseActor.getTokenDocument();
-            const actorData = foundry.utils.getProperty(this, "flags.dnd5e.previousActorData");
+            const actorData = this.token.get.getFlag("dnd5e", "previousActorData");
             const tokenUpdate = this.token.toObject();
             tokenUpdate.actorData = actorData ? actorData : {};
 
@@ -1418,78 +1418,46 @@ export default {
 			}
 
 			// Remove active effects
-			if (removeAE) {
-				d.effects = [];
-			} else if (removeEquipmentAE || removeFeatAE || removeOriginAE || removeSpellAE) {
-				const oEffects = foundry.utils.deepClone(d.effects);
-				d.effects = [];
-				const originEffectIds = oEffects
+			const oEffects = foundry.utils.deepClone(d.effects);
+			const originEffectIds = new Set(
+				oEffects
 					.filter((effect) => {
 						return !effect.origin || effect.origin === this.uuid;
 					})
-					.map((e) => e._id);
-
-				for (const e of oEffects) {
-					const origin = <any>await fromUuid(e.origin);
-					const originIsSelf = origin.parent?.uuid === this.uuid;
-					const isOriginEffect = originEffectIds.includes(e._id);
-
-					if (isOriginEffect) {
-						// If effect originates on actor
-						if (keepOriginAE) {
-							d.effects.push(e);
-						}
-					} else if (!isOriginEffect && !originIsSelf) {
-						// Effect is not from Actor
-						if (keepOtherOriginAE) {
-							d.effects.push(e);
-						}
-					} else {
-						// Effect is from an item originating on actor
-						switch (origin.type) {
-							case "spell": {
-								if (keepSpellAE) {
-									d.effects.push(e);
-								}
-								break;
-							}
-							case "feat": {
-								if (keepFeatAE) {
-									d.effects.push(e);
-								}
-								break;
-							}
-							case "subclass":
-							case "class": {
-								if (keepClassAE) {
-									d.effects.push(e);
-								}
-								break;
-							}
-							case "equipment":
-							case "weapon":
-							case "tool":
-							case "loot":
-							case "backpack": {
-								if (keepEquipmentAE) {
-									d.effects.push(e);
-								}
-								break;
-							}
-							case "background": {
-								if (keepBackgroundAE) {
-									d.effects.push(e);
-								}
-								break;
-							}
-							default: {
-								// Unknown type, or origin was not caught by above filters, keep
-								d.effects.push(e);
-							}
-						}
-					}
+					.map((e) => e._id)
+			);
+			d.effects = d.effects.filter((e) => {
+				if (keepAE) {
+					return true;
 				}
-			}
+				const origin =
+					//@ts-ignore
+					e.origin?.startsWith("Actor") || e.origin?.startsWith("Item") ? fromUuidSync(e.origin) : {};
+				const originIsSelf = origin?.parent?.uuid === this.uuid;
+				const isOriginEffect = originEffectIds.has(e._id);
+				if (isOriginEffect) {
+					return keepOriginAE;
+				}
+				if (!isOriginEffect && !originIsSelf) {
+					return keepOtherOriginAE;
+				}
+				if (origin.type === "spell") {
+					return keepSpellAE;
+				}
+				if (origin.type === "feat") {
+					return keepFeatAE;
+				}
+				if (origin.type === "background") {
+					return keepBackgroundAE;
+				}
+				if (["subclass", "feat"].includes(origin.type)) {
+					return keepClassAE;
+				}
+				if (["equipment", "weapon", "tool", "loot", "backpack"].includes(origin.type)) {
+					return keepEquipmentAE;
+				}
+				return true;
+			});
 		}
 
 		//@ts-ignore
