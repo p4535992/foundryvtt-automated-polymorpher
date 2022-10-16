@@ -34,7 +34,7 @@ export default {
 	 * @property {boolean} [keepBio=false]            Keep biography
 	 * @property {boolean} [keepVision=false]         Keep vision
 	 * @property {boolean} [keepSelf=false]           Keep self
-	 * @property {boolean} [removeAE=false]           Remove all effects
+	 * @property {boolean} [keepAE=false]           Remove all effects
 	 * @property {boolean} [removeOriginAE=true]      Remove effects which originate on this actor
 	 * @property {boolean} [removeOtherOriginAE=true] Remove effects which originate on another actor
 	 * @property {boolean} [removeSpellAE=false]      Remove effects which originate from actors spells
@@ -59,7 +59,8 @@ export default {
 		keepBio: false,
 		keepVision: true,
 		keepSelf: false,
-		removeAE: false,
+		keepAE: false,
+		// removeAE: false,
 		// keepAEOnlyOriginNotEquipment: false,
 		removeOriginAE: false,
 		removeOtherOriginAE: false,
@@ -99,7 +100,8 @@ export default {
 	 * @enum {string}
 	 */
 	i18nPolymorphEffectSettings: {
-		removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
+		keepAE: `${CONSTANTS.MODULE_NAME}.polymorphKeepAE`,
+		// removeAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveAE`,
 		removeOtherOriginAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveOtherOriginAE`,
 		removeOriginAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveOriginAE`,
 		removeEquipmentAE: `${CONSTANTS.MODULE_NAME}.polymorphRemoveEquipmentAE`,
@@ -969,7 +971,8 @@ export default {
 									mergeSaves: true,
 									mergeSkills: true,
 									transformTokens: rememberOptions(html).transformTokens,
-									removeAE: rememberOptions(html).removeAE,
+									keepAE: rememberOptions(html).keepAE,
+									// removeAE: rememberOptions(html).removeAE,
 									removeOriginAE: rememberOptions(html).removeOriginAE,
 									removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
 									removeFeatAE: rememberOptions(html).removeFeatAE,
@@ -1009,7 +1012,8 @@ export default {
 								targetActor,
 								{
 									transformTokens: rememberOptions(html).transformTokens,
-									removeAE: rememberOptions(html).removeAE,
+									keepAE: rememberOptions(html).keepAE,
+									// removeAE: rememberOptions(html).removeAE,
 									removeOriginAE: rememberOptions(html).removeOriginAE,
 									removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
 									removeFeatAE: rememberOptions(html).removeFeatAE,
@@ -1035,7 +1039,8 @@ export default {
 								{
 									keepSelf: true,
 									transformTokens: rememberOptions(html).transformTokens,
-									removeAE: rememberOptions(html).removeAE,
+									keepAE: rememberOptions(html).keepAE,
+									// removeAE: rememberOptions(html).removeAE,
 									removeOriginAE: rememberOptions(html).removeOriginAE,
 									removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
 									removeFeatAE: rememberOptions(html).removeFeatAE,
@@ -1084,7 +1089,8 @@ export default {
 		const keepBio = transformOptions?.keepBio || false;
 		const keepVision = transformOptions?.keepVision || false;
 		const keepSelf = transformOptions?.keepSelf || false;
-		const removeAE = transformOptions?.removeAE || false;
+		const keepAE = transformOptions?.keepAE || false;
+		// const removeAE = transformOptions?.removeAE || false;
 		// const keepAEOnlyOriginNotEquipment = transformOptions?.keepAEOnlyOriginNotEquipment || false;
 		const removeOriginAE = transformOptions?.removeOriginAE || false;
 		const removeOtherOriginAE = transformOptions?.removeOtherOriginAE || false;
@@ -1118,7 +1124,8 @@ export default {
 			keepBio,
 			keepVision,
 			keepSelf,
-			removeAE,
+			keepAE,
+			// removeAE,
 			// keepAEOnlyOriginNotEquipment,
 			removeOriginAE,
 			removeOtherOriginAE,
@@ -1185,9 +1192,7 @@ export default {
 				ownership: originalActorData.ownership, // Use the original actor permissions
 				folder: originalActorData.folder, // Be displayed in the same sidebar folder
 				flags: originalActorData.flags, // Use the original actor flags
-				// x: sourceToken.x,
-				// y: sourceToken.y,
-				// token: sourceToken.toObject()
+				prototypeToken: { name: `${originalActorData.name} (${targetActorData.name})`, texture: {}, sight: {}, detectionModes: [] }, // Set a new empty token
 				//@ts-ignore
 				width: targetActorData.prototypeToken.width,
 				//@ts-ignore
@@ -1246,10 +1251,10 @@ export default {
 		// }
 
 		// Token appearance updates
-		if (!hasProperty(d, "prototypeToken.texture.src")) {
-			//@ts-ignore
-			d.prototypeToken = { name: d.name, texture: {}, sight: {}, detectionModes: [] };
-		}
+		// if (!hasProperty(d, "prototypeToken.texture.src")) {
+		// 	//@ts-ignore
+		// 	d.prototypeToken = { name: d.name, texture: {}, sight: {}, detectionModes: [] };
+		// }
 
 		for (const k of ["width", "height", "alpha", "lockRotation"]) {
 			//@ts-ignore
@@ -1277,6 +1282,7 @@ export default {
 				"brightness",
 				"saturation",
 				"contrast",
+				"enabled"
 			]) {
 				//@ts-ignore
 				d.prototypeToken.sight[k] = sightSource.sight[k];

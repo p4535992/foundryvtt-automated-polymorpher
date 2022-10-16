@@ -77,7 +77,8 @@ export class TransformOptionsGeneric {
 	keepBio = false;
 	keepVision = false;
 	keepSelf = false;
-	removeAE = false;
+	keepAE = false;
+	// removeAE = false;
 	// keepAEOnlyOriginNotEquipment = false;
 	removeOtherOriginAE = false;
 	removeOriginAE = false;

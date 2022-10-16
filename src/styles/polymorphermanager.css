@@ -147,13 +147,6 @@
 }
 .automated-polymorpher .two-column {
 	display: grid;
-	grid-template-columns: var(--grid-two-column-left-size) var(--grid-two-column-right-size);
-	grid-template-areas: "left right";
+	grid-template-columns: 45% 55%;
 	grid-gap: 0.4em;
-}
-.automated-polymorpher .two-column .left-column {
-	grid-area: left;
-}
-.automated-polymorpher .two-column .right-column {
-	grid-area: right;
 }
