@@ -69,6 +69,8 @@ export const readyHooks = async () => {
 			isPolymorphed = true;
 		}
 
+        if (useWarpGate && getPolymorphs(actor).length) isPolymorphed = true;
+
 		const removeLabelSheetHeader = game.settings.get(CONSTANTS.MODULE_NAME, "removeLabelSheetHeader");
 		const restrictedOnlyGM = game.settings.get(CONSTANTS.MODULE_NAME, "restrictOnlyGM");
 		if (restrictedOnlyGM && !game.user?.isGM) {
@@ -84,7 +86,7 @@ export const readyHooks = async () => {
 			});
 		}
 
-		if (isPolymorphed && !useWarpGate) {
+		if (isPolymorphed) {
 			buttons.unshift({
 				icon: "fas fa-backward",
 				class: "restore-transformation-pm",
