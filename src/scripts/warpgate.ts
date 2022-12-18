@@ -77,16 +77,16 @@ export async function polymorph(
 	targetTokenDocData: any
 ): Promise<TokenDocument> {
 	//@ts-ignore
-	if(!sourceActor instanceof Actor) {
+	if (!sourceActor instanceof Actor) {
 		throw error(`The sourceActorData must be a Actor object`);
 	}
 	let sourceActorData = <any>sourceActor;
 	//@ts-ignore
-	if(sourceActor instanceof Actor) {
+	if (sourceActor instanceof Actor) {
 		sourceActorData = sourceActor.toObject();
 	}
 	let targetActorData = <any>targetActor;
-	if(targetActor instanceof Actor) {
+	if (targetActor instanceof Actor) {
 		// throw error(`The sourceActorData cannot be a Actor object`);
 		targetActorData = targetActor.toObject();
 	}
@@ -105,7 +105,7 @@ export async function polymorph(
 
 	const updates = {
 		//@ts-ignore
-		token: targetTokenDocData, // targetActor.prototypeToken,
+		token: targetActorData.prototypeToken, // targetTokenDocData, // targetActor.prototypeToken,
 		actor: targetActorData,
 		embedded: {},
 	};
@@ -117,15 +117,22 @@ export async function polymorph(
 		if (embedded) {
 			updates.embedded[key] = Object.fromEntries([
 				//@ts-ignore
-				...original.map((item) => [item.name, warpgate.CONST.DELETE]),
-				...embedded.map((item) => [item.name, item]),
+				...original.map((item) => [item.name ?? item.label, warpgate.CONST.DELETE]),
+				...embedded.map((item) => [item.name ?? item.label, item]),
 			]);
-			// TODO can't delete 'effects' or 'items' ???
 			delete updates.actor[metadata];
 		}
 	}
 	//@ts-ignore
-	await warpgate.mutate(tokenDocument, updates, {}, { name: "poly:" + randomID() });
+	await warpgate.mutate(
+		tokenDocument,
+		updates,
+		{},
+		{
+			// name: "poly:" + randomID()
+			targetTokenDocData,
+		}
+	);
 
 	if (tokenDocuments.length === 0) {
 		//@ts-ignore
