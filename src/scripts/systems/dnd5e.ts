@@ -204,8 +204,8 @@ export default {
 		let previousTokenData =
 			<TokenRevertData[]>(
 				getProperty(
-					originalActorData,
-					`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`
+					originalActorData.flags,
+					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`
 				)
 			) || [];
 		// const currentTokenData = await sourceActor.getTokenDocument();
@@ -233,19 +233,16 @@ export default {
 		mergeObject(d.prototypeToken.flags, d.flags);
 
 		// Step up the array of mutation names
-		let arrayMutationNames: string[] = <string[]>(
-			getProperty(
-				<Actor>sourceToken.actor,
-				`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
-			)
+		let arrayMutationNames: string[] = <string[]>getProperty(
+			//@ts-ignore
+			<Actor>sourceToken.actor.flags,
+			`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
 		);
 		if (!arrayMutationNames || arrayMutationNames.length == 0) {
-			arrayMutationNames =
-				<string[]>(
-					getProperty(
-						sourceActor,
-						`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
-					)
+			arrayMutationNames = <string[]>getProperty(
+					//@ts-ignore
+					sourceActor.flags,
+					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
 				) || [];
 		}
 		const mutationNameOriginalToken = sourceToken.id + "_" + randomID();
@@ -270,7 +267,14 @@ export default {
 			// =============================================
 			// THIS IS THE DND5E SOLUTION WITh THE CREATION OF ACTOR)
 			// ===========================================
-			return await polymorphWithActorLinked(sourceToken, sourceActor, d, targetActor, externalUserId, renderSheet);
+			return await polymorphWithActorLinked(
+				sourceToken,
+				sourceActor,
+				d,
+				targetActor,
+				externalUserId,
+				renderSheet
+			);
 		}
 	},
 

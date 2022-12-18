@@ -206,7 +206,7 @@ export async function polymorphWithActorLinked(
 	targetActor: Actor,
 	d: any,
 	externalUserId: string,
-	renderSheet:boolean,
+	renderSheet: boolean
 ) {
 	const transformTokens = true;
 	/*
@@ -254,7 +254,7 @@ export async function polymorphWithActorLinked(
 	//   return;
 	// }
 	let tokens = <Token[]>[];
-	
+
 	if (transformTokens) {
 		tokens = <Token[]>sourceActor.getActiveTokens(true);
 		if (!tokens || tokens.length == 0) {
@@ -303,16 +303,21 @@ export async function polymorphWithActorLinked(
 	// 	tokensFinal.push(token);
 	// }
 	for (const tokenFinal of tokensFinal) {
-		// await tokenFinal.update({
-		// 	updates[0]
-		// });
+		await tokenFinal.update({
+			actorId: updates[0].actorId,
+			actorLink: updates[0].actorLink,
+		});
+		await tokenFinal.update({
+			//@ts-ignore
+			flags: mergeObject(tokenFinal.actor.flags, updates[0].flags),
+		});
 		// Force this to be true
-		await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
-		await tokenFinal.actor?.setFlag(
-			CONSTANTS.MODULE_NAME,
-			PolymorpherFlags.ORIGINAL_ACTOR,
-			getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
-		);
+		// await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
+		// await tokenFinal.actor?.setFlag(
+		// 	CONSTANTS.MODULE_NAME,
+		// 	PolymorpherFlags.ORIGINAL_ACTOR,
+		// 	getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
+		// );
 	}
 	await transferPermissionsActorInner(originalActor, newActor, externalUserId);
 	/* run mutation and label it 'powermorph' */
