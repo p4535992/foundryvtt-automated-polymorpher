@@ -13,6 +13,7 @@ import {
 	isEmptyObject,
 	retrieveActorFromData,
 	retrieveActorFromToken,
+	revertFlagsOnActor,
 	transferPermissionsActorInner,
 	wait,
 	warn,
@@ -204,6 +205,7 @@ const API = {
 			const actorOriginalId = await this.revertOriginalForm(currentToken, currentActor, false);
 			if (!actorOriginalId) {
 				warn(`NO actor id returned from revert polymorph action. Check out the logs`, true);
+				await revertFlagsOnActor(currentActor);
 				return;
 			}
 			const actorOriginal = <Actor>game.actors?.get(actorOriginalId);
@@ -518,6 +520,7 @@ const API = {
 		);
 		if (!actorOriginalId) {
 			warn(`NO actor id returned from revert polymorph action. Check out the logs`, true);
+			await revertFlagsOnActor(sourceActor);
 			return undefined;
 		}
 		const actorOriginal = <Actor>game.actors?.get(actorOriginalId);

@@ -474,16 +474,18 @@ export async function retrieveActorFromData(
 						for (const entityComp of pack.index) {
 							const actorComp = <Actor>await pack.getDocument(entityComp._id);
 							if (actorComp.id === aId || actorComp.name === aName) {
-								actorToTransformLi = actorComp;
+								actorToTransformLi = <any>actorComp.toObject();
 								break;
 							}
 						}
+					} else {
+						actorToTransformLi = <any>actorToTransformLi.toObject();
 					}
 				}
 				// Create actor from compendium
-				const collection = <any>game.collections.get(pack.documentName);
-				const id = <string>actorToTransformLi.id; // li.data("document-id");
-				actorToTransformLi = <Actor>await collection.importFromCompendium(pack, id, {}, { renderSheet: false });
+				// const collection = <any>game.collections.get(pack.documentName);
+				// const id = <string>actorToTransformLi.id; // li.data("document-id");
+				// actorToTransformLi = <Actor>await collection.importFromCompendium(pack, id, {}, { renderSheet: false });
 			}
 		}
 		if (actorToTransformLi) {
@@ -511,18 +513,20 @@ export async function retrieveActorFromData(
 				for (const entityComp of pack.index) {
 					const actorComp = <Actor>await pack.getDocument(entityComp._id);
 					if (actorComp.id === aId || actorComp.name === aName) {
-						actorToTransformLi = actorComp;
+						actorToTransformLi = <any>actorComp.toObject();
 						break;
 					}
 				}
+			} else {
+				actorToTransformLi = <any>actorToTransformLi.toObject();
 			}
 		}
-		if (actorToTransformLi && createOnWorld && (game.user?.isGM || should_I_run_this(actorToTransformLi))) {
-			// Create actor from compendium
-			const collection = <any>game.collections.get(pack.documentName);
-			const id = actorToTransformLi.id; // li.data("document-id");
-			actorToTransformLi = await collection.importFromCompendium(pack, id, {}, { renderSheet: false });
-		}
+		// if (actorToTransformLi && createOnWorld && (game.user?.isGM || should_I_run_this(actorToTransformLi))) {
+		// 	// Create actor from compendium
+		// 	const collection = <any>game.collections.get(pack.documentName);
+		// 	const id = actorToTransformLi.id; // li.data("document-id");
+		// 	actorToTransformLi = await collection.importFromCompendium(pack, id, {}, { renderSheet: false });
+		// }
 	}
 	if (!actorToTransformLi) {
 		actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
@@ -639,4 +643,38 @@ function _getHandPermission(actor, externalUserId) {
 		handPermission[externalUserId] = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
 	}
 	return handPermission;
+}
+
+export async function revertFlagsOnActor(original: Actor) {
+	if (original && hasProperty(original, `flags.${CONSTANTS.MODULE_NAME}`)) {
+		await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+		await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+		await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+		await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+
+		for (const token of original.getActiveTokens()) {
+			if (token.actor) {
+				if (token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) != undefined) {
+					await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
+				}
+				if (
+					token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) !=
+					undefined
+				) {
+					await token.actor?.unsetFlag(
+						CONSTANTS.MODULE_NAME,
+						PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
+					);
+				}
+				if (
+					token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) != undefined
+				) {
+					await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+				}
+				if (token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR) != undefined) {
+					await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
+				}
+			}
+		}
+	}
 }

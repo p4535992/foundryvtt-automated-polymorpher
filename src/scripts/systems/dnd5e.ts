@@ -14,7 +14,7 @@ import {
 	TransformOptionsGeneric,
 } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
-import { debug, i18n, info, log, transferPermissionsActorInner, wait, warn } from "../lib/lib";
+import { debug, i18n, info, log, revertFlagsOnActor, transferPermissionsActorInner, wait, warn } from "../lib/lib";
 import { polymorph, revertPolymorph, getPolymorphs, prepareTargetData } from "../warpgate";
 
 export default {
@@ -137,8 +137,8 @@ export default {
 		const transformTokens = transformOptions?.transformTokens || true;
 
 		// Get the original Actor data and the new source data
-		const originalActorData = sourceActor.toObject(true);
-		const targetActorData = targetActor.toObject(true);
+		const originalActorData = <any>sourceActor.toObject(true);
+		const targetActorData = <any>targetActor.toObject(true);
 
 		const targetActorImages = await targetActor.getTokenImages();
 		//@ts-ignore
@@ -198,18 +198,21 @@ export default {
 		);
 		//setProperty(d.flags, `${CONSTANTS.MODULE_NAME}`, getProperty(actorThis.flags, `${CONSTANTS.MODULE_NAME}`));
 		//@ts-ignore
-		mergeObject(d.flags, sourceActor.flags);
+		mergeObject(d.flags, originalActorData.flags);
 		if (
 			!sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) ||
 			!getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
 		) {
-			setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, sourceActor.id);
+			setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, originalActorData.id);
 		}
 		setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
 
 		let previousTokenData =
 			<TokenRevertData[]>(
-				sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+				getProperty(
+					originalActorData,
+					`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`
+				)
 			) || [];
 		// const currentTokenData = await sourceActor.getTokenDocument();
 		const currentTokenData = sourceToken.document;
@@ -576,43 +579,7 @@ export default {
 				}
 			}
 		} finally {
-			if (original && hasProperty(original, `flags.${CONSTANTS.MODULE_NAME}`)) {
-				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
-				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
-				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
-
-				for (const token of original.getActiveTokens()) {
-					if (token.actor) {
-						if (token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) != undefined) {
-							await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
-						}
-						if (
-							token.actor.getFlag(
-								CONSTANTS.MODULE_NAME,
-								PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
-							) != undefined
-						) {
-							await token.actor?.unsetFlag(
-								CONSTANTS.MODULE_NAME,
-								PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
-							);
-						}
-						if (
-							token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) !=
-							undefined
-						) {
-							await token.actor?.unsetFlag(
-								CONSTANTS.MODULE_NAME,
-								PolymorpherFlags.MUTATION_NAMES_FOR_REVERT
-							);
-						}
-						if (token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR) != undefined) {
-							await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
-						}
-					}
-				}
-			}
+			await revertFlagsOnActor(original);
 		}
 		if (isRendered && renderSheet) {
 			original.sheet?.render(isRendered);
@@ -727,15 +694,6 @@ export default {
 								targetActor,
 								foundry.utils.mergeObject(transformationPresets.wildshape.options, {
 									transformTokens: rememberOptions(html).transformTokens,
-									// keepAE: rememberOptions(html).keepAE,
-									// //removeAE: rememberOptions(html).removeAE,
-									// removeOriginAE: rememberOptions(html).removeOriginAE,
-									// removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-									// removeFeatAE: rememberOptions(html).removeFeatAE,
-									// removeSpellAE: rememberOptions(html).removeSpellAE,
-									// removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-									// removeClassAE: rememberOptions(html).removeClassAE,
-									// removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 								}),
 								false,
 								<string>game.user?.id
@@ -767,15 +725,6 @@ export default {
 								targetActor,
 								foundry.utils.mergeObject(transformationPresets.polymorph.options, {
 									transformTokens: rememberOptions(html).transformTokens,
-									// keepAE: rememberOptions(html).keepAE,
-									// //removeAE: rememberOptions(html).removeAE,
-									// removeOriginAE: rememberOptions(html).removeOriginAE,
-									// removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-									// removeFeatAE: rememberOptions(html).removeFeatAE,
-									// removeSpellAE: rememberOptions(html).removeSpellAE,
-									// removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-									// removeClassAE: rememberOptions(html).removeClassAE,
-									// removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 								}),
 								false,
 								<string>game.user?.id
@@ -792,15 +741,6 @@ export default {
 								targetActor,
 								foundry.utils.mergeObject(transformationPresets.polymorphSelf.options, {
 									transformTokens: rememberOptions(html).transformTokens,
-									// keepAE: rememberOptions(html).keepAE,
-									// //removeAE: rememberOptions(html).removeAE,
-									// removeOriginAE: rememberOptions(html).removeOriginAE,
-									// removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-									// removeFeatAE: rememberOptions(html).removeFeatAE,
-									// removeSpellAE: rememberOptions(html).removeSpellAE,
-									// removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-									// removeClassAE: rememberOptions(html).removeClassAE,
-									// removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 								}),
 								false,
 								<string>game.user?.id
@@ -1186,7 +1126,11 @@ export default {
 				}
 				const origin =
 					//@ts-ignore
-					e.origin?.startsWith("Actor") || e.origin?.startsWith("Item") ? fromUuidSync(e.origin) : {};
+					e.origin?.startsWith("Actor") || e.origin?.startsWith("Item") ? fromUuidSync(e.origin) : undefined;
+				if (!origin) {
+					warn(`The effect ${e.label} has a invalid origin ${e.origin} is not passed to the target actor`);
+					return false;
+				}
 				const originIsSelf = origin?.parent?.uuid === this.uuid;
 				const isOriginEffect = originEffectIds.has(e._id);
 				if (isOriginEffect) {
