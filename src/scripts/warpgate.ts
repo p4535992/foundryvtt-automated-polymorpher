@@ -79,8 +79,8 @@ export async function polymorph(
 	const tokenDocument = tokenDocuments?.[0] ?? createToken(sourceActor);
 
 	const actorData = sourceActor.toObject();
-	// TODO can't delete id i nedd to invoke 'targetActor.toObject(false)' ?
-	// prepareTargetData(targetActor);
+	// TODO can't delete the '_id' ???
+	prepareTargetData(targetActor);
 	if(!targetTokenDocData){
 		warn(`No token data is been passed on the polymorph warpgate method`);
 		//@ts-ignore
@@ -105,9 +105,7 @@ export async function polymorph(
 				...embedded.map((item) => [item.name, item]),
 			]);
 			// TODO can't delete 'effects' or 'items' ???
-			if(metadata != "effects" && metadata != "items") {
-				delete updates.actor[metadata];
-			}
+			delete updates.actor[metadata];
 		}
 	}
 	//@ts-ignore

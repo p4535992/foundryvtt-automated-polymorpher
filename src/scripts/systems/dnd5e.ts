@@ -137,8 +137,8 @@ export default {
 		const transformTokens = transformOptions?.transformTokens || true;
 
 		// Get the original Actor data and the new source data
-		const originalActorData = sourceActor.toObject(false);
-		const targetActorData = prepareTargetData(targetActor.toObject(false));
+		const originalActorData = sourceActor.toObject(true);
+		const targetActorData = targetActor.toObject(true);
 
 		const targetActorImages = await targetActor.getTokenImages();
 		//@ts-ignore
@@ -1100,7 +1100,7 @@ export default {
 
 			// Keep specific items from the original data
 			//@ts-ignore
-			d.items = d.items ? d.items : [];
+			d.items = d.items ? (d.items.contents ? d.items.contents : d.items) : [];
 			if (originalActorData.items && originalActorData.items.size > 0) {
 				//@ts-ignore
 				d.items = d.items.concat(
