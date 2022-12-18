@@ -15,6 +15,7 @@ import {
 } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
 import { debug, i18n, info, log, transferPermissionsActorInner, wait, warn } from "../lib/lib";
+import { polymorph, revertPolymorph, getPolymorphs } from '../warpgate';
 
 export default {
 	/**
@@ -259,272 +260,14 @@ export default {
 			// =============================================
 			// THIS IS THE SOLUTION WITH WARP GATE (AVOID THE CREATION OF ACTOR)
 			// ===========================================
-
-			/* get the new protodata and remove its null x/y */
-			const newActor = targetActor;
-			//@ts-ignore
-			let proto = <TokenDocument>(await newActor.getTokenDocument()).toObject();
-			//@ts-ignore
-			delete proto.x;
-			//@ts-ignore
-			delete proto.y;
-
-			/* overwrite any fields of the original with fields from the new proto */
-			// proto = mergeObject(sourceToken.toObject(), proto, {inplace:false});
-			//@ts-ignore
-			proto = mergeObject(proto, d, { inplace: false });
-			//proto = mergeObject(d, proto, {inplace:false});
-
-			/* remove erroneous fields */
-			//@ts-ignore
-			delete proto.actorData;
-			//@ts-ignore
-			delete proto._id;
-
-			/* get the root actor data (i.e. no embedded collections) */
-			//const actorData = _getRootActorData(newActor)
-
-			// START _getRootActorData
-
-			/* returns the actor data sans ALL embedded collections */
-			const newRootActorData = newActor.toObject();
-
-			// Transfer flags module from token to actor
-			if (!getProperty(newRootActorData, `flags`)) {
-				setProperty(newRootActorData, `flags`, {});
-			}
-			if (!getProperty(newRootActorData.flags, `${CONSTANTS.MODULE_NAME}`)) {
-				setProperty(newRootActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
-			}
-			//@ts-ignore
-			mergeObject(newRootActorData.flags[CONSTANTS.MODULE_NAME], d.prototypeToken.flags[CONSTANTS.MODULE_NAME]);
-
-			/* get the key NAME of the embedded document type.
-			 * ex. not 'ActiveEffect' (the class name), 'effect' the collection's field name
-			 */
-			//@ts-ignore
-			const embeddedFields = Object.values(Actor.implementation.metadata.embedded).map(
-				//@ts-ignore
-				(thisClass) => thisClass.metadata.collection
-			);
-
-			/* delete any embedded fields from the actor data */
-			embeddedFields.forEach((field) => {
-				delete newRootActorData[field];
-			});
-
-			// END _getRootActorData
-
-			/* for some strange reason for pass the elemnt to the actor i nedd to reset everything for the actor */
-			/* for things like effects ecc... */
-			// TODO
-			const newActorData = await this.prepareDataFromTransformOptions(
-				newRootActorData,
-				targetActorData,
-				//@ts-ignore
-				proto.effects,
+			const data = await this.prepareDataFromTransformOptions(
+				sourceActor.toObject(),
+				targetActor.toObject(),
+				sourceEffects,
 				targetActorImages,
 				transformOptions
 			);
-			//@ts-ignore
-			// newActorData.effects = proto.effects;
-			// delete newActorData.effects;
-			//@ts-ignore
-			delete newActorData._id;
-
-			if (!getProperty(newActorData.flags, `${CONSTANTS.MODULE_NAME}`)) {
-				setProperty(newActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
-			}
-			//@ts-ignore
-			mergeObject(newActorData.flags[CONSTANTS.MODULE_NAME], d.prototypeToken.flags[CONSTANTS.MODULE_NAME]);
-
-			/* form the update */
-			// const updates = {
-			//   token: <TokenData>proto,
-			//   actor: <any>newActorData
-			// }
-
-			delete newActorData.token;
-
-			/* default is 0,0 -- let's stay where we are */
-			// delete newActorData.token.x;
-			// delete newActorData.token.y;
-
-			const updates = {
-				token: <any>{
-					name: proto.name,
-					//@ts-ignore
-					img: proto.img,
-					// scale: proto.scale,
-					texture: {
-						//@ts-ignore
-						scaleX: proto.texture.scaleX,
-						//@ts-ignore
-						scaleY: proto.texture.scaleY,
-					},
-					system: proto,
-					// actor: actorToTransform
-					actor: {
-						system: newActorData.system,
-					},
-					// actorId: <string>newActor.id,
-					actorLink: false,
-				},
-				actor: {
-					system: newActorData.system,
-				},
-			};
-
-			delete updates.token.document.token;
-			delete updates.token.actor.token;
-
-			/*
-			 * Protects the actor a bit more, but requires you
-			 * to close and repon the sheet after reverting.
-			 */
-			updates.token.document.actorLink = false;
-
-			/* leave the actor link unchanged for a more seamless mutation */
-			delete updates.token.document.actorLink;
-
-			/* we want to keep our source actor, not swap to a new one entirely */
-			delete updates.token.document.actorId;
-
-			/* default is 0,0 -- let's stay where we are */
-			// delete updates.token.x;
-			// delete updates.token.y;
-
-			// delete the cached sheet to furce a full re-render
-			const sheet = <any>sourceToken.actor?.sheet;
-			// await sourceToken.actor?.sheet?.close();
-			//@ts-ignore
-			delete sourceToken.actor?._sheet;
-			delete sourceToken.actor?.apps[sheet.appId];
-
-			// Update placed Token instances
-			if (!transformTokens) {
-				// ======================================================================================
-				// SETTING FLAGS
-				if (!updates.token.flags) {
-					setProperty(updates.token, `flags`, {});
-				}
-				setProperty(
-					updates.token.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
-				);
-				setProperty(updates.token.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-				setProperty(
-					updates.token.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
-					arrayMutationNames
-				);
-				// NEDDED FOR WARPGATE ????
-				//@ts-ignore
-				if (!updates.actor.flags) {
-					setProperty(updates.actor, `flags`, {});
-				}
-				setProperty(
-					//@ts-ignore
-					updates.actor.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
-				);
-				setProperty(
-					//@ts-ignore
-					updates.actor.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
-					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`)
-				);
-				setProperty(updates.actor, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-				// ======================================================================================
-
-				// TODO show on chat ?
-				//await ChatMessage.create({content: `${actorThis.name} mutate into a ${actorToTransform.name}`, speaker:{alias: actorThis.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-				//@ts-ignore
-				const tokensMutate = await warpgate.mutate(
-					sourceToken.document ? sourceToken.document : sourceToken, // TODO why sourceToken is a TokenDocument and not a Token ?
-					updates,
-					{},
-					{
-						name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
-						//comparisonKeys:{ ActiveEffect: 'label'}
-						delta: {
-							token: updates.token,
-							actor: updates.actor,
-							embedded: {},
-						},
-					}
-				);
-				return tokensMutate;
-			}
-
-			const tokens = sourceActor.getActiveTokens(true);
-			tokens.map(async (t: Token) => {
-				const newTokenData = <any>foundry.utils.deepClone(updates);
-				//newTokenData._id = t.id;
-
-				// ======================================================================================
-				// SETTING FLAGS
-				if (!newTokenData.token.flags) {
-					setProperty(newTokenData.token, `flags`, {});
-				}
-				setProperty(
-					newTokenData.token.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
-				);
-				setProperty(
-					newTokenData.token.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`,
-					true
-				);
-				setProperty(
-					newTokenData.token.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
-					arrayMutationNames
-				);
-				// NEDDED FOR WARPGATE ????
-				if (!newTokenData.actor) {
-					setProperty(newTokenData, `actor`, {});
-				}
-				if (!newTokenData.actor.flags) {
-					setProperty(newTokenData.actor, `flags`, {});
-				}
-				setProperty(
-					//@ts-ignore
-					newTokenData.actor.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
-					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
-				);
-				setProperty(
-					//@ts-ignore
-					newTokenData.actor.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
-					getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`)
-				);
-				setProperty(newTokenData.actor, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-				// =======================================================================================================
-
-				// TODO show on chat ?
-				//await ChatMessage.create({content: `${actorThis.name} mutate into a ${actorToTransform.name}`, speaker:{alias: actorThis.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-				//@ts-ignore
-				const tokensMutate = await warpgate.mutate(
-					t.document ? t.document : t, // TODO why sourceToken is a TokenDocument and not a Token ?
-					newTokenData,
-					{},
-					{
-						name: mutationNameOriginalToken, // User provided name, or identifier, for this particular mutation operation. Used for 'named revert'.
-						//comparisonKeys:{ ActiveEffect: 'label'}
-						delta: {
-							token: updates.token,
-							actor: updates.actor,
-							embedded: {},
-						},
-					}
-				);
-				return tokensMutate;
-			});
+			return await polymorph(sourceActor, data);
 		} else {
 			// =============================================
 			// THIS IS THE DND5E SOLUTION WITh THE CREATION OF ACTOR)
@@ -641,8 +384,12 @@ export default {
 	 * @returns {Promise<Actor>|null}  Original actor if it was reverted.
 	 */
 	async revertOriginalForm(sourceToken: Token, sourceActor: Actor, renderSheet = true) {
+		const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, 'forceUseOfWarpgate');
+		const hasWarpPolymorphs = Boolean(getPolymorphs(sourceActor).length);
+		const WarpGateMode = useWarpGate && hasWarpPolymorphs;
+
 		const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
-		if (!sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
+		if (!sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED) && !WarpGateMode) {
 			warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`) + ` type 1`, true);
 			return;
 		}
@@ -660,6 +407,29 @@ export default {
 		 * @param {boolean} renderSheet             Render Sheet after revert the transformation.
 		 */
 		Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, sourceActor, renderSheet);
+
+        if (WarpGateMode) {
+			// =============================================
+			// THIS IS THE SOLUTION WITH WARP GATE (AVOID THE CREATION OF ACTOR)
+			// ===========================================
+			const mutations = getPolymorphs(sourceActor);
+
+			if (!mutations || mutations.length == 0) {
+				warn(`Array mutation names for the revert is null or empty`);
+			}
+			if (mutations.length) {
+				//info(`${sourceToken.actor?.name} reverts to their ${mutations.length === 1 ? 'original' : 'previous'} form`);
+				// TODO show on chat ?
+				//await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+				//@ts-ignore
+				await revertPolymorph(sourceActor);
+			}
+			const isRendered = sourceActor.sheet?.rendered;
+			if (isRendered) {
+				sourceActor.sheet?.close();
+			}
+			return sourceActor;
+		}
 
 		const previousOriginalActorTokenData = <TokenRevertData[]>(
 			sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
@@ -731,110 +501,83 @@ export default {
 			sourceActor.sheet?.close();
 		}
 		try {
-			if (useWarpGate) {
-				// =============================================
-				// THIS IS THE SOLUTION WITH WARP GATE (AVOID THE CREATION OF ACTOR)
-				// ===========================================
-
-				let arrayMutationNames: string[] = <string[]>(
-					sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
-				);
-				if (!arrayMutationNames || arrayMutationNames.length == 0) {
-					arrayMutationNames = [];
-					warn(`Array mutation names for the revert is null or empty`);
-				}
-
-				if (arrayMutationNames.length > 0) {
-					for (const revertName of arrayMutationNames) {
-						info(`${sourceToken.actor?.name} reverts to their original form`);
-						// TODO show on chat ?
-						//await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-						//@ts-ignore
-						await warpgate.revert(sourceToken.document, revertName);
-					}
-				} else {
-					//@ts-ignore
-					await warpgate.revert(sourceToken.document, "");
-				}
-			} else {
-				// =============================================
-				// THIS IS THE DND5E SOLUTION WITh THE CREATION OF ACTOR)
-				// ===========================================
-				// Get the Tokens which represent this actor
-				if (canvas.ready) {
-					const tokens = sourceActor.getActiveTokens(true);
-					//@ts-ignore
-					const tokenData = <TokenDocument>await original.getTokenDocument();
-					const tokenUpdates = tokens.map((t) => {
-						const update = duplicate(tokenData);
-						update._id = t.id;
-						//@ts-ignore
-						delete update.x;
-						//@ts-ignore
-						delete update.y;
-						return update;
-					});
-					await canvas.scene?.updateEmbeddedDocuments("Token", tokenUpdates);
-				} else if (previousOriginalActorTokenData) {
-					const tokenData = previousOriginalActorTokenData;
-					const update = <any>duplicate(tokenData);
-					//@ts-ignore
-					delete update.x;
-					//@ts-ignore
-					delete update.y;
-					await canvas.scene?.updateEmbeddedDocuments("Token", [update]);
-				}
-				// Delete the polymorphed version of the actor, if possible
-				if (!game.settings.get(CONSTANTS.MODULE_NAME, "doNotDeleteTmpActors")) {
-					const idsToDelete = <string[]>[];
-					idsToDelete.push(<string>sourceActor.id);
-					const othersActorsToDelete = <TokenRevertData[]>(
-						sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-					);
-					if (
-						othersActorsToDelete &&
-						Array.isArray(othersActorsToDelete) &&
-						othersActorsToDelete.length > 0
-					) {
-						othersActorsToDelete.reverse();
-						for (const td of othersActorsToDelete) {
-							if (
-								//@ts-ignore
-								td.actorId &&
-								//@ts-ignore
-								!idsToDelete.includes(td.actorId) &&
-								//@ts-ignore
-								td.actorId != original.id &&
-								//@ts-ignore
-								game.actors?.get(td.actorId)
-							) {
-								//@ts-ignore
-								idsToDelete.push(td.actorId);
-							}
-						}
-					} else {
-						warn(
-							`Invoked the revert to original, but no flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}' is been found or is empty`
-						);
-					}
-					if (idsToDelete.length > 0) {
-						const idsActorToDelete = <string[]>[];
-						for (const id of idsToDelete) {
-							const actorToDelete = game.actors?.get(id);
-							if (actorToDelete) {
-								info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
-								// await actorToDelete.delete();
-								if (!idsActorToDelete.includes(actorToDelete.id)) {
-									idsActorToDelete.push(actorToDelete.id);
-								}
-							}
-						}
-						// await Actor.deleteDocuments(idsActorToDelete);
-						//@ts-ignore
-						await Actor.implementation.deleteDocuments(idsActorToDelete);
-					}
-				}
-			}
+            // =============================================
+            // THIS IS THE DND5E SOLUTION WITh THE CREATION OF ACTOR)
+            // ===========================================
+            // Get the Tokens which represent this actor
+            if (canvas.ready) {
+                const tokens = sourceActor.getActiveTokens(true);
+                //@ts-ignore
+                const tokenData = <TokenDocument>await original.getTokenDocument();
+                const tokenUpdates = tokens.map((t) => {
+                    const update = duplicate(tokenData);
+                    update._id = t.id;
+                    //@ts-ignore
+                    delete update.x;
+                    //@ts-ignore
+                    delete update.y;
+                    return update;
+                });
+                await canvas.scene?.updateEmbeddedDocuments("Token", tokenUpdates);
+            } else if (previousOriginalActorTokenData) {
+                const tokenData = previousOriginalActorTokenData;
+                const update = <any>duplicate(tokenData);
+                //@ts-ignore
+                delete update.x;
+                //@ts-ignore
+                delete update.y;
+                await canvas.scene?.updateEmbeddedDocuments("Token", [update]);
+            }
+            // Delete the polymorphed version of the actor, if possible
+            if (!game.settings.get(CONSTANTS.MODULE_NAME, "doNotDeleteTmpActors")) {
+                const idsToDelete = <string[]>[];
+                idsToDelete.push(<string>sourceActor.id);
+                const othersActorsToDelete = <TokenRevertData[]>(
+                    sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+                );
+                if (
+                    othersActorsToDelete &&
+                    Array.isArray(othersActorsToDelete) &&
+                    othersActorsToDelete.length > 0
+                ) {
+                    othersActorsToDelete.reverse();
+                    for (const td of othersActorsToDelete) {
+                        if (
+                            //@ts-ignore
+                            td.actorId &&
+                            //@ts-ignore
+                            !idsToDelete.includes(td.actorId) &&
+                            //@ts-ignore
+                            td.actorId != original.id &&
+                            //@ts-ignore
+                            game.actors?.get(td.actorId)
+                        ) {
+                            //@ts-ignore
+                            idsToDelete.push(td.actorId);
+                        }
+                    }
+                } else {
+                    warn(
+                        `Invoked the revert to original, but no flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}' is been found or is empty`
+                    );
+                }
+                if (idsToDelete.length > 0) {
+                    const idsActorToDelete = <string[]>[];
+                    for (const id of idsToDelete) {
+                        const actorToDelete = game.actors?.get(id);
+                        if (actorToDelete) {
+                            info(`Delete actor polymorphed ${actorToDelete.name}|${actorToDelete.id}`);
+                            // await actorToDelete.delete();
+                            if (!idsActorToDelete.includes(actorToDelete.id)) {
+                                idsActorToDelete.push(actorToDelete.id);
+                            }
+                        }
+                    }
+                    // await Actor.deleteDocuments(idsActorToDelete);
+                    //@ts-ignore
+                    await Actor.implementation.deleteDocuments(idsActorToDelete);
+                }
+            }
 		} finally {
 			if (original && hasProperty(original, `flags.${CONSTANTS.MODULE_NAME}`)) {
 				await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
