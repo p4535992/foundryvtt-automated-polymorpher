@@ -1,6 +1,6 @@
 import { PolymorpherFlags, TokenRevertData } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
-import { getPolymorphsWithWarpgate, revertPolymorphWithWarpgate } from "../warpgate";
+import { getPolymorphsWithWarpgate, revertPolymorphWithWarpgate } from "./warpgate";
 import { info, revertFlagsOnActor, transferPermissionsActorInner, warn } from "./lib";
 
 export async function revertOriginalFormImpl(sourceToken: Token, sourceActor: Actor, renderSheet: boolean) {

@@ -1,21 +1,13 @@
-import type { ActorDataBaseProperties } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/actorData";
-import type {
-	ActorData,
-	PrototypeTokenData,
-	TokenData,
-} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
-import type { PropertiesToSource } from "@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes";
 import { ANIMATIONS } from "../animations";
 import {
-	PolymorpherData,
 	PolymorpherFlags,
 	TokenRevertData,
 	transformationPresets,
 	TransformOptionsGeneric,
 } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
-import { debug, i18n, info, log, revertFlagsOnActor, transferPermissionsActorInner, wait, warn } from "../lib/lib";
-import { polymorphWithWarpgate } from "../warpgate";
+import { debug, i18n, info, log, wait, warn } from "../lib/lib";
+import { polymorphWithWarpgate } from "../lib/warpgate";
 import { polymorphWithActorLinked, revertOriginalFormImpl } from "../lib/polymorph-utilities";
 
 export default {
@@ -242,11 +234,19 @@ export default {
 
 		// Step up the array of mutation names
 		let arrayMutationNames: string[] = <string[]>(
-			sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT)
+			getProperty(
+				<Actor>sourceToken.actor,
+				`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
+			)
 		);
 		if (!arrayMutationNames || arrayMutationNames.length == 0) {
 			arrayMutationNames =
-				<string[]>sourceActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) || [];
+				<string[]>(
+					getProperty(
+						sourceActor,
+						`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
+					)
+				) || [];
 		}
 		const mutationNameOriginalToken = sourceToken.id + "_" + randomID();
 		if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
@@ -272,7 +272,6 @@ export default {
 			// ===========================================
 			return await polymorphWithActorLinked(sourceToken, sourceActor, targetActor, externalUserId, d);
 		}
-		return undefined;
 	},
 
 	/**

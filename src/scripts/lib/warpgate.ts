@@ -1,6 +1,6 @@
-import { PolymorpherFlags } from "./automatedPolymorpherModels";
-import CONSTANTS from "./constants";
-import { warn, error, transferPermissionsActorInner, info } from "./lib/lib";
+import { PolymorpherFlags } from "../automatedPolymorpherModels";
+import CONSTANTS from "../constants";
+import { warn, error, transferPermissionsActorInner, info } from "./lib";
 
 /**
  * Creates a token so it can be mutated by warpgate
@@ -55,7 +55,12 @@ export async function revertPolymorphWithWarpgate(actor: Actor, name: string | u
 	const token = tokens[0] ?? createToken(actor);
 	if (name === undefined) {
 		const poly = getPolymorphsWithWarpgate(actor);
-		name = poly[poly.length - 1].name;
+		const polyObj = poly[poly.length - 1];
+		if (!polyObj || !polyObj.name) {
+			warn(`Something is wrong, is already reverted`);
+			return;
+		}
+		name = polyObj.name;
 	}
 	//@ts-ignore
 	await warpgate.revert(token, name);

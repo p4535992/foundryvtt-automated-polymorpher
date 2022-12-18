@@ -6,7 +6,7 @@ import API from "./api";
 import { registerSocket } from "./socket";
 import { setApi } from "../automated-polymorpher";
 import { PolymorpherFlags } from "./automatedPolymorpherModels";
-import { getPolymorphsWithWarpgate } from "./warpgate";
+import { getPolymorphsWithWarpgate } from "./lib/warpgate";
 
 export const initHooks = () => {
 	warn("Init Hooks processing");

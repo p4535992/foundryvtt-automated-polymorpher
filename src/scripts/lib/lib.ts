@@ -4,7 +4,7 @@ import { PolymorpherFlags } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
 import { PolymorpherManager } from "../polymorphermanager";
 import type { ActorData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
-import { revertPolymorphWithWarpgate } from "../warpgate";
+import { revertPolymorphWithWarpgate } from "./warpgate";
 
 // =============================
 // Module Generic function
