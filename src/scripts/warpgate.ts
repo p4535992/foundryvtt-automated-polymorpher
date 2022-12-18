@@ -1,4 +1,6 @@
-import { warn, error } from "./lib/lib";
+import { PolymorpherFlags } from "./automatedPolymorpherModels";
+import CONSTANTS from "./constants";
+import { warn, error, transferPermissionsActorInner, info } from "./lib/lib";
 
 /**
  * Creates a token so it can be mutated by warpgate
@@ -17,8 +19,8 @@ async function createToken(actor: Actor): Promise<TokenDocument> {
  * @param actor
  * @returns List of mutations the actor has
  */
-export function getPolymorphs(actor: Actor) {
-	const regex = /poly:.+/;
+export function getPolymorphsWithWarpgate(actor: Actor) {
+	const regex = /poly-automated-polymorpher:.+/;
 	const mutations = <any[]>actor.getFlag("warpgate", "mutate") ?? [];
 	return mutations?.filter((mut) => regex.exec(mut.name)) ?? [];
 }
@@ -48,11 +50,11 @@ async function getTokens(actor: Actor) {
  * @param actor
  * @param name Mutation name, if undefined reverts the last mutation
  */
-export async function revertPolymorph(actor: Actor, name: string) {
+export async function revertPolymorphWithWarpgate(actor: Actor, name: string | undefined) {
 	const tokens = await getTokens(actor);
 	const token = tokens[0] ?? createToken(actor);
 	if (name === undefined) {
-		const poly = getPolymorphs(actor);
+		const poly = getPolymorphsWithWarpgate(actor);
 		name = poly[poly.length - 1].name;
 	}
 	//@ts-ignore
@@ -71,7 +73,7 @@ export async function revertPolymorph(actor: Actor, name: string) {
  * @param Data targetData
  * @returns Warpgate Mutation
  */
-export async function polymorph(
+export async function polymorphWithWarpgate(
 	sourceActor: Actor,
 	targetActor: Actor,
 	targetTokenDocData: any
@@ -129,8 +131,8 @@ export async function polymorph(
 		updates,
 		{},
 		{
-			// name: "poly:" + randomID()
-			targetTokenDocData,
+			name: "poly-automated-polymorpher:" + randomID(),
+			updateOpts: targetTokenDocData,
 		}
 	);
 
@@ -147,7 +149,7 @@ export async function polymorph(
  * @param targetData ActorData
  * @returns ActorData
  */
-export function prepareTargetData(targetData: Actor | any): Actor {
+function prepareTargetData(targetData: Actor | any): Actor {
 	const _deletions = [
 		"-=_id",
 		"-=_stats",
