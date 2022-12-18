@@ -260,12 +260,14 @@ export default {
 			// =============================================
 			// THIS IS THE SOLUTION WITH WARP GATE (AVOID THE CREATION OF ACTOR)
 			// ===========================================
-			const data = <any>await this.prepareDataFromTransformOptions(
-				sourceActor.toObject(),
-				targetActor.toObject(),
-				sourceEffects,
-				targetActorImages,
-				transformOptions
+			const data = <any>(
+				await this.prepareDataFromTransformOptions(
+					sourceActor.toObject(),
+					targetActor.toObject(),
+					sourceEffects,
+					targetActorImages,
+					transformOptions
+				)
 			);
 			return await polymorph(sourceActor, targetActor, data);
 		} else {
@@ -863,7 +865,7 @@ export default {
 			try {
 				//@ts-ignore
 				setProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
-			} catch(e) {
+			} catch (e) {
 				//@ts-ignore
 				originalActorData.flags[CONSTANTS.MODULE_NAME] = {};
 			}

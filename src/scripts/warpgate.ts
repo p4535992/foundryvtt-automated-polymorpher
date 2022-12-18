@@ -1,11 +1,11 @@
-import { warn } from "./lib/lib";
+import { warn, error } from "./lib/lib";
 
 /**
  * Creates a token so it can be mutated by warpgate
  * @param actor
  * @returns Tokendocument in a 'mutable' state by Warpgate
  */
-async function createToken(actor: Actor):Promise<TokenDocument> {
+async function createToken(actor: Actor): Promise<TokenDocument> {
 	//@ts-ignore
 	const baseToken = await actor.getTokenDocument({ hidden: true });
 	return <TokenDocument>await baseToken.constructor.create(baseToken, { parent: canvas.scene });
@@ -66,31 +66,47 @@ export async function revertPolymorph(actor: Actor, name: string) {
 
 /**
  * Polymorphs an Actor into the targetData
- * @param sourceActor
+ * @param sourceActorData
+ * @param targetActorData
  * @param Data targetData
  * @returns Warpgate Mutation
  */
 export async function polymorph(
-	sourceActor: Actor, 
-	targetActor: Actor, 
-	targetTokenDocData: any):Promise<TokenDocument> {
+	sourceActor: Actor,
+	targetActor: Actor,
+	targetTokenDocData: any
+): Promise<TokenDocument> {
+	//@ts-ignore
+	if(!sourceActor instanceof Actor) {
+		throw error(`The sourceActorData must be a Actor object`);
+	}
+	let sourceActorData = <any>sourceActor;
+	//@ts-ignore
+	if(sourceActor instanceof Actor) {
+		sourceActorData = sourceActor.toObject();
+	}
+	let targetActorData = <any>targetActor;
+	if(targetActor instanceof Actor) {
+		// throw error(`The sourceActorData cannot be a Actor object`);
+		targetActorData = targetActor.toObject();
+	}
 	// If the source is an Actor, we create a temporary token, wich will be deleted once warpgate is set
 	const tokenDocuments = await getTokens(sourceActor);
 	const tokenDocument = tokenDocuments?.[0] ?? createToken(sourceActor);
 
-	const actorData = sourceActor.toObject();
+	const actorData = sourceActorData;
 	// TODO can't delete the '_id' ???
-	prepareTargetData(targetActor);
-	if(!targetTokenDocData){
+	prepareTargetData(targetActorData);
+	if (!targetTokenDocData) {
 		warn(`No token data is been passed on the polymorph warpgate method`);
 		//@ts-ignore
-		targetTokenDocData = targetActor.prototypeToken;
+		targetTokenDocData = targetActorData.prototypeToken;
 	}
 
 	const updates = {
 		//@ts-ignore
 		token: targetTokenDocData, // targetActor.prototypeToken,
-		actor: targetActor,
+		actor: targetActorData,
 		embedded: {},
 	};
 	//@ts-ignore
@@ -124,7 +140,7 @@ export async function polymorph(
  * @param targetData ActorData
  * @returns ActorData
  */
-export function prepareTargetData(targetData: Actor|any):Actor {
+export function prepareTargetData(targetData: Actor | any): Actor {
 	const _deletions = [
 		"-=_id",
 		"-=_stats",
