@@ -1,11 +1,14 @@
+import { warn } from "./lib/lib";
+
 /**
  * Creates a token so it can be mutated by warpgate
  * @param actor
  * @returns Tokendocument in a 'mutable' state by Warpgate
  */
-async function createToken(actor: Actor) {
+async function createToken(actor: Actor):Promise<TokenDocument> {
+	//@ts-ignore
 	const baseToken = await actor.getTokenDocument({ hidden: true });
-	return await baseToken.constructor.create(baseToken, { parent: canvas.scene });
+	return <TokenDocument>await baseToken.constructor.create(baseToken, { parent: canvas.scene });
 }
 
 /**
@@ -16,7 +19,7 @@ async function createToken(actor: Actor) {
  */
 export function getPolymorphs(actor: Actor) {
 	const regex = /poly:.+/;
-	const mutations = actor.getFlag('warpgate', 'mutate');
+	const mutations = <any[]>actor.getFlag("warpgate", "mutate") ?? [];
 	return mutations?.filter((mut) => regex.exec(mut.name)) ?? [];
 }
 
@@ -26,12 +29,17 @@ export function getPolymorphs(actor: Actor) {
  * @returns List of active tokens, linked to the actor
  */
 async function getTokens(actor: Actor) {
-	if (actor.token) return [actor.token];
+	if (actor.token) {
+		return [actor.token];
+	}
 	const tokens = actor
 		.getActiveTokens()
 		.map((t) => t.document)
-		.filter((doc) => doc.actorLink);
-	if (tokens.length) return tokens;
+		//@ts-ignore
+		.filter((doc: TokenDocument) => doc.actorLink);
+	if (tokens.length) {
+		return tokens;
+	}
 	return [];
 }
 
@@ -47,10 +55,13 @@ export async function revertPolymorph(actor: Actor, name: string) {
 		const poly = getPolymorphs(actor);
 		name = poly[poly.length - 1].name;
 	}
-
+	//@ts-ignore
 	await warpgate.revert(token, name);
 
-	if (tokens.length === 0) token.delete();
+	if (tokens.length === 0) {
+		//@ts-ignore
+		token.delete();
+	}
 }
 
 /**
@@ -59,36 +70,51 @@ export async function revertPolymorph(actor: Actor, name: string) {
  * @param Data targetData
  * @returns Warpgate Mutation
  */
-export async function polymorph(sourceActor: Actor, targetData: ActorData) {
+export async function polymorph(
+	sourceActor: Actor, 
+	targetActor: Actor, 
+	targetTokenDocData: any):Promise<TokenDocument> {
 	// If the source is an Actor, we create a temporary token, wich will be deleted once warpgate is set
-	const tokens = await getTokens(sourceActor);
-	const token = tokens?.[0] ?? createToken(sourceActor);
+	const tokenDocuments = await getTokens(sourceActor);
+	const tokenDocument = tokenDocuments?.[0] ?? createToken(sourceActor);
 
 	const actorData = sourceActor.toObject();
-
-	prepareTargetData(targetData);
+	
+	prepareTargetData(targetActor);
+	if(!targetTokenDocData){
+		warn(`No token data is been passed on the polymorph warpgate method`);
+		//@ts-ignore
+		targetTokenDocData = targetActor.prototypeToken;
+	}
 
 	const updates = {
-		token: targetData.prototypeToken,
-		actor: targetData,
+		//@ts-ignore
+		token: targetTokenDocData, // targetActor.prototypeToken,
+		actor: targetActor,
 		embedded: {},
 	};
-
+	//@ts-ignore
 	for (const [key, value] of Object.entries(Actor.implementation.metadata.embedded)) {
-		const embedded = updates.actor[value];
-		const original = actorData[value];
+		const metadata = <any>value;
+		const embedded = updates.actor[metadata];
+		const original = actorData[metadata];
 		if (embedded) {
 			updates.embedded[key] = Object.fromEntries([
+				//@ts-ignore
 				...original.map((item) => [item.name, warpgate.CONST.DELETE]),
 				...embedded.map((item) => [item.name, item]),
 			]);
-			delete updates.actor[value];
+			delete updates.actor[metadata];
 		}
 	}
+	//@ts-ignore
+	await warpgate.mutate(tokenDocument, updates, {}, { name: "poly:" + randomID() });
 
-	await warpgate.mutate(token, updates, {}, { name: 'poly:' + randomID() });
-
-	if (tokens.length === 0) token.delete();
+	if (tokenDocuments.length === 0) {
+		//@ts-ignore
+		tokenDocument.delete();
+	}
+	return tokenDocument;
 }
 
 /**
@@ -97,22 +123,25 @@ export async function polymorph(sourceActor: Actor, targetData: ActorData) {
  * @param targetData ActorData
  * @returns ActorData
  */
-function prepareTargetData(targetData: ActorData) {
+export function prepareTargetData(targetData: Actor):Actor {
 	const _deletions = [
-		'-=_id',
-		'-=_stats',
-		'-=ownership',
-		'-=folder',
-		'-=sort',
-		'-=flags',
-		'-=type',
-		'prototypeToken.-=actorLink',
-		'prototypeToken.-=name',
-		'prototypeToken.-=flags',
+		"-=_id",
+		"-=_stats",
+		"-=ownership",
+		"-=folder",
+		"-=sort",
+		"-=flags",
+		"-=type",
+		"prototypeToken.-=actorLink",
+		"prototypeToken.-=name",
+		"prototypeToken.-=flags",
 	];
 	const deletions = Object.fromEntries(_deletions.map((v) => [v, null]));
 
-	mergeObject(targetData, deletions, { performDeletions: true });
+	mergeObject(targetData, deletions, {
+		//@ts-ignore
+		performDeletions: true,
+	});
 
 	return targetData;
 }

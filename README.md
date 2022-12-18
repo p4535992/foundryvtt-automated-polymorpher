@@ -49,8 +49,8 @@ I don't have time for check every system attributes and skill need help from the
 
 ```
   async prepareDataFromTransformOptions(
-    originalActorData: ActorData,
-    targetActorData: ActorData,
+    originalActorData: Actor,
+    targetActorData: Actor,
     sourceEffects: any[],
     targetActorImages: string[],
     transformOptions: TransformOptionsGeneric,
