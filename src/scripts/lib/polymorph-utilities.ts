@@ -204,9 +204,11 @@ export async function polymorphWithActorLinked(
 	sourceToken: Token,
 	sourceActor: Actor,
 	targetActor: Actor,
+	d: any,
 	externalUserId: string,
-	d: any
+	renderSheet:boolean,
 ) {
+	const transformTokens = true;
 	/*
 	// Update unlinked Tokens, and grab a copy of any actorData adjustments to re-apply
 	if ( this.isToken ) {
@@ -252,7 +254,7 @@ export async function polymorphWithActorLinked(
 	//   return;
 	// }
 	let tokens = <Token[]>[];
-	/*
+	
 	if (transformTokens) {
 		tokens = <Token[]>sourceActor.getActiveTokens(true);
 		if (!tokens || tokens.length == 0) {
@@ -265,8 +267,7 @@ export async function polymorphWithActorLinked(
 	} else {
 		tokens = [sourceToken];
 	}
-    */
-	tokens = [sourceToken];
+
 	const updates = tokens.map((t) => {
 		const newTokenData = <any>foundry.utils.deepClone(d.prototypeToken);
 		newTokenData._id = t.id;
@@ -295,9 +296,16 @@ export async function polymorphWithActorLinked(
 	// 		keepId: false, // MOD 4535992 on dnd5e is true
 	// 		render: false, // MOD 4535992 on dnd5e is true
 	// 	});
+	// 	await token.update({
+	// 		actorId: tokenUpdate.actorId,
+	// 		actorLink: tokenUpdate.actorLink
+	// 	});
 	// 	tokensFinal.push(token);
 	// }
 	for (const tokenFinal of tokensFinal) {
+		// await tokenFinal.update({
+		// 	updates[0]
+		// });
 		// Force this to be true
 		await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
 		await tokenFinal.actor?.setFlag(

@@ -245,7 +245,7 @@ export default {
 			// =============================================
 			// THIS IS THE DND5E SOLUTION WITh THE CREATION OF ACTOR)
 			// ===========================================
-			return await polymorphWithActorLinked(sourceToken, sourceActor, targetActor, externalUserId, d);
+			return await polymorphWithActorLinked(sourceToken, sourceActor, d, targetActor, externalUserId, renderSheet);
 		}
 	},
 
