@@ -138,7 +138,7 @@ export default {
 
 		// Get the original Actor data and the new source data
 		const originalActorData = sourceActor.toObject(false);
-		const targetActorData = targetActor.toObject(false);
+		const targetActorData = prepareTargetData(targetActor.toObject(false));
 
 		const targetActorImages = await targetActor.getTokenImages();
 		//@ts-ignore
@@ -826,8 +826,6 @@ export default {
 		targetActorImages: string[],
 		transformOptions: TransformOptionsGeneric
 	) {
-		prepareTargetData(targetActorData);
-
 		const keepPhysical = transformOptions?.keepPhysical || false;
 		const keepMental = transformOptions?.keepMental || false;
 		const keepSaves = transformOptions?.keepSaves || false;
