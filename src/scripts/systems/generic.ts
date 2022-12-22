@@ -1,22 +1,14 @@
-import type { ActorDataBaseProperties } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/actorData";
-import type {
-	ActorData,
-	PrototypeTokenData,
-	TokenData,
-} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
-import type { PropertiesToSource } from "@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes";
 import { ANIMATIONS } from "../animations";
 import {
-	PolymorpherData,
 	PolymorpherFlags,
 	TokenRevertData,
 	transformationPresets,
 	TransformOptionsGeneric,
 } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
-import { debug, i18n, info, log, transferPermissionsActorInner, wait, warn } from "../lib/lib";
-import { polymorphWithActorLinked, revertOriginalFormImpl } from "../lib/polymorph-utilities";
+import { debug, i18n, info, log, wait, warn } from "../lib/lib";
 import { polymorphWithWarpgate } from "../lib/warpgate";
+import { polymorphWithActorLinked, revertOriginalFormImpl } from "../lib/polymorph-utilities";
 
 export default {
 	/**
@@ -49,6 +41,17 @@ export default {
 	 * @property {string} [explicitName]  Explicit name for generated actor
 	 */
 	polymorphSettings: <TransformOptionsGeneric>{
+		keepPhysical: false,
+		keepMental: false,
+		keepSaves: false,
+		keepSkills: false,
+		mergeSaves: false,
+		mergeSkills: false,
+		keepClass: false,
+		keepFeats: false,
+		keepSpells: false,
+		keepItems: false,
+		keepBio: false,
 		keepVision: true,
 		keepSelf: false,
 		keepAE: false,
@@ -64,6 +67,28 @@ export default {
 		//
 		transformTokens: true,
 		explicitName: "",
+	},
+
+	/**
+	 * Settings to configure how actors are merged when polymorphing is applied.
+	 * @enum {string}
+	 */
+	i18nPolymorphSettings: {
+		keepPhysical: `${CONSTANTS.MODULE_NAME}.polymorphKeepPhysical`,
+		keepMental: `${CONSTANTS.MODULE_NAME}.polymorphKeepMental`,
+		keepSaves: `${CONSTANTS.MODULE_NAME}.polymorphKeepSaves`,
+		keepSkills: `${CONSTANTS.MODULE_NAME}.polymorphKeepSkills`,
+		mergeSaves: `${CONSTANTS.MODULE_NAME}.polymorphMergeSaves`,
+		mergeSkills: `${CONSTANTS.MODULE_NAME}.polymorphMergeSkills`,
+		keepClass: `${CONSTANTS.MODULE_NAME}.polymorphKeepClass`,
+		keepFeats: `${CONSTANTS.MODULE_NAME}.polymorphKeepFeats`,
+		keepSpells: `${CONSTANTS.MODULE_NAME}.polymorphKeepSpells`,
+		keepItems: `${CONSTANTS.MODULE_NAME}.polymorphKeepItems`,
+		keepBio: `${CONSTANTS.MODULE_NAME}.polymorphKeepBio`,
+		keepVision: `${CONSTANTS.MODULE_NAME}.polymorphKeepVision`,
+		keepSelf: `${CONSTANTS.MODULE_NAME}.polymorphKeepSelf`,
+		transformTokens: `${CONSTANTS.MODULE_NAME}.polymorphTransformTokens`,
+		explicitName: `${CONSTANTS.MODULE_NAME}.polymorphExplicitName`,
 	},
 
 	/**
@@ -179,8 +204,8 @@ export default {
 		let previousTokenData =
 			<TokenRevertData[]>(
 				getProperty(
-					originalActorData,
-					`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`
+					originalActorData.flags,
+					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}`
 				)
 			) || [];
 		// const currentTokenData = await sourceActor.getTokenDocument();
@@ -208,19 +233,16 @@ export default {
 		mergeObject(d.prototypeToken.flags, d.flags);
 
 		// Step up the array of mutation names
-		let arrayMutationNames: string[] = <string[]>(
-			getProperty(
-				<Actor>sourceToken.actor,
-				`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
-			)
+		let arrayMutationNames: string[] = <string[]>getProperty(
+			//@ts-ignore
+			<Actor>sourceToken.actor.flags,
+			`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
 		);
 		if (!arrayMutationNames || arrayMutationNames.length == 0) {
-			arrayMutationNames =
-				<string[]>(
-					getProperty(
-						sourceActor,
-						`flags.${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
-					)
+			arrayMutationNames = <string[]>getProperty(
+					//@ts-ignore
+					sourceActor.flags,
+					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
 				) || [];
 		}
 		const mutationNameOriginalToken = sourceToken.id + "_" + randomID();
@@ -248,8 +270,8 @@ export default {
 			return await polymorphWithActorLinked(
 				sourceToken,
 				sourceActor,
-				d,
 				targetActor,
+				d,
 				externalUserId,
 				renderSheet
 			);
@@ -374,15 +396,6 @@ export default {
 								targetActor,
 								foundry.utils.mergeObject(transformationPresets.wildshape.options, {
 									transformTokens: rememberOptions(html).transformTokens,
-									// keepAE: rememberOptions(html).keepAE,
-									// //removeAE: rememberOptions(html).removeAE,
-									// removeOriginAE: rememberOptions(html).removeOriginAE,
-									// removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-									// removeFeatAE: rememberOptions(html).removeFeatAE,
-									// removeSpellAE: rememberOptions(html).removeSpellAE,
-									// removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-									// removeClassAE: rememberOptions(html).removeClassAE,
-									// removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 								}),
 								false,
 								<string>game.user?.id
@@ -414,15 +427,6 @@ export default {
 								targetActor,
 								foundry.utils.mergeObject(transformationPresets.polymorph.options, {
 									transformTokens: rememberOptions(html).transformTokens,
-									// keepAE: rememberOptions(html).keepAE,
-									// //removeAE: rememberOptions(html).removeAE,
-									// removeOriginAE: rememberOptions(html).removeOriginAE,
-									// removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-									// removeFeatAE: rememberOptions(html).removeFeatAE,
-									// removeSpellAE: rememberOptions(html).removeSpellAE,
-									// removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-									// removeClassAE: rememberOptions(html).removeClassAE,
-									// removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 								}),
 								false,
 								<string>game.user?.id
@@ -439,15 +443,6 @@ export default {
 								targetActor,
 								foundry.utils.mergeObject(transformationPresets.polymorphSelf.options, {
 									transformTokens: rememberOptions(html).transformTokens,
-									// keepAE: rememberOptions(html).keepAE,
-									// //removeAE: rememberOptions(html).removeAE,
-									// removeOriginAE: rememberOptions(html).removeOriginAE,
-									// removeOtherOriginAE: rememberOptions(html).removeOtherOriginAE,
-									// removeFeatAE: rememberOptions(html).removeFeatAE,
-									// removeSpellAE: rememberOptions(html).removeSpellAE,
-									// removeEquipmentAE: rememberOptions(html).removeEquipmentAE,
-									// removeClassAE: rememberOptions(html).removeClassAE,
-									// removeBackgroundAE: rememberOptions(html).removeBackgroundAE,
 								}),
 								false,
 								<string>game.user?.id
@@ -469,8 +464,8 @@ export default {
 	},
 
 	async prepareDataFromTransformOptions(
-		originalActorData: ActorData,
-		targetActorData: ActorData,
+		originalActorData: Actor,
+		targetActorData: Actor,
 		sourceEffects: any[],
 		targetActorImages: string[],
 		transformOptions: TransformOptionsGeneric
@@ -507,9 +502,17 @@ export default {
 		// const originalActorData = <any>sourceActor.toJSON();
 		//originalActorData.flags.dnd5e = originalActorData.flags.dnd5e || {};
 		//originalActorData.flags.dnd5e.transformOptions = {mergeSkills, mergeSaves};
+		//@ts-ignore
 		if (!getProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`)) {
-			setProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
+			try {
+				//@ts-ignore
+				setProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}`, {});
+			} catch (e) {
+				//@ts-ignore
+				originalActorData.flags[CONSTANTS.MODULE_NAME] = {};
+			}
 		}
+		//@ts-ignore
 		setProperty(originalActorData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.TRANSFORMER_OPTIONS}`, {
 			keepPhysical,
 			keepMental,
@@ -592,6 +595,7 @@ export default {
 				//@ts-ignore
 				ownership: originalActorData.ownership, // Use the original actor permissions
 				folder: originalActorData.folder, // Be displayed in the same sidebar folder
+				//@ts-ignore
 				flags: originalActorData.flags, // Use the original actor flags
 				prototypeToken: {
 					name: `${originalActorData.name} (${targetActorData.name})`,
@@ -740,7 +744,7 @@ export default {
 
 			// Keep specific items from the original data
 			//@ts-ignore
-			d.items = d.items ? d.items : [];
+			d.items = d.items ? (d.items.contents ? d.items.contents : d.items) : [];
 			if (originalActorData.items && originalActorData.items.size > 0) {
 				//@ts-ignore
 				d.items = d.items.concat(
@@ -824,7 +828,11 @@ export default {
 				}
 				const origin =
 					//@ts-ignore
-					e.origin?.startsWith("Actor") || e.origin?.startsWith("Item") ? fromUuidSync(e.origin) : {};
+					e.origin?.startsWith("Actor") || e.origin?.startsWith("Item") ? fromUuidSync(e.origin) : undefined;
+				if (!origin) {
+					warn(`The effect ${e.label} has a invalid origin ${e.origin} is not passed to the target actor`);
+					return false;
+				}
 				const originIsSelf = origin?.parent?.uuid === this.uuid;
 				const isOriginEffect = originEffectIds.has(e._id);
 				if (isOriginEffect) {
@@ -860,6 +868,7 @@ export default {
 			d.prototypeToken.texture.src = images[Math.floor(Math.random() * images.length)];
 		}
 		// Strange bug with fvtt10
+
 		const tokenEffectsCleaned: any[] = [];
 		for (const effect of d.effects) {
 			let effectTmp = undefined;
