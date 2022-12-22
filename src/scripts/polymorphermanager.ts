@@ -249,18 +249,31 @@ export class PolymorpherManager extends FormApplication {
 		}
 
 		// Prepare flag for revert ???
-		const updatesForRevert = <TokenRevertData[]>(
+		let updatesForRevert = <TokenRevertData[]>(
 			this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 		)
 			? <TokenRevertData[]>(
 					this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			  )
 			: <TokenRevertData[]>[];
-		updatesForRevert.push({
-			//@ts-ignore
-			actorId: <string>this.token.document.actorId,
-			id: <string>this.token.document.id,
-		});
+
+		//@ts-ignore
+		const actorId = this.token.document.actorId;
+		if (actorId && updatesForRevert.filter((z) => z.id === actorId).length <= 0) {
+			updatesForRevert.push({
+				//@ts-ignore
+				actorId: <string>actorId,
+				id: <string>this.token.document.id,
+			});
+			updatesForRevert = updatesForRevert.filter(
+				(value, index, self) => index === self.findIndex((t) => t.id === null || t.id === value.id)
+			);
+		}
+		// updatesForRevert.push({
+		// 	//@ts-ignore
+		// 	actorId: <string>this.token.document.actorId,
+		// 	id: <string>this.token.document.id,
+		// });
 		await this.actor?.setFlag(
 			CONSTANTS.MODULE_NAME,
 			PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
@@ -630,18 +643,32 @@ export class PolymorpherManager extends FormApplication {
       await this.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.UPDATES_FOR_REVERT, updatesForRevert);
       */
 
-		const updatesForRevert = <TokenRevertData[]>(
+		let updatesForRevert = <TokenRevertData[]>(
 			this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 		)
 			? <TokenRevertData[]>(
 					this.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
 			  )
 			: <TokenRevertData[]>[];
-		updatesForRevert.push({
-			//@ts-ignore
-			actorId: <string>this.token.document.actorId,
-			id: <string>this.token.document.id,
-		});
+
+		//@ts-ignore
+		const actorId = this.token.document.actorId;
+		if (actorId && updatesForRevert.filter((z) => z.id === actorId).length <= 0) {
+			updatesForRevert.push({
+				//@ts-ignore
+				actorId: <string>actorId,
+				id: <string>this.token.document.id,
+			});
+			updatesForRevert = updatesForRevert.filter(
+				(value, index, self) => index === self.findIndex((t) => t.id === null || t.id === value.id)
+			);
+		}
+
+		// updatesForRevert.push({
+		// 	//@ts-ignore
+		// 	actorId: <string>this.token.document.actorId,
+		// 	id: <string>this.token.document.id,
+		// });
 		await this.actor?.setFlag(
 			CONSTANTS.MODULE_NAME,
 			PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,

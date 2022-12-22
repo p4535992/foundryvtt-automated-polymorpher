@@ -270,8 +270,8 @@ export default {
 			return await polymorphWithActorLinked(
 				sourceToken,
 				sourceActor,
-				d,
 				targetActor,
+				d,
 				externalUserId,
 				renderSheet
 			);

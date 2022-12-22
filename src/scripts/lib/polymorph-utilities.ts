@@ -23,7 +23,7 @@ export async function revertOriginalFormImpl(sourceToken: Token, sourceActor: Ac
 	}
 
 	// Obtain a reference to the original actor
-	const original = <Actor>(
+	let original = <Actor>(
 		game.actors?.get(<string>sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
 	);
 
@@ -38,6 +38,9 @@ export async function revertOriginalFormImpl(sourceToken: Token, sourceActor: Ac
 				true
 			);
 			return undefined;
+		} else if (!isTheOriginalActor) {
+			const actorIdToCheck = previousOriginalActorTokenData[previousOriginalActorTokenData.length - 1]?.actorId;
+			original = <Actor>game.actors?.get(<string>actorIdToCheck);
 		}
 	}
 
@@ -75,7 +78,7 @@ export async function revertOriginalFormImpl(sourceToken: Token, sourceActor: Ac
 				// TODO show on chat ?
 				//await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
 				//@ts-ignore
-				await revertPolymorphWithWarpgate(sourceActor);
+				await revertPolymorphWithWarpgate(sourceActor, undefined);
 			}
 		} else {
 			// If we are reverting an unlinked token, grab the previous actorData, and create a new token
@@ -232,12 +235,14 @@ export async function polymorphWithActorLinked(
 	// TODO Understand why is not working work like on dnd5e
 	// const newActor = await Actor.implementation.create(d, { renderSheet: renderSheet });
 	// Force this to be true
+
 	await newActor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
 	await newActor.setFlag(
 		CONSTANTS.MODULE_NAME,
 		PolymorpherFlags.ORIGINAL_ACTOR,
 		getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
 	);
+
 	mergeObject(d.prototypeToken, tokenBackup);
 
 	let originalActor = <Actor>(
@@ -246,7 +251,9 @@ export async function polymorphWithActorLinked(
 	// If no originalActorIsFounded it must be the orginal itself
 	if (!originalActor) {
 		originalActor = sourceActor;
+		setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, originalActor.id);
 	}
+
 	// await transferPermissionsActorInner(originalActor, newActor, externalUserId);
 
 	// Update placed Token instances
@@ -312,12 +319,13 @@ export async function polymorphWithActorLinked(
 			flags: mergeObject(tokenFinal.actor.flags, updates[0].flags),
 		});
 		// Force this to be true
-		// await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
-		// await tokenFinal.actor?.setFlag(
-		// 	CONSTANTS.MODULE_NAME,
-		// 	PolymorpherFlags.ORIGINAL_ACTOR,
-		// 	getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
-		// );
+
+		await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
+		await tokenFinal.actor?.setFlag(
+			CONSTANTS.MODULE_NAME,
+			PolymorpherFlags.ORIGINAL_ACTOR,
+			getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
+		);
 	}
 	await transferPermissionsActorInner(originalActor, newActor, externalUserId);
 	/* run mutation and label it 'powermorph' */

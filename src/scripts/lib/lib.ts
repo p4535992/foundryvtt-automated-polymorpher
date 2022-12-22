@@ -678,5 +678,4 @@ export async function revertFlagsOnActor(original: Actor) {
 			}
 		}
 	}
-	await revertPolymorphWithWarpgate(original, undefined);
 }
