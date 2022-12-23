@@ -39,7 +39,7 @@ export enum PolymorpherFlags {
 	ORDERED = "ordered",
 	COMPENDIUM = "compendium",
 	// UPDATES_FOR_REVERT = 'updatesforrevert',
-	MUTATION_NAMES_FOR_REVERT = "mutationNamesForRevert",
+	// MUTATION_NAMES_FOR_REVERT = "mutationNamesForRevert",
 	TRANSFORMER_OPTIONS = "transformOptions",
 	// ORIGINAL FLAG DND5E
 	IS_POLYMORPHED = "isPolymorphed",

@@ -3,7 +3,6 @@ import API from "../api";
 import { PolymorpherFlags } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
 import { PolymorpherManager } from "../polymorphermanager";
-import type { ActorData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import { revertPolymorphWithWarpgate } from "./warpgate";
 
 // =============================
@@ -649,8 +648,13 @@ function _getHandPermission(actor, externalUserId) {
 export async function revertFlagsOnActor(original: Actor) {
 	if (original && hasProperty(original, `flags.${CONSTANTS.MODULE_NAME}`)) {
 		await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
-		await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
-		await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+		// await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
+		const arr = <PolymorpherData[]>(
+			original.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+		);
+		arr.pop();
+		await original?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR, arr);
+		// await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
 		await original.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
 
 		for (const token of original.getActiveTokens()) {
@@ -662,16 +666,21 @@ export async function revertFlagsOnActor(original: Actor) {
 					token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR) !=
 					undefined
 				) {
-					await token.actor?.unsetFlag(
+					const arr = <PolymorpherData[]>(
+						original.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+					);
+					arr.pop();
+					await token.actor?.setFlag(
 						CONSTANTS.MODULE_NAME,
-						PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
+						PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR,
+						arr
 					);
 				}
-				if (
-					token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) != undefined
-				) {
-					await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-				}
+				// if (
+				// 	token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT) != undefined
+				// ) {
+				// 	await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+				// }
 				if (token.actor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR) != undefined) {
 					await token.actor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR);
 				}

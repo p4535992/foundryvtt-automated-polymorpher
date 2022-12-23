@@ -70,8 +70,9 @@ export const readyHooks = async () => {
 			isPolymorphed = true;
 		}
 
-		if (useWarpGate && getPolymorphsWithWarpgate(actor).length) isPolymorphed = true;
-
+		if (useWarpGate && getPolymorphsWithWarpgate(actor).length) {
+			isPolymorphed = true;
+		}
 		const removeLabelSheetHeader = game.settings.get(CONSTANTS.MODULE_NAME, "removeLabelSheetHeader");
 		const restrictedOnlyGM = game.settings.get(CONSTANTS.MODULE_NAME, "restrictOnlyGM");
 		if (restrictedOnlyGM && !game.user?.isGM) {

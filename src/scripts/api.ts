@@ -145,21 +145,21 @@ const API = {
 			// REVERT TO ORIGINAL FORM
 			// =====================================
 
-			const updatesForRevert = <TokenRevertData[]>(
-				currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
-			);
-			if (!updatesForRevert || updatesForRevert.length <= 0) {
-				await currentActor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-				await currentActor?.unsetFlag(
-					CONSTANTS.MODULE_NAME,
-					PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
-				);
-				warn(
-					`Can't revert this token without the flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}'`,
-					true
-				);
-				return;
-			}
+			// const updatesForRevert = <TokenRevertData[]>(
+			// 	currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+			// );
+			// if (!updatesForRevert || updatesForRevert.length <= 0) {
+			// 	await currentActor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+			// 	await currentActor?.unsetFlag(
+			// 		CONSTANTS.MODULE_NAME,
+			// 		PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
+			// 	);
+			// 	warn(
+			// 		`Can't revert this token without the flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}'`,
+			// 		true
+			// 	);
+			// 	return;
+			// }
 
 			const polyData = listPolymorphers.find((a) => {
 				return (

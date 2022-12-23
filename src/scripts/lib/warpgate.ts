@@ -97,13 +97,43 @@ export async function polymorphWithWarpgate(
 		// throw error(`The sourceActorData cannot be a Actor object`);
 		targetActorData = targetActor.toObject();
 	}
+
+	// await sourceActor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
+	// await sourceActor.setFlag(
+	// 	CONSTANTS.MODULE_NAME,
+	// 	PolymorpherFlags.ORIGINAL_ACTOR,
+	// 	getProperty(targetActorData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
+	// );
+
+	let originalActor = <Actor>(
+		game.actors?.get(<string>sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR))
+	);
+	// If no originalActorIsFounded it must be the orginal itself
+	if (!originalActor) {
+		originalActor = sourceActor;
+		setProperty(
+			targetActorData.flags,
+			`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
+			originalActor.id
+		);
+	}
+
 	// If the source is an Actor, we create a temporary token, wich will be deleted once warpgate is set
 	const tokenDocuments = await getTokens(sourceActor);
 	const tokenDocument = tokenDocuments?.[0] ?? createToken(sourceActor);
 
 	const actorData = sourceActorData;
-	// TODO can't delete the '_id' ???
+
 	prepareTargetData(targetActorData);
+
+	if (!targetActorData.flags) {
+		targetActorData.flags = {};
+	}
+	if (!targetActorData.flags[CONSTANTS.MODULE_NAME]) {
+		targetActorData.flags[CONSTANTS.MODULE_NAME] = {};
+	}
+	mergeObject(targetActorData.flags[CONSTANTS.MODULE_NAME], targetTokenDocData.flags[CONSTANTS.MODULE_NAME]);
+
 	if (!targetTokenDocData) {
 		warn(`No token data is been passed on the polymorph warpgate method`);
 		//@ts-ignore

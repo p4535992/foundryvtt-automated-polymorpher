@@ -232,28 +232,28 @@ export default {
 		}
 		mergeObject(d.prototypeToken.flags, d.flags);
 
-		// Step up the array of mutation names
-		let arrayMutationNames: string[] = <string[]>getProperty(
-			//@ts-ignore
-			<Actor>sourceToken.actor.flags,
-			`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
-		);
-		if (!arrayMutationNames || arrayMutationNames.length == 0) {
-			arrayMutationNames = <string[]>getProperty(
-					//@ts-ignore
-					sourceActor.flags,
-					`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
-				) || [];
-		}
-		const mutationNameOriginalToken = sourceToken.id + "_" + randomID();
-		if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
-			arrayMutationNames.push(mutationNameOriginalToken);
-		}
-		setProperty(
-			d.prototypeToken.flags,
-			`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
-			arrayMutationNames
-		);
+		// // Step up the array of mutation names
+		// let arrayMutationNames: string[] = <string[]>getProperty(
+		// 	//@ts-ignore
+		// 	<Actor>sourceToken.actor.flags,
+		// 	`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
+		// );
+		// if (!arrayMutationNames || arrayMutationNames.length == 0) {
+		// 	arrayMutationNames = <string[]>getProperty(
+		// 			//@ts-ignore
+		// 			sourceActor.flags,
+		// 			`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
+		// 		) || [];
+		// }
+		// const mutationNameOriginalToken = sourceToken.id + "_" + randomID();
+		// if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
+		// 	arrayMutationNames.push(mutationNameOriginalToken);
+		// }
+		// setProperty(
+		// 	d.prototypeToken.flags,
+		// 	`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
+		// 	arrayMutationNames
+		// );
 
 		// Close sheet for non-transformed Actor
 		await sourceActor.sheet?.close();
