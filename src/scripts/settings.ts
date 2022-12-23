@@ -170,9 +170,9 @@ export const registerSettings = function () {
 		name: i18n(`${CONSTANTS.MODULE_NAME}.settings.forceUseOfWarpgate.title`),
 		hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.forceUseOfWarpgate.hint`),
 		scope: "world",
-		config: true,
+		config: false,
 		type: Boolean,
-		default: false,
+		default: true,
 	});
 
 	// ========================================================================

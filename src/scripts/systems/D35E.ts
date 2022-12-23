@@ -126,7 +126,7 @@ export default {
 		renderSheet = true,
 		externalUserId = <string>game.user?.id
 	): Promise<TokenDocument | undefined> {
-		const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
+		// const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
 		// const transformTokens = transformOptions?.transformTokens || true;
 
 		// Get the original Actor data and the new source data
@@ -232,32 +232,11 @@ export default {
 		}
 		mergeObject(d.prototypeToken.flags, d.flags);
 
-		// // Step up the array of mutation names
-		// let arrayMutationNames: string[] = <string[]>getProperty(
-		// 	//@ts-ignore
-		// 	<Actor>sourceToken.actor.flags,
-		// 	`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
-		// );
-		// if (!arrayMutationNames || arrayMutationNames.length == 0) {
-		// 	arrayMutationNames = <string[]>getProperty(
-		// 			//@ts-ignore
-		// 			sourceActor.flags,
-		// 			`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`
-		// 		) || [];
-		// }
-		// const mutationNameOriginalToken = sourceToken.id + "_" + randomID();
-		// if (!arrayMutationNames.includes(mutationNameOriginalToken)) {
-		// 	arrayMutationNames.push(mutationNameOriginalToken);
-		// }
-		// setProperty(
-		// 	d.prototypeToken.flags,
-		// 	`${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.MUTATION_NAMES_FOR_REVERT}`,
-		// 	arrayMutationNames
-		// );
-
 		// Close sheet for non-transformed Actor
 		await sourceActor.sheet?.close();
 
+		return await polymorphWithWarpgate(sourceActor, targetActor, d);
+		/*
 		if (useWarpGate) {
 			// =============================================
 			// THIS IS THE SOLUTION WITH WARP GATE (AVOID THE CREATION OF ACTOR)
@@ -276,6 +255,7 @@ export default {
 				renderSheet
 			);
 		}
+		*/
 	},
 
 	/**

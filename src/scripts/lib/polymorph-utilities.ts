@@ -19,6 +19,8 @@ export async function revertOriginalFormImpl(sourceToken: Token, sourceActor: Ac
 		sourceActor.sheet?.close();
 	}
 
+	const original = sourceActor;
+
 	const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
 	const hasWarpPolymorphs = Boolean(getPolymorphsWithWarpgate(sourceActor).length);
 	const WarpGateMode = useWarpGate && hasWarpPolymorphs;
@@ -47,6 +49,7 @@ export async function revertOriginalFormImpl(sourceToken: Token, sourceActor: Ac
 		}
 		return sourceActor;
 	} else {
+		/*
 		if (!sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
 			warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`) + ` type 1`, true);
 			return;
@@ -89,43 +92,43 @@ export async function revertOriginalFormImpl(sourceToken: Token, sourceActor: Ac
 		}
 
 		// If we are reverting an unlinked token, grab the previous actorData, and create a new token
-		/*
-		if ( this.isToken ) {
-			const baseActor = original ? original : game.actors.get(this.token.actorId);
-			if ( !baseActor ) {
-				ui.notifications.warn(game.i18n.format("DND5E.PolymorphRevertNoOriginalActorWarn", {
-				reference: this.getFlag("dnd5e", "originalActor")
-				}));
-				return;
-			}
-			const prototypeTokenData = await baseActor.getTokenDocument();
-			const actorData = this.token.get.getFlag("dnd5e", "previousActorData");
-			const tokenUpdate = this.token.toObject();
-			tokenUpdate.actorData = actorData ? actorData : {};
+		
+		// if ( this.isToken ) {
+		// 	const baseActor = original ? original : game.actors.get(this.token.actorId);
+		// 	if ( !baseActor ) {
+		// 		ui.notifications.warn(game.i18n.format("DND5E.PolymorphRevertNoOriginalActorWarn", {
+		// 		reference: this.getFlag("dnd5e", "originalActor")
+		// 		}));
+		// 		return;
+		// 	}
+		// 	const prototypeTokenData = await baseActor.getTokenDocument();
+		// 	const actorData = this.token.get.getFlag("dnd5e", "previousActorData");
+		// 	const tokenUpdate = this.token.toObject();
+		// 	tokenUpdate.actorData = actorData ? actorData : {};
 
-			for ( const k of ["width", "height", "alpha", "lockRotation", "name"] ) {
-				tokenUpdate[k] = prototypeTokenData[k];
-			}
-			for ( const k of ["offsetX", "offsetY", "scaleX", "scaleY", "src", "tint"] ) {
-				tokenUpdate.texture[k] = prototypeTokenData.texture[k];
-			}
-			tokenUpdate.sight = prototypeTokenData.sight;
-			tokenUpdate.detectionModes = prototypeTokenData.detectionModes;
+		// 	for ( const k of ["width", "height", "alpha", "lockRotation", "name"] ) {
+		// 		tokenUpdate[k] = prototypeTokenData[k];
+		// 	}
+		// 	for ( const k of ["offsetX", "offsetY", "scaleX", "scaleY", "src", "tint"] ) {
+		// 		tokenUpdate.texture[k] = prototypeTokenData.texture[k];
+		// 	}
+		// 	tokenUpdate.sight = prototypeTokenData.sight;
+		// 	tokenUpdate.detectionModes = prototypeTokenData.detectionModes;
 
-			await this.sheet.close();
-			await canvas.scene?.deleteEmbeddedDocuments("Token", [this.token._id]);
-			const token = await TokenDocument.implementation.create(tokenUpdate, {
-				parent: canvas.scene, keepId: true, render: true
-			});
-			const actor = results.find(r => r._id === tokenUpdate._id).actor;
-			if ( isOriginalActor ) {
-				await this.unsetFlag("dnd5e", "isPolymorphed");
-				await this.unsetFlag("dnd5e", "previousActorIds");
-			}
-			if ( isRendered && renderSheet ) token.actor.sheet?.render(true);
-			return token;
-			}
-		*/
+		// 	await this.sheet.close();
+		// 	await canvas.scene?.deleteEmbeddedDocuments("Token", [this.token._id]);
+		// 	const token = await TokenDocument.implementation.create(tokenUpdate, {
+		// 		parent: canvas.scene, keepId: true, render: true
+		// 	});
+		// 	const actor = results.find(r => r._id === tokenUpdate._id).actor;
+		// 	if ( isOriginalActor ) {
+		// 		await this.unsetFlag("dnd5e", "isPolymorphed");
+		// 		await this.unsetFlag("dnd5e", "previousActorIds");
+		// 	}
+		// 	if ( isRendered && renderSheet ) token.actor.sheet?.render(true);
+		// 	return token;
+		// 	}
+		
 
 		// =============================================
 		// THIS IS THE DND5E SOLUTION WITh THE CREATION OF ACTOR)
@@ -200,7 +203,7 @@ export async function revertOriginalFormImpl(sourceToken: Token, sourceActor: Ac
 				await Actor.implementation.deleteDocuments(idsActorToDelete);
 			}
 		}
-
+		*/
 		await revertFlagsOnActor(original);
 
 		if (isRendered && renderSheet) {
