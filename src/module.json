@@ -1,20 +1,9 @@
 {
 	"id": "automated-polymorpher",
-	"title": "[BETA] Automated Evocations - Polymorpher Manager",
+	"title": "[BETA] Automated Polymorpher Manager",
 	"description": "[BETA] A user interface to manage polymorpher with summoning animations and automated summoning for spells",
 	"version": "1.1.13",
 	"authors": [
-		{
-			"name": "theripper93",
-			"url": "https://github.com/theripper93",
-			"discord": "theripper93#3276",
-			"twitter": "",
-			"patreon": "theripper93",
-			"github": "theripper93",
-			"ko-fi": "",
-			"reddit": "u/theripper93",
-			"email": "tsplab@gmail.com"
-		},
 		{
 			"name": "p4535992",
 			"url": "https://github.com/p4535992",
