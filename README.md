@@ -14,9 +14,9 @@
 
 ### If you want to buy me a coffee [![alt-text](https://img.shields.io/badge/-Patreon-%23ff424d?style=for-the-badge)](https://www.patreon.com/p4535992)
 
-# [BETA] Due to several issues that I cannot solve (details on the github project), the module has been categorized as beta, there is an open commission on the league server for anyone interested.
+### NOTE: The module is been "removed" from the official module list for avoid code issues with the [automated-evocations](https://github.com/theripper93/automated-evocations), given this caveat the rest of the code not inherent to the selection panel is under MIT, GPL-3.0 License, CC BY-NC-SA 4.0 and CC BY 3.0 license or the , if anyone plans to retake the module let them know first at [theRipper93](https://github.com/theripper93) to avoid problems.
 
-# THIS MODULE IS LOOKING FOR A NEW ACTIVE DEVELOPER
+### [BETA] Due to several issues that I cannot solve (details on the github project), the module has been categorized as beta, there is an open commission on the league server for anyone interested.
 
 A user interface to manage the polymorph feature of Dnd5e with summoning animations.
 
