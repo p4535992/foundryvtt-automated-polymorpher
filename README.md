@@ -1,4 +1,4 @@
-#  FoundryVTT Automated Polymorpher (Abbandoned module)
+#  FoundryVTT Automated Polymorpher (Abandoned module)
 
 ![Latest Release Download Count](https://img.shields.io/github/downloads/p4535992/foundryvtt-automated-polymorpher/latest/module.zip?color=2b82fc&label=DOWNLOADS&style=for-the-badge) 
 
@@ -14,7 +14,7 @@
 
 ### If you want to buy me a coffee [![alt-text](https://img.shields.io/badge/-Patreon-%23ff424d?style=for-the-badge)](https://www.patreon.com/p4535992)
 
-# NOTE: The module is ABBANDONED and is been "removed" from the official module list for avoid license issues with the module [automated-evocations](https://github.com/theripper93/automated-evocations), if anyone plans to retake the module let them know first at [theRipper93](https://github.com/theripper93) to avoid any kind of problems.
+# NOTE: The module is ABANDONED and is been "removed" from the official module list for avoid license issues with the module [automated-evocations](https://github.com/theripper93/automated-evocations), if anyone plans to retake the module let them know first at [theRipper93](https://github.com/theripper93) to avoid any kind of problems.
 
 ### [BETA] Due to several issues that I cannot solve (details on the github project), the module has been categorized as beta, there is an open commission on the league server for anyone interested.
 
