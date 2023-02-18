@@ -6,7 +6,7 @@ import {
 	TransformOptionsGeneric,
 } from "../automatedPolymorpherModels";
 import CONSTANTS from "../constants";
-import { debug, i18n, info, log, wait, warn } from "../lib/lib";
+import { debug, evaluateExpression, i18n, info, log, wait, warn } from "../lib/lib";
 import { polymorphWithWarpgate } from "../lib/warpgate";
 import { polymorphWithActorLinked, revertOriginalFormImpl } from "../lib/polymorph-utilities";
 
@@ -329,10 +329,17 @@ export default {
 						callback: async (html) => {
 							if (sourceToken) {
 								if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
-									game.macros
-										?.getName(ANIMATIONS.animationFunctions[animation].fn)
+									// //@ts-ignore
+									// game.macros
+									// 	?.getName(ANIMATIONS.animationFunctions[animation].fn)
+									// 	//@ts-ignore
+									// 	?.execute(tokenFromTransform, tokenDataToTransform);
+									evaluateExpression(
 										//@ts-ignore
-										?.execute(sourceToken, tokenUpdatesToTransform);
+										game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.command,
+										sourceToken,
+										tokenUpdatesToTransform
+									);
 								} else {
 									ANIMATIONS.animationFunctions[animation].fn(sourceToken, tokenUpdatesToTransform);
 								}
@@ -357,10 +364,17 @@ export default {
 						callback: async (html) => {
 							if (sourceToken) {
 								if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
-									game.macros
-										?.getName(ANIMATIONS.animationFunctions[animation].fn)
+									// //@ts-ignore
+									// game.macros
+									// 	?.getName(ANIMATIONS.animationFunctions[animation].fn)
+									// 	//@ts-ignore
+									// 	?.execute(tokenFromTransform, tokenDataToTransform);
+									evaluateExpression(
 										//@ts-ignore
-										?.execute(sourceToken, tokenUpdatesToTransform);
+										game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.command,
+										sourceToken,
+										tokenUpdatesToTransform
+									);
 								} else {
 									ANIMATIONS.animationFunctions[animation].fn(sourceToken, tokenUpdatesToTransform);
 								}
@@ -388,10 +402,17 @@ export default {
 						callback: async (html) => {
 							if (sourceToken) {
 								if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
-									game.macros
-										?.getName(ANIMATIONS.animationFunctions[animation].fn)
+									// //@ts-ignore
+									// game.macros
+									// 	?.getName(ANIMATIONS.animationFunctions[animation].fn)
+									// 	//@ts-ignore
+									// 	?.execute(tokenFromTransform, tokenDataToTransform);
+									evaluateExpression(
 										//@ts-ignore
-										?.execute(sourceToken, tokenUpdatesToTransform);
+										game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.command,
+										sourceToken,
+										tokenUpdatesToTransform
+									);
 								} else {
 									ANIMATIONS.animationFunctions[animation].fn(sourceToken, tokenUpdatesToTransform);
 								}

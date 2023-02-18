@@ -688,3 +688,17 @@ export async function revertFlagsOnActor(original: Actor) {
 		}
 	}
 }
+
+export const evaluateExpression = async function (expression, ...args) {
+	if (!expression) return null;
+	const AsyncFunction = async function () {}.constructor;
+	//@ts-ignore
+	const fn = new AsyncFunction("args", $("<span />", { html: expression }).text());
+	try {
+		return await fn(args);
+	} catch (e) {
+		error("There was an error in your macro syntax. See the console (F12) for details", true);
+		error(e);
+		return undefined;
+	}
+};

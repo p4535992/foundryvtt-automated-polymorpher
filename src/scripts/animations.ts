@@ -301,8 +301,7 @@ export const ANIMATIONS = {
 					.file(`modules/${CONSTANTS.MODULE_NAME}/assets/animations/energy_spark_CIRCLE_01.webm`)
 					.belowTokens()
 					.randomRotation()
-					.atLocation(template)
-					.randomOffset()
+					.atLocation(template, { randomOffset: true })
 					.repeats(6, 50, 25, 75, 60, 20)
 					.scale(
 						((Math.max(tokenData.width, tokenData.height) *

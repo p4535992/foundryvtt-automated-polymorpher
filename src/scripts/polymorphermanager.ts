@@ -8,7 +8,7 @@ import {
 	TokenRevertData,
 } from "./automatedPolymorpherModels";
 import CONSTANTS from "./constants";
-import { error, i18n, info, retrieveActorFromData, should_I_run_this, wait, warn } from "./lib/lib";
+import { evaluateExpression, error, i18n, info, retrieveActorFromData, should_I_run_this, wait, warn } from "./lib/lib";
 import { automatedPolymorpherSocket } from "./socket";
 
 export class PolymorpherManager extends FormApplication {
@@ -683,11 +683,17 @@ export class PolymorpherManager extends FormApplication {
 					await wait(animationExternal.timeToWait);
 				} else if (animation) {
 					if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
-						//@ts-ignore
-						game.macros
-							?.getName(ANIMATIONS.animationFunctions[animation].fn)
+						// //@ts-ignore
+						// game.macros
+						// 	?.getName(ANIMATIONS.animationFunctions[animation].fn)
+						// 	//@ts-ignore
+						// 	?.execute(tokenFromTransform, tokenDataToTransform);
+						evaluateExpression(
 							//@ts-ignore
-							?.execute({ tokenFromTransform, tokenDataToTransform });
+							game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.command,
+							tokenFromTransform,
+							tokenDataToTransform
+						);
 					} else {
 						ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
 					}
@@ -728,11 +734,17 @@ export class PolymorpherManager extends FormApplication {
 					await wait(animationExternal.timeToWait);
 				} else if (animation) {
 					if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
-						//@ts-ignore
-						game.macros
-							?.getName(ANIMATIONS.animationFunctions[animation].fn)
+						// //@ts-ignore
+						// game.macros
+						// 	?.getName(ANIMATIONS.animationFunctions[animation].fn)
+						// 	//@ts-ignore
+						// 	?.execute(tokenFromTransform, tokenDataToTransform);
+						evaluateExpression(
 							//@ts-ignore
-							?.execute(tokenFromTransform, tokenDataToTransform);
+							game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.command,
+							tokenFromTransform,
+							tokenDataToTransform
+						);
 					} else {
 						ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
 					}
@@ -767,11 +779,17 @@ export class PolymorpherManager extends FormApplication {
 					await wait(animationExternal.timeToWait);
 				} else if (animation) {
 					if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
-						//@ts-ignore
-						game.macros
-							?.getName(ANIMATIONS.animationFunctions[animation].fn)
+						// //@ts-ignore
+						// game.macros
+						// 	?.getName(ANIMATIONS.animationFunctions[animation].fn)
+						// 	//@ts-ignore
+						// 	?.execute(tokenFromTransform, tokenDataToTransform);
+						evaluateExpression(
 							//@ts-ignore
-							?.execute(tokenFromTransform, tokenDataToTransform);
+							game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.command,
+							tokenFromTransform,
+							tokenDataToTransform
+						);
 					} else {
 						ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
 					}
@@ -812,11 +830,17 @@ export class PolymorpherManager extends FormApplication {
 					await wait(animationExternal.timeToWait);
 				} else if (animation) {
 					if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
-						//@ts-ignore
-						game.macros
-							?.getName(ANIMATIONS.animationFunctions[animation].fn)
+						// //@ts-ignore
+						// game.macros
+						// 	?.getName(ANIMATIONS.animationFunctions[animation].fn)
+						// 	//@ts-ignore
+						// 	?.execute(tokenFromTransform, tokenDataToTransform);
+						evaluateExpression(
 							//@ts-ignore
-							?.execute(tokenFromTransform, tokenDataToTransform);
+							game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.command,
+							tokenFromTransform,
+							tokenDataToTransform
+						);
 					} else {
 						ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
 					}
