@@ -1,4 +1,4 @@
-#  FoundryVTT Automated Polymorpher
+#  FoundryVTT Automated Polymorpher (Abbandoned module)
 
 ![Latest Release Download Count](https://img.shields.io/github/downloads/p4535992/foundryvtt-automated-polymorpher/latest/module.zip?color=2b82fc&label=DOWNLOADS&style=for-the-badge) 
 
@@ -14,11 +14,11 @@
 
 ### If you want to buy me a coffee [![alt-text](https://img.shields.io/badge/-Patreon-%23ff424d?style=for-the-badge)](https://www.patreon.com/p4535992)
 
-### NOTE: The module is been "removed" from the official module list for avoid code issues with the [automated-evocations](https://github.com/theripper93/automated-evocations), given this caveat the rest of the code not inherent to the selection panel is under MIT, GPL-3.0 License, CC BY-NC-SA 4.0 and CC BY 3.0 license or the , if anyone plans to retake the module let them know first at [theRipper93](https://github.com/theripper93) to avoid problems.
+# NOTE: The module is ABBANDONED and is been "removed" from the official module list for avoid license issues with the module [automated-evocations](https://github.com/theripper93/automated-evocations), if anyone plans to retake the module let them know first at [theRipper93](https://github.com/theripper93) to avoid any kind of problems.
 
 ### [BETA] Due to several issues that I cannot solve (details on the github project), the module has been categorized as beta, there is an open commission on the league server for anyone interested.
 
-A user interface to manage the polymorph feature of Dnd5e with summoning animations.
+A user interface to manage the polymorph feature for summoning with animations.
 
 **Note: This is module is inspired from the  wonderful work done by [theRipper93](https://github.com/theripper93) with its [automated-evocations](https://github.com/theripper93/automated-evocations) module.
 If you want to support more modules of this kind, I invite you to go and support his patreon**
@@ -30,18 +30,13 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 ![gif](./wiki/feature_automated_polymorhper.gif)
 ![hud](./wiki/feature_hud_1.gif)
 
-## NOTE this module work very well with this other module [Automated Evocations (Variant Fork)](https://github.com/p4535992/automated-evocations-variant)
+## NOTE this module work very well with this other module [Automated Evocations (Variant Fork)](https://github.com/p4535992/automated-evocations-variant) and  [Automated Evocations](https://github.com/theripper93/automated-evocations)
 
 ## NOTE: If you are a javascript developer and not a typescript developer, you can just use the javascript files under the dist folder
 
 ## Known issue/Limitation
 
-- Sadly i have to create a temprary actor for save the data of the polymorphed acotr (just like dnd5e do now), but everything is going by the plan you didn't notice because i automatically delete the actor when you revert the polymorphing, in the worst case scenario you can just go to delete the actor the standard way.
-- Sadly i cannot understand a strange beahviour with warpgater after the mutation the mutated token is still linked to the original actor, i try everything, but it still show the original actor sheet. You can test the behaviour enabling the module settings 'Force use of Warpgate' Here a video of the problem:
-![img](./wiki/bug_warpgate_1.gif)
-- If you add or remove items on the polymorphed actor the "revert" action wil simply delete the actor without transfer any items, so beware about it
-- 
-- **At the moment the warpgate integration doesn't work, so don't use**
+- The module need a full rewrite .... 
 
 ## How contribute to your own multisystem
 
