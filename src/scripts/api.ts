@@ -20,14 +20,11 @@ import {
 } from "./lib/lib";
 import { PolymorpherManager } from "./polymorphermanager";
 import { automatedPolymorpherSocket } from "./socket";
-import D35E from "./systems/D35E";
 import dnd5e from "./systems/dnd5e";
 import generic from "./systems/generic";
-import pf1 from "./systems/pf1";
-import pf2e from "./systems/pf2e";
-import swade from "./systems/swade";
 
 const API = {
+	automatedPolymorpherSystemInterface: {},
 	async invokePolymorpherManagerFromActorArr(...inAttributes: any[]) {
 		if (!Array.isArray(inAttributes)) {
 			throw error("invokePolymorpherManagerFromActorArr | inAttributes must be of type array");
@@ -566,44 +563,8 @@ const API = {
 		//   return;
 		// }
 
-		if (game.system.id === "D35E") {
-			return await D35E.transformInto(
-				sourceToken,
-				sourceActor,
-				targetActor,
-				transformOptions,
-				renderSheet,
-				externalUserId
-			);
-		} else if (game.system.id === "dnd5e") {
+		if (game.system.id === "dnd5e") {
 			return await dnd5e.transformInto(
-				sourceToken,
-				sourceActor,
-				targetActor,
-				transformOptions,
-				renderSheet,
-				externalUserId
-			);
-		} else if (game.system.id === "pf1") {
-			return await pf1.transformInto(
-				sourceToken,
-				sourceActor,
-				targetActor,
-				transformOptions,
-				renderSheet,
-				externalUserId
-			);
-		} else if (game.system.id === "pf2e") {
-			return await pf2e.transformInto(
-				sourceToken,
-				sourceActor,
-				targetActor,
-				transformOptions,
-				renderSheet,
-				externalUserId
-			);
-		} else if (game.system.id === "swade") {
-			return await swade.transformInto(
 				sourceToken,
 				sourceActor,
 				targetActor,
@@ -635,16 +596,8 @@ const API = {
 		sourceActor: Actor,
 		renderSheet: boolean
 	): Promise<Actor | undefined> {
-		if (game.system.id === "D35E") {
-			return await D35E.revertOriginalForm(sourceToken, sourceActor, renderSheet);
-		} else if (game.system.id === "dnd5e") {
+		if (game.system.id === "dnd5e") {
 			return await dnd5e.revertOriginalForm(sourceToken, sourceActor, renderSheet);
-		} else if (game.system.id === "pf1") {
-			return await pf1.revertOriginalForm(sourceToken, sourceActor, renderSheet);
-		} else if (game.system.id === "pf2e") {
-			return await pf2e.revertOriginalForm(sourceToken, sourceActor, renderSheet);
-		} else if (game.system.id === "swade") {
-			return await swade.revertOriginalForm(sourceToken, sourceActor, renderSheet);
 		} else {
 			return await generic.revertOriginalForm(sourceToken, sourceActor, renderSheet);
 		}
@@ -657,40 +610,8 @@ const API = {
 		explicitName: string,
 		animation: string
 	): Promise<Dialog<DialogOptions>> {
-		if (game.system.id === "D35E") {
-			return await D35E.renderDialogTransformOptions(
-				sourceToken,
-				sourceActor,
-				targetActor,
-				explicitName,
-				animation
-			);
-		} else if (game.system.id === "dnd5e") {
+		if (game.system.id === "dnd5e") {
 			return await dnd5e.renderDialogTransformOptions(
-				sourceToken,
-				sourceActor,
-				targetActor,
-				explicitName,
-				animation
-			);
-		} else if (game.system.id === "pf1") {
-			return await pf1.renderDialogTransformOptions(
-				sourceToken,
-				sourceActor,
-				targetActor,
-				explicitName,
-				animation
-			);
-		} else if (game.system.id === "pf2e") {
-			return await pf2e.renderDialogTransformOptions(
-				sourceToken,
-				sourceActor,
-				targetActor,
-				explicitName,
-				animation
-			);
-		} else if (game.system.id === "swade") {
-			return await swade.renderDialogTransformOptions(
 				sourceToken,
 				sourceActor,
 				targetActor,

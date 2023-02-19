@@ -327,49 +327,6 @@ export function retrieveActorFromToken(sourceToken: Token): Actor | undefined {
 	return actor;
 }
 
-// export async function retrieveActorFromData(
-// 	aId: string,
-// 	aName: string,
-// 	currentCompendium: string
-// ): Promise<Actor | null> {
-// 	let actorToTransformLi: Actor | null = null;
-// 	if (currentCompendium && currentCompendium != "none" && currentCompendium != "nonenodelete") {
-// 		const pack = game.packs.get(currentCompendium);
-// 		if (pack) {
-// 			await pack.getIndex();
-// 			/*
-//       for (const entityComp of pack.index) {
-//         const actorComp = <Actor>await pack.getDocument(entityComp._id);
-//         if (actorComp.id === aId || actorComp.name === aName) {
-//           actorToTransformLi = actorComp;
-//           break;
-//         }
-//       }
-//       */
-// 			// If the actor is found in the index, return it by exact ID
-// 			if (pack.index.get(aId)) {
-// 				actorToTransformLi = <Actor>await pack.getDocument(aId);
-// 			}
-// 			// If not found, search for the actor by name
-// 			if (!actorToTransformLi) {
-// 				for (const entityComp of pack.index) {
-// 					const actorComp = <StoredDocument<Actor>>await pack.getDocument(entityComp._id);
-// 					if (actorComp.id === aId || actorComp.name === aName) {
-// 						actorToTransformLi = actorComp;
-// 						break;
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// 	if (!actorToTransformLi) {
-// 		actorToTransformLi = <Actor>game.actors?.contents.find((a) => {
-// 			return a.id === aId || a.name === aName;
-// 		});
-// 	}
-// 	return actorToTransformLi;
-// }
-
 /* returns the actor data sans ALL embedded collections */
 export function _getRootActorData(actorDoc: Actor) {
 	const actorData = actorDoc.toObject();
@@ -464,7 +421,9 @@ export async function retrieveActorFromData(
 				const packId = aUuid.replace("Compendium.", "").replace("." + aId, "");
 				const pack = <any>game.packs.get(packId);
 				if (pack) {
-					await pack.getIndex();
+					if (!pack.indexed) {
+						await pack.getIndex();
+					}
 					// If the actor is found in the index, return it by exact ID
 					if (pack.index.get(aId)) {
 						actorToTransformLi = <Actor>await pack.getDocument(aId);
@@ -503,7 +462,9 @@ export async function retrieveActorFromData(
 	) {
 		const pack = <any>game.packs.get(currentCompendium);
 		if (pack) {
-			await pack.getIndex();
+			if (!pack.indexed) {
+				await pack.getIndex();
+			}
 			// If the actor is found in the index, return it by exact ID
 			if (pack.index.get(aId)) {
 				actorToTransformLi = <Actor>await pack.getDocument(aId);

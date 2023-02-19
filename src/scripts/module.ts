@@ -7,12 +7,19 @@ import { registerSocket } from "./socket";
 import { setApi } from "../automated-polymorpher";
 import { PolymorpherFlags } from "./automatedPolymorpherModels";
 import { getPolymorphsWithWarpgate } from "./lib/warpgate";
+import { CoreSystem } from "./interface/CoreSystem";
 
 export const initHooks = () => {
 	warn("Init Hooks processing");
 	Hooks.once("socketlib.ready", registerSocket);
 	// TODO not enter on socketlib.ready
 	registerSocket();
+	// globalThis.automatedPolymorpherSystemInterface = new CoreSystem();
+    // if(!game[NAMESPACE]){
+	// 	game[NAMESPACE]=automatedPolymorpherSystemInterface;
+	// }
+	API.automatedPolymorpherSystemInterface = new CoreSystem();
+    Hooks.call("automated-polymorpher-system-interface.init");
 };
 
 export const setupHooks = () => {
@@ -20,6 +27,9 @@ export const setupHooks = () => {
 };
 
 export const readyHooks = async () => {
+	API.automatedPolymorpherSystemInterface.checkValidity();
+    await API.automatedPolymorpherSystemInterface.init();
+    Hooks.call("automated-polymorpher-system-interface.ready");
 	// setup all the hooks
 	//@ts-ignore
 	ANIMATIONS.animationFunctions = mergeObject(
@@ -62,6 +72,7 @@ export const readyHooks = async () => {
 				return t.document.actorId === actor.id;
 			});
 		}
+		
 		const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
 		const isPolymorphedF = actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED);
 
