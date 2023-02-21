@@ -16,7 +16,7 @@
 
 # NOTE: The module is ABANDONED and is been "removed" from the official module list for avoid license issues with the module [automated-evocations](https://github.com/theripper93/automated-evocations), if anyone plans to retake the module let them know first at [theRipper93](https://github.com/theripper93) to avoid any kind of problems.
 
-### [BETA] Due to several issues that I cannot solve (details on the github project), the module has been categorized as beta, there is an open commission on the league server for anyone interested.
+### [BETA] Due to several issues that I cannot solve (details on the github project), the module has been categorized as beta, there is an open commission on the league server for anyone interested in support a module with these features https://discord.com/channels/732325252788387980/1076817951623229500.
 
 A user interface to manage the polymorph feature for summoning with animations.
 
