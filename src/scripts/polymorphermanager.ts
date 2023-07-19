@@ -408,7 +408,7 @@ export class PolymorpherManager extends FormApplication {
         <div class="summon-btn">
           <img
             class="actor-image"
-            src="${actorToTransformLi.img}" alt="">
+            src="${actorToTransformLi.img ?? CONST.DEFAULT_TOKEN}" alt="">
           <div
             class="warpgate-btn"
             id="summon-polymorpher"

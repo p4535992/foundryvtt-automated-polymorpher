@@ -705,7 +705,7 @@ export default {
 				//@ts-ignore
 				originalActorData.system.abilities &&
 				//@ts-ignore
-				(originalActorData.system.abilities.length > 0 || originalActorData.system.abilities.size > 0)
+				Object.keys(originalActorData.system.abilities).length
 			) {
 				//@ts-ignore
 				const abilities = d.system.abilities;
@@ -728,7 +728,7 @@ export default {
 				//@ts-ignore
 				originalActorData.system.skills &&
 				//@ts-ignore
-				(originalActorData.system.skills.length > 0 || originalActorData.system.skills.size > 0)
+				Object.keys(originalActorData.system.skills).length
 			) {
 				if (keepSkills) {
 					//@ts-ignore
