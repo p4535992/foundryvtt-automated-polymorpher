@@ -1,0 +1,50 @@
+<div class="dialog-content automated-polymorpher two-column">
+    <div class="left-column">
+		<h3>{{localize 'automated-polymorpher.polymorphCustomTransformation'}}</h3>
+        {{#each content.settings}}
+            <div>
+                <label class="checkbox" for="{{@key}}">
+                    <input type="checkbox" id="{{@key}}" name="{{@key}}" {{checked (lookup ../content.options @key)}}>
+                    {{this}}
+                </label>
+            </div>
+        {{/each}}
+        <div>
+            <label class="text" for="explicitName">
+                <input type="text" id="explicitName" name="explicitName" placeholder="{{content.targetActorName}}"
+                    value="{{content.targetActorName}}"
+                    onchange="$(this).attr('value', this.value);" onkeyup="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();">
+                {{localize "automated-polymorpher.polymorphExplicitName"}}
+            </label>
+        </div>
+        {{#unless content.isToken}}
+        <hr>
+        <div>
+            <label class="checkbox" for="transformTokens">
+                <input type="checkbox" id="transformTokens" name="transformTokens"
+                    {{checked content.options.transformTokens}}>
+                {{localize 'automated-polymorpher.polymorphTokens'}}
+            </label>
+        </div>
+        {{/unless}}
+    </div>
+    <div class="right-column">
+		<h3>{{localize 'automated-polymorpher.polymorphEffectTransformation'}}</h3>
+        {{#each content.effectSettings}}
+        <div>
+            <label class="checkbox" for="{{@key}}">
+                <input type="checkbox" id="{{@key}}" name="{{@key}}" {{checked (lookup ../content.options @key)}}>
+                {{this}}
+            </label>
+        </div>
+        {{/each}}
+    </div>
+</div>
+<div class="dialog-buttons">
+    {{#each buttons as |button id|}}
+    <button class="dialog-button" data-button="{{id}}">
+        {{{button.icon}}}
+        {{{button.label}}}
+    </button>
+    {{/each}}
+</div>

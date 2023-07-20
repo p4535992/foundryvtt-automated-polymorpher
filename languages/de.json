@@ -1,0 +1,80 @@
+{
+	"automated-polymorpher": {
+		"dialogs": {
+			"polymorpherManager": {
+				"title": "Verwandlungs Manager",
+				"confirm": {
+					"title": "Entferne Verwandlung",
+					"content": "<p>Bist du dir sicher, dass du diese Verwandlung löschen möchtest?</p>"
+				},
+				"defaultSummonType": "Standard Beschwörungs Typ"
+			},
+			"random": "Zufall",
+			"ordered": "Sortiert"
+		},
+		"actorSheetBtn": "Verwandlungen",
+		"animations": {
+			"fire": "Feuer",
+			"air": "Luft",
+			"lightning": "Blitz",
+			"water": "Wasser",
+			"energy1": "Energie",
+			"magic1": "Magie",
+			"heart": "Doki-Doki",
+			"music": "Crescendo",
+			"fourelements": "Vier Elemente",
+			"music2": "Noten",
+			"darkness": "Dunkelheit",
+			"ice1": "Eis",
+			"magic2": "Beschwörung",
+			"lightning2": "Sturm"
+		},
+		"groups": {
+			"elemental": "Elementar",
+			"magical": "Magisch",
+			"z-none": "Andere"
+		},
+		"settings": {
+			"storeonactor": {
+				"title": "Speicher Verwandlungen auf Akteur",
+				"hint": "Speichert die Verwandlungen standardtmäßig auf dem Akteur anstatt auf dem Benutzer."
+			},
+			"enableautomations": {
+				"title": "Aktiviere Automatisierungen",
+				"hint": "Aktiviere das automatische Verwandlungssystem beim Wirken von Zaubern."
+			},
+			"autoclose": {
+				"title": "Automatisches Schließen",
+				"hint": "Schließe automatisch das Verwandlungsfenster nach der Beschwörung."
+			},
+			"hidebutton": {
+				"title": "Verstecke Verwandlungs Schaltfläche",
+				"hint": "Verstecke die Verwandlungs Schaltfläche auf Charakterbögen."
+			},
+			"restrictOwned": {
+				"title": "Nur Akteure in Besitz",
+				"hint": "Schränke die Verwandlungsliste auf Akteure ein, bei denen der Benutzer der Besitzer ist."
+			},
+			"restrictOnlyGM": {
+				"title": "Nur der SL sieht die Verwandlungs Schaltfläche",
+				"hint": "Schränke die Verwandlungsliste auf den Spielleiter ein"
+			},
+			"removeLabelSheetHeader": {
+				"title": "Entferne die Beschriftung der Titelleistenschaltfläche",
+				"hint": "Entferne die Beschriftung der Titelleistenschaltfläche, nützlich bei kleineren Monitoren oder Tablets."
+			},
+			"hudColumn": {
+				"title": "HUD Spalte",
+				"hint": "In welcher Spalte des HUDs soll die Schaltfläche platziert werden"
+			},
+			"hudTopBottom": {
+				"title": "HUD Oben/Unten",
+				"hint": "Wo in der Spalte soll die Schaltfläche angezeigt werden."
+			},
+			"hudEnable": {
+				"title": "Aktiviere Figur HUD Funktion",
+				"hint": "Vermeide das Rendern des Verwandlungs Managers für schnelle Verwandlungen, wenn du auf die HUD-Schaltfläche klickst. Alle Einheiten mit einem 'Standardbeschwörungstyp', welcher in der Figur/Akteur-Konfiguration eingestellt ist, lassen dich das Rendern des Verwandlungs-Managers überspringen, das kann für schnelle Kämpfe sehr nützlich sein. Es gibt zwei Optionen 'Zufall' und 'Sortiert', die du einstellen kannst, du kannst nicht beides aktivieren.. Denke daran, dass du das Token besitzen musst, um die HUD-Schaltfläche zu sehen"
+			}
+		}
+	}
+}
