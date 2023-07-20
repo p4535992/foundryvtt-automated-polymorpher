@@ -1,0 +1,184 @@
+{
+	"automated-polymorpher": {
+		"dialogs": {
+			"polymorpherManager": {
+				"title": "Polymorpher Manager",
+				"confirm": {
+					"title": "Delete Polymorpher",
+					"content": "<p>Are you sure you want to delete this polymorpher?</p>"
+				},
+				"defaultSummonType": "Default summon type"
+			},
+			"random": "Random",
+			"ordered": "Ordered",
+			"selectcompendium": "Select a compendium",
+			"deleteall": "Delete All",
+			"storeonactor": "Store Polymorphers on Actor",
+			"none": "None",
+			"nonenodelete": "None but not delete the loaded actors",
+			"resetsettings": {
+				"title": "Reset Module Settings",
+				"content": "Are you sure you want to reset all of the module settings to the current system's defaults? <strong>THIS CANNOT BE UNDONE!</strong>",
+				"confirm": "Reset Module Settings",
+				"cancel": "Cancel"
+			}
+		},
+		"polymorphRestoreTransformationBtn": "Restore Transformation",
+		"actorSheetBtn": "Polymorphers",
+		"animations": {
+			"fire": "Fire",
+			"air": "Air",
+			"lightning": "Lightning",
+			"water": "Water",
+			"energy1": "Energy",
+			"magic1": "Magic",
+			"heart": "Doki-Doki",
+			"music": "Crescendo",
+			"fourelements": "Four Elements",
+			"music2": "Chord",
+			"darkness": "Darkness",
+			"ice1": "Ice",
+			"magic2": "Conjuration",
+			"lightning2": "Storm"
+		},
+		"groups": {
+			"elemental": "Elemental",
+			"magical": "Magical",
+			"z-none": "Other"
+		},
+		"settings": {
+			"storeonactor": {
+				"title": "Store Polymorphers on Actor",
+				"name": "Store Polymorphers on Actor",
+				"hint": "Store the polymorphers on the actor instead of the token by default."
+			},
+			"enableautomations": {
+				"title": "Enable Automations",
+				"name": "Enable Automations",
+				"hint": "Enable the polymorpher automation system on spellcast."
+			},
+			"autoclose": {
+				"title": "Auto-Close",
+				"name": "Auto-Close",
+				"hint": "Automatically close the polymorpher window after summoning."
+			},
+			"hidebutton": {
+				"title": "Hide Polymorpher Button",
+				"name": "Hide Polymorpher Button",
+				"hint": "Hide the polymorpher button on the character sheet."
+			},
+			"disableSettingsForNoGM": {
+				"title": "Disable dialog summon settings for no GM",
+				"hint": "Disable the settings (such as the compendium option, store in actor, delete all button, animation type and number of creatures) from summon dialog and block drop of actors for no GM player."
+			},
+			"restrictOwned": {
+				"title": "Only Owned Actors",
+				"name": "Only Owned Actors",
+				"hint": "Restrict the polymorpher list to only show owned polymorphers actors."
+			},
+			"restrictOnlyGM": {
+				"title": "Only GM can see Polymorpher button",
+				"name": "Only GM can see Polymorpher button",
+				"hint": "Restrict the polymorpher list to GMs only"
+			},
+			"removeLabelSheetHeader": {
+				"title": "Remove label from sheet header button",
+				"name": "Remove label from sheet header button",
+				"hint": "Remove label from sheet header button useful for small monitor, tablet"
+			},
+			"hudColumn": {
+				"title": "HUD Column",
+				"name": "HUD Column",
+				"hint": "Which HUD column to place the button in"
+			},
+			"hudTopBottom": {
+				"title": "HUD Top/Bottom",
+				"name": "HUD Top/Bottom",
+				"hint": "Where to place the button in the column"
+			},
+			"hudEnable": {
+				"title": "Enable token HUD feature",
+				"name": "Enable token HUD feature",
+				"hint": "Avoid the rendering of the polymorpher manager for fast polymorphing when click on the hud button. All the entities with a 'default summon type' setted on the token/actor configuration, will let you avoid the rendering of the polymorpher manager, can be really useful for fast combat, there two options 'random' and 'ordered' you can't enable both. Remember you must own the token for see the HUD button"
+			},
+			"hudColorButton": {
+				"title": "Color button for the 'Polymorphing' button",
+				"name": "Color button for the 'Polymorphing' button",
+				"hint": "Choose what color to use for the 'Polymorphing' button"
+			},
+			"hudColorButtonRestoreTransformation": {
+				"title": "Color button for the 'Restore Transformation'",
+				"name": "Color button for the 'Restore Transformation'",
+				"hint": "Choose what color to use for the 'Restore Transformation'"
+			},
+			"forceUseOfWarpgate": {
+				"title": "Force use of Warpgate",
+				"name": "Force use of Warpgate",
+				"hint": "THE WARPGATE INTEGRATION HAS SOME ISSUE THERE IS A BOUNTY ON THE LEGUE SERVER FOR ANYONE INTERESTED. If enabled it will use the warpgate mutate function instead the system default mechanism."
+			},
+			"doNotDeleteTmpActors": {
+				"title": "Do not delete temporary actors",
+				"name": "Do not delete temporary actors",
+				"hint": "Do not automatically delete temporary actors, useful if you want to take control of everything."
+			},
+			"reset": {
+				"title": "Reset settings to default",
+				"name": "Reset settings to default",
+				"label": "Reset Settings To Default",
+				"hint": "This will reset all of the settings of back to the active game system's default."
+			},
+			"debug": {
+				"title": "Enable debugging",
+				"name": "Enable debugging",
+				"label": "Prints debug messages to the console",
+				"hint": " "
+			}
+		},
+		"polymorph": "Polymorph",
+		"polymorphAcceptSettings": "Custom Settings",
+		"polymorphCustomTransformation": "Custom Transformation",
+		"polymorphEffectTransformation": "Effect Transformation",
+		"polymorphKeepBio": "Keep biography",
+		"polymorphKeepClass": "Keep proficiency bonus (leaves class items in sheet)",
+		"polymorphKeepAE": "Keep all effects (overrides other effect retention options).",
+		"polymorphKeepBackgroundAE": "Keep effects that originate from your background?",
+		"polymorphKeepClassAE": "Keep effects that originate from your class or subclass?",
+		"polymorphKeepEquipmentAE": "Keep effects that originate from your equipment?",
+		"polymorphKeepFeats": "Keep features",
+		"polymorphKeepFeatureAE": "Keep effects that originate from your features?",
+		"polymorphKeepItems": "Keep equipment",
+		"polymorphKeepMental": "Keep mental ability scores (Int, Wis, Cha)",
+		"polymorphKeepOriginAE": "Keep effects that originate from this actor (i.e. effects not attached to features, items, spells)",
+		"polymorphKeepOtherOriginAE": "Keep effects that originate from a different actor?",
+		"polymorphKeepPhysical": "Keep physical ability scores (Str, Dex, Con)",
+		"polymorphKeepSaves": "Keep saving throw proficiencies",
+		"polymorphKeepSkills": "Keep skill proficiencies",
+		"polymorphKeepSpellAE": "Keep effects that originate from your spells?",
+		"polymorphKeepSpells": "Keep spells",
+		"polymorphKeepVision": "Keep vision (character and token)",
+		"polymorphKeepSelf": "Keep self (just change image and size i.e. for spells like Disguise Self)",
+		"polymorphMergeSaves": "Merge saving throw proficiencies (take the highest)",
+		"polymorphMergeSkills": "Merge skill proficiencies (take the highest)",
+		"polymorphPromptTitle": "Transforming Actor",
+		"polymorphRestoreTransformation": "Restore Transformation",
+		"polymorphRevertNoOriginalActorWarn": "No original actor was found with reference '{reference}'",
+		"polymorphRevertWarn": "You do not have permission to revert this Actor's polymorphed state.",
+		"polymorphTmpClass": "Temporary Class",
+		"polymorphTokens": "Transform all linked tokens?",
+		"polymorphWarn": "You are not allowed to polymorph this actor!",
+		"polymorphWildShape": "Wild Shape",
+		"polymorphSelf": "Appearance Only",
+		"polymorphTransformTokens": "Transform all linked tokens?",
+		"polymorphExplicitName": "Explicit Name of the transformed actor",
+
+		"polymorphKeepAEOnlyOriginNotEquipment": "Keep only Active effects which origin is not equipment (override the 'Not Keep Active effects' if checked)",
+		"polymorphRemoveAE": "Remove all effects (overrides other effect retention options).",
+		"polymorphRemoveBackgroundAE": "Remove effects that originate from your background?",
+		"polymorphRemoveClassAE": "Remove effects that originate from your class or subclass?",
+		"polymorphRemoveEquipmentAE": "Remove effects that originate from your equipment?",
+		"polymorphRemoveFeatureAE": "Remove effects that originate from your features?",
+		"polymorphRemoveOriginAE": "Remove effects that originate on the actor i.e. effects not attached to features/items/spells",
+		"polymorphRemoveOtherOriginAE": "Remove effects that originate on a different actor i.e. spells/items/features from opponents",
+		"polymorphRemoveSpellAE": "Remove effects that originate from your spells?"
+	}
+}

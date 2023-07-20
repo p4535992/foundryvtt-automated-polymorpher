@@ -1,0 +1,59 @@
+<form class="nodrop">
+    <div class="form-group" {{#if showoptionstogm}} {{else}} style="display:none;" {{/if}}>
+        <label>{{localize "automated-polymorpher.dialogs.random"}}</label>
+        <input
+            id="polymorpher-random"
+            name="polymorpher-random"
+            class="polymorpher-random"
+            type="checkbox"
+            value="{{random}}"
+            {{#if random}} checked{{/if}}
+            onclick="$(this).attr('value', this.checked ? true : false)"
+            {{#if showoptionstogm}} {{else}} readonly {{/if}}
+        />
+        <label>{{localize "automated-polymorpher.dialogs.ordered"}}</label>
+        <input
+            id="polymorpher-ordered"
+            name="polymorpher-ordered"
+            class="polymorpher-ordered"
+            type="checkbox"
+            value="{{ordered}}"
+            {{#if ordered}} checked{{/if}}
+            onclick="$(this).attr('value', this.checked ? true : false)"
+            {{#if showoptionstogm}} {{else}} readonly {{/if}}
+        />
+        {{!--
+        <label>{{localize "automated-polymorpher.dialogs.storeonactor"}}</label>
+        <input
+            id="polymorpher-storeonactor"
+            name="polymorpher-storeonactor"
+            class="polymorpher-storeonactor"
+            type="checkbox"
+            value="{{storeonactor}}"
+            {{#if storeonactor}}checked{{/if}}
+            onclick="$(this).attr('value', this.checked ? true : false)"
+        />
+        --}}
+        <button
+            id="polymorpher-deleteall"
+            name="polymorpher-deleteall"
+            class="polymorpher-deleteall"
+            {{#if showoptionstogm}} {{else}} readonly {{/if}}
+        >{{localize "automated-polymorpher.dialogs.deleteall"}}</button>
+    </div>
+    <div class="form-group" {{#if showoptionstogm}} {{else}} style="display:none;" {{/if}}>
+        <label>{{localize "automated-polymorpher.dialogs.selectcompendium"}}</label>
+        <select
+            id="polymorpher-selectcompendium"
+            class="polymorpher-selectcompendium"
+            name="polymorpher-selectcompendium" data-dtype="String"
+            {{#if showoptionstogm}} {{else}} disabled {{/if}}>
+            {{#each compendiums as |compendium|}}
+            <option {{#if compendium.selected}}selected{{/if}} value="{{compendium.id}}">{{localize compendium.name}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <div class="form-group">
+        <ol id="polymorpher-list" class="directory-list"></ol>
+    </div>
+</form>
