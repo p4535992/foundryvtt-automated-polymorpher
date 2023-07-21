@@ -1,7 +1,7 @@
 import CONSTANTS from "./constants.js";
 import API from "./api.js";
 import { debug } from "./lib/lib.js";
-import { setSocket } from "../automated-polymorpher.js";
+import { setSocket } from "../module.js";
 export let automatedPolymorpherSocket;
 export function registerSocket() {
     debug("Registered automatedPolymorpherSocket");

@@ -4,7 +4,7 @@ import { ANIMATIONS } from "./animations.js";
 import CONSTANTS from "./constants.js";
 import API from "./api.js";
 import { registerSocket } from "./socket.js";
-import { setApi } from "../automated-polymorpher.js";
+import { setApi } from "../module.js";
 import { PolymorpherFlags } from "./automatedPolymorpherModels.js";
 import { getPolymorphsWithWarpgate } from "./lib/warpgate.js";
 export const initHooks = () => {
