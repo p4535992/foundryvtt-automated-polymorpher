@@ -160,7 +160,7 @@ export const registerSettings = function () {
     name: i18n(`${CONSTANTS.MODULE_NAME}.settings.forceUseOfWarpgate.title`),
     hint: i18n(`${CONSTANTS.MODULE_NAME}.settings.forceUseOfWarpgate.hint`),
     scope: "world",
-    config: false,
+    config: true,
     type: Boolean,
     default: true,
   });
