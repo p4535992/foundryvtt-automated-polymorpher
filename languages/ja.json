@@ -1,0 +1,65 @@
+{
+	"automated-polymorpher": {
+		"dialogs": {
+			"polymorpherManager": {
+				"title": "変身の設定",
+				"confirm": {
+					"title": "変身の削除",
+					"content": "<p>この変身設定を削除しますか？</p>"
+				}
+			}
+		},
+		"actorSheetBtn": "ポリモーファー",
+		"animations": {
+			"fire": "火",
+			"air": "風",
+			"lightning": "雷",
+			"water": "水",
+			"energy1": "生気",
+			"magic1": "魔法",
+			"heart": "ハート",
+			"music": "音楽的",
+			"fourelements": "四元素",
+			"music2": "弦楽",
+			"darkness": "闇",
+			"ice1": "氷",
+			"magic2": "魔法円",
+			"lightning2": "嵐"
+		},
+		"groups": {
+			"elemental": "元素",
+			"magical": "魔法",
+			"z-none": "その他"
+		},
+		"settings": {
+			"storeonactor": {
+				"title": "キャラクターシートの中に、変身設定を保存する",
+				"hint": "デフォルトとは異なり、キャラクターシートの中に変身設定を保存する。"
+			},
+			"enableautomations": {
+				"title": "自動化を可能にする",
+				"hint": "呪文発動でのポリモーファーの自動化を可能にする。"
+			},
+			"autoclose": {
+				"title": "自動的にウィンドウを閉じる",
+				"hint": "変身した後、自動的にポリモーファーのウィンドウを閉じる。"
+			},
+			"hidebutton": {
+				"title": "ポリモーファーのボタンを隠す",
+				"hint": "キャラクターシートのポリモーファーのボタンを隠す。"
+			},
+			"restrictOwned": {
+				"title": "所有しているキャラクターシートのみ",
+				"hint": "変身できるリストを、所有しているキャラクターシートのみから選択できる。"
+			},
+			"restrictOnlyGM": {
+				"title": "ＧＭのみがポリモーファーを見られる。",
+				"hint": "変身のリストを見るのは、ＧＭのみに制限される。"
+			},
+			"removeLabelSheetHeader": {
+				"title": "キャラクターシートのヘッダーの、ポリモーファーのボタンの名前を隠す",
+				"hint": "キャラクターシートのヘッダーの、ポリモーファーのボタンの名前を隠す。"
+			}
+		}
+	}
+}
