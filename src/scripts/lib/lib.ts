@@ -461,8 +461,8 @@ export async function retrieveActorFromData(
 		actorToTransformLi = await Actor.implementation.fromDropData({ type: "Actor", uuid: aUuid });
 		if (aUuid.toLowerCase().includes("compendium")) {
 			if (actorToTransformLi && createOnWorld && (game.user?.isGM || should_I_run_this(actorToTransformLi))) {
-				const packId = aUuid.replace("Compendium.", "").replace("." + aId, "");
-				const pack = <any>game.packs.get(packId);
+                //const packId = aUuid.replace("Compendium.", "").replace("." + aId, "");
+                const pack = game.packs.get(currentCompendium);
 				if (pack) {
 					await pack.getIndex();
 					// If the actor is found in the index, return it by exact ID
