@@ -18,20 +18,15 @@ export class TokenRevertData {
 // type FunctionCreature = ReturnType<typeof createCreature>
 export var PolymorpherFlags;
 (function (PolymorpherFlags) {
-    // IS_LOCAL = 'isLocal',
-    // STORE_ON_ACTOR = 'storeonactor',
     PolymorpherFlags["POLYMORPHERS"] = "polymorphers";
     PolymorpherFlags["RANDOM"] = "random";
     PolymorpherFlags["ORDERED"] = "ordered";
     PolymorpherFlags["COMPENDIUM"] = "compendium";
-    // UPDATES_FOR_REVERT = 'updatesforrevert',
-    PolymorpherFlags["MUTATION_NAMES_FOR_REVERT"] = "mutationNamesForRevert";
+    // MUTATION_NAMES_FOR_REVERT = "mutationNamesForRevert",
     PolymorpherFlags["TRANSFORMER_OPTIONS"] = "transformOptions";
-    // ORIGINAL FLAG DND5E
     PolymorpherFlags["IS_POLYMORPHED"] = "isPolymorphed";
     PolymorpherFlags["ORIGINAL_ACTOR"] = "originalActor";
     PolymorpherFlags["PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR"] = "previousOriginalActor";
-    // NEW_CREATED_ACTOR_TO_DELETE = 'newCreatedActorToDelete',
 })(PolymorpherFlags || (PolymorpherFlags = {}));
 export class PolymorpherData {
 }

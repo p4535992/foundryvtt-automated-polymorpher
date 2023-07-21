@@ -6,6 +6,7 @@ import API from "./api.js";
 import { registerSocket } from "./socket.js";
 import { setApi } from "../automated-polymorpher.js";
 import { PolymorpherFlags } from "./automatedPolymorpherModels.js";
+import { getPolymorphsWithWarpgate } from "./lib/warpgate.js";
 export const initHooks = () => {
     warn("Init Hooks processing");
     Hooks.once("socketlib.ready", registerSocket);
@@ -59,6 +60,9 @@ export const readyHooks = async () => {
         if (String(isPolymorphedF) === "true") {
             isPolymorphed = true;
         }
+        if (useWarpGate && getPolymorphsWithWarpgate(actor).length) {
+            isPolymorphed = true;
+        }
         const removeLabelSheetHeader = game.settings.get(CONSTANTS.MODULE_NAME, "removeLabelSheetHeader");
         const restrictedOnlyGM = game.settings.get(CONSTANTS.MODULE_NAME, "restrictOnlyGM");
         if (restrictedOnlyGM && !game.user?.isGM) {
@@ -74,7 +78,7 @@ export const readyHooks = async () => {
                 },
             });
         }
-        if (isPolymorphed && !useWarpGate) {
+        if (isPolymorphed) {
             buttons.unshift({
                 icon: "fas fa-backward",
                 class: "restore-transformation-pm",

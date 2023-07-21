@@ -1,7 +1,7 @@
 import { ANIMATIONS } from "./animations.js";
 import { PolymorpherFlags, } from "./automatedPolymorpherModels.js";
 import CONSTANTS from "./constants.js";
-import { error, info, isEmptyObject, retrieveActorFromData, retrieveActorFromToken, transferPermissionsActorInner, wait, warn, } from "./lib/lib.js";
+import { error, info, isEmptyObject, retrieveActorFromData, retrieveActorFromToken, revertFlagsOnActor, transferPermissionsActorInner, wait, warn, } from "./lib/lib.js";
 import { PolymorpherManager } from "./polymorphermanager.js";
 import { automatedPolymorpherSocket } from "./socket.js";
 import D35E from "./systems/D35E.js";
@@ -74,13 +74,21 @@ const API = {
             // =====================================
             // REVERT TO ORIGINAL FORM
             // =====================================
-            const updatesForRevert = (currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR));
-            if (!updatesForRevert || updatesForRevert.length <= 0) {
-                await currentActor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
-                await currentActor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR);
-                warn(`Can't revert this token without the flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}'`, true);
-                return;
-            }
+            // const updatesForRevert = <TokenRevertData[]>(
+            // 	currentActor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR)
+            // );
+            // if (!updatesForRevert || updatesForRevert.length <= 0) {
+            // 	await currentActor?.unsetFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.MUTATION_NAMES_FOR_REVERT);
+            // 	await currentActor?.unsetFlag(
+            // 		CONSTANTS.MODULE_NAME,
+            // 		PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR
+            // 	);
+            // 	warn(
+            // 		`Can't revert this token without the flag '${PolymorpherFlags.PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR}'`,
+            // 		true
+            // 	);
+            // 	return;
+            // }
             const polyData = listPolymorphers.find((a) => {
                 return (lastElement.toLowerCase().includes(a.name.toLowerCase()) ||
                     (a.explicitname && lastElement.toLowerCase().includes(a.explicitname.toLowerCase())));
@@ -103,10 +111,13 @@ const API = {
             else if (animation) {
                 if (typeof ANIMATIONS.animationFunctions[animation].fn == "string") {
                     //@ts-ignore
-                    game.macros
-                        ?.getName(ANIMATIONS.animationFunctions[animation].fn)
-                        //@ts-ignore
-                        ?.execute({ tokenFromTransform, tokenDataToTransform });
+                    // game.macros
+                    // 	?.getName(ANIMATIONS.animationFunctions[animation].fn)
+                    // 	//@ts-ignore
+                    // 	?.execute({ tokenFromTransform, tokenDataToTransform });
+                    evaluateExpression(
+                    //@ts-ignore
+                    game.macros?.getName(ANIMATIONS.animationFunctions[animation].fn)?.command, tokenFromTransform, tokenDataToTransform);
                 }
                 else {
                     ANIMATIONS.animationFunctions[animation].fn(tokenFromTransform, tokenDataToTransform);
@@ -120,6 +131,7 @@ const API = {
             const actorOriginalId = await this.revertOriginalForm(currentToken, currentActor, false);
             if (!actorOriginalId) {
                 warn(`NO actor id returned from revert polymorph action. Check out the logs`, true);
+                await revertFlagsOnActor(currentActor);
                 return;
             }
             const actorOriginal = game.actors?.get(actorOriginalId);
@@ -325,6 +337,7 @@ const API = {
         let actorOriginalId = (await automatedPolymorpherSocket.executeAsGM("revertOriginalForm", sourceToken.id, sourceActor.id, sourceActor.name, renderSheet));
         if (!actorOriginalId) {
             warn(`NO actor id returned from revert polymorph action. Check out the logs`, true);
+            await revertFlagsOnActor(sourceActor);
             return undefined;
         }
         const actorOriginal = game.actors?.get(actorOriginalId);
