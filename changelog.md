@@ -1,3 +1,6 @@
+### 1.2.0
+
+- Community update for v11 ty to @RDPrint, @elizeuangelo  and @rivet on discord
 ### 1.1.11-12-13
 
 - Synchronization with dnd5e pr from mr primate

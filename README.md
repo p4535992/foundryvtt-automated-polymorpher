@@ -1,6 +1,6 @@
 #  FoundryVTT Automated Polymorpher
 
-![Latest Release Download Count](https://img.shields.io/github/downloads/p4535992/foundryvtt-automated-polymorpher/latest/module.zip?color=2b82fc&label=DOWNLOADS&style=for-the-badge) 
+![Latest Release Download Count](https://img.shields.io/github/downloads/p4535992/foundryvtt-automated-polymorpher/latest/module.zip?color=2b82fc&label=DOWNLOADS&style=for-the-badge)
 
 [![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fautomated-polymorpher&colorB=006400&style=for-the-badge)](https://forge-vtt.com/bazaar#package=automated-polymorpher)
 
@@ -36,7 +36,7 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 
 ## Known issue/Limitation
 
-- The module need a full rewrite .... 
+- The module need a full rewrite ....
 
 ## How contribute to your own multisystem
 
@@ -108,7 +108,7 @@ This module uses the [advanced-macros](https://github.com/League-of-Foundry-Deve
 
 **NOTE: you need this only for the custom macro feature, i don't suggest it is much easier to create the actors and set them up, with the drag and drop but it's up to you**
 
-## Features 
+## Features
 
 ## Integration wit 'Warpgate'
 
@@ -147,7 +147,7 @@ An interface in the hud layer now allows you to speed up the transformations dur
 - Ordered: the next transformation is taken according to the order of the list of transformations associated with the actor
 - No random, No orderder: the standard method shows the configuration panel that you would have by clicking on the header sheet button
 
-the actions on the hud button are of two types left click and right click. 
+the actions on the hud button are of two types left click and right click.
 
 - Left click activates the transformation event
 - Right click reverts the transformation and returns to the original shape.
@@ -321,43 +321,31 @@ game.modules.get('automated-polymorpher').socket.executeAsGM('invokePolymorpherM
 ```bash
 npm install
 ```
+
+### dev
+
+`dev` will let you develop you own code with hot reloading on the browser
+
+```bash
+npm run dev
+```
+
 ## npm build scripts
 
 ### build
 
-will build the code and copy all necessary assets into the dist folder and make a symlink to install the result into your foundry data; create a
-`foundryconfig.json` file with your Foundry Data path.
-
-```json
-{
-  "dataPath": "~/.local/share/FoundryVTT/"
-}
-```
-
 `build` will build and set up a symlink between `dist` and your `dataPath`.
 
 ```bash
-npm run-script build
+npm run build
 ```
 
-### NOTE:
+### build-watch
 
-You don't need to build the `foundryconfig.json` file you can just copy the content of the `dist` folder on the module folder under `modules` of Foundry
-
-### build:watch
-
-`build:watch` will build and watch for changes, rebuilding automatically.
+`build-watch` will build and watch for changes, rebuilding automatically.
 
 ```bash
-npm run-script build:watch
-```
-
-### clean
-
-`clean` will remove all contents in the dist folder (but keeps the link from build:install).
-
-```bash
-npm run-script clean
+npm run build-watch
 ```
 
 ### prettier-format
@@ -366,14 +354,6 @@ npm run-script clean
 
 ```bash
 npm run-script prettier-format
-```
-
-### package
-
-`package` generates a zip file containing the contents of the dist folder generated previously with the `build` command. Useful for those who want to manually load the module or want to create their own release
-
-```bash
-npm run-script package
 ```
 
 ## [Changelog](./changelog.md)

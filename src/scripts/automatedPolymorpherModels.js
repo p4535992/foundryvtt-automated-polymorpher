@@ -1,13 +1,10 @@
 import CONSTANTS from "./constants.js";
-export class SystemCreatures {
-}
+export class SystemCreatures {}
 // export class Creatures {
 //   [key: string]: Creature[]|FunctionCreature;
 // }
-export class Creature {
-}
-export class TokenRevertData {
-}
+export class Creature {}
+export class TokenRevertData {}
 // export class CreatureData{
 //   animation:string;
 //   level:number;
@@ -18,49 +15,47 @@ export class TokenRevertData {
 // type FunctionCreature = ReturnType<typeof createCreature>
 export var PolymorpherFlags;
 (function (PolymorpherFlags) {
-    PolymorpherFlags["POLYMORPHERS"] = "polymorphers";
-    PolymorpherFlags["RANDOM"] = "random";
-    PolymorpherFlags["ORDERED"] = "ordered";
-    PolymorpherFlags["COMPENDIUM"] = "compendium";
-    // MUTATION_NAMES_FOR_REVERT = "mutationNamesForRevert",
-    PolymorpherFlags["TRANSFORMER_OPTIONS"] = "transformOptions";
-    PolymorpherFlags["IS_POLYMORPHED"] = "isPolymorphed";
-    PolymorpherFlags["ORIGINAL_ACTOR"] = "originalActor";
-    PolymorpherFlags["PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR"] = "previousOriginalActor";
+  PolymorpherFlags["POLYMORPHERS"] = "polymorphers";
+  PolymorpherFlags["RANDOM"] = "random";
+  PolymorpherFlags["ORDERED"] = "ordered";
+  PolymorpherFlags["COMPENDIUM"] = "compendium";
+  // MUTATION_NAMES_FOR_REVERT = "mutationNamesForRevert",
+  PolymorpherFlags["TRANSFORMER_OPTIONS"] = "transformOptions";
+  PolymorpherFlags["IS_POLYMORPHED"] = "isPolymorphed";
+  PolymorpherFlags["ORIGINAL_ACTOR"] = "originalActor";
+  PolymorpherFlags["PREVIOUS_TOKEN_DATA_ORIGINAL_ACTOR"] = "previousOriginalActor";
 })(PolymorpherFlags || (PolymorpherFlags = {}));
-export class PolymorpherData {
-}
-export class PolymorpherCompendiumData {
-}
+export class PolymorpherData {}
+export class PolymorpherCompendiumData {}
 export class TransformOptionsGeneric {
-    constructor() {
-        this.keepPhysical = false;
-        this.keepMental = false;
-        this.keepSaves = false;
-        this.keepSkills = false;
-        this.mergeSaves = false;
-        this.mergeSkills = false;
-        this.keepClass = false;
-        this.keepFeats = false;
-        this.keepSpells = false;
-        this.keepItems = false;
-        this.keepBio = false;
-        this.keepVision = false;
-        this.keepSelf = false;
-        this.keepAE = false;
-        // removeAE = false;
-        // keepAEOnlyOriginNotEquipment = false;
-        this.keepOtherOriginAE = true;
-        this.keepOriginAE = true;
-        this.keepEquipmentAE = true;
-        this.keepFeatAE = true;
-        this.keepSpellAE = true;
-        this.keepClassAE = true;
-        this.keepBackgroundAE = true;
-        //
-        this.transformTokens = true;
-        this.explicitName = "";
-    }
+  constructor() {
+    this.keepPhysical = false;
+    this.keepMental = false;
+    this.keepSaves = false;
+    this.keepSkills = false;
+    this.mergeSaves = false;
+    this.mergeSkills = false;
+    this.keepClass = false;
+    this.keepFeats = false;
+    this.keepSpells = false;
+    this.keepItems = false;
+    this.keepBio = false;
+    this.keepVision = false;
+    this.keepSelf = false;
+    this.keepAE = false;
+    // removeAE = false;
+    // keepAEOnlyOriginNotEquipment = false;
+    this.keepOtherOriginAE = true;
+    this.keepOriginAE = true;
+    this.keepEquipmentAE = true;
+    this.keepFeatAE = true;
+    this.keepSpellAE = true;
+    this.keepClassAE = true;
+    this.keepBackgroundAE = true;
+    //
+    this.transformTokens = true;
+    this.explicitName = "";
+  }
 }
 /* pf2e */
 // interface SenseDataPf2e {
@@ -90,33 +85,33 @@ export class TransformOptionsGeneric {
  * @enum {object}
  */
 export const transformationPresets = {
-    wildshape: {
-        icon: '<i class="fas fa-paw"></i>',
-        label: `${CONSTANTS.MODULE_NAME}.polymorphWildShape`,
-        options: {
-            keepBio: true,
-            keepClass: true,
-            keepMental: true,
-            mergeSaves: true,
-            mergeSkills: true,
-            keepEquipmentAE: false,
-        },
+  wildshape: {
+    icon: '<i class="fas fa-paw"></i>',
+    label: `${CONSTANTS.MODULE_NAME}.polymorphWildShape`,
+    options: {
+      keepBio: true,
+      keepClass: true,
+      keepMental: true,
+      mergeSaves: true,
+      mergeSkills: true,
+      keepEquipmentAE: false,
     },
-    polymorph: {
-        icon: '<i class="fas fa-pastafarianism"></i>',
-        label: `${CONSTANTS.MODULE_NAME}.polymorph`,
-        options: {
-            keepEquipmentAE: false,
-            keepClassAE: false,
-            keepFeatAE: false,
-            keepBackgroundAE: false,
-        },
+  },
+  polymorph: {
+    icon: '<i class="fas fa-pastafarianism"></i>',
+    label: `${CONSTANTS.MODULE_NAME}.polymorph`,
+    options: {
+      keepEquipmentAE: false,
+      keepClassAE: false,
+      keepFeatAE: false,
+      keepBackgroundAE: false,
     },
-    polymorphSelf: {
-        icon: '<i class="fas fa-eye"></i>',
-        label: `${CONSTANTS.MODULE_NAME}.polymorphSelf`,
-        options: {
-            keepSelf: true,
-        },
+  },
+  polymorphSelf: {
+    icon: '<i class="fas fa-eye"></i>',
+    label: `${CONSTANTS.MODULE_NAME}.polymorphSelf`,
+    options: {
+      keepSelf: true,
     },
+  },
 };

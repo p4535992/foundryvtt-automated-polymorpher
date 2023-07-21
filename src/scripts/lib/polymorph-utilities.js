@@ -3,46 +3,45 @@ import CONSTANTS from "../constants.js";
 import { getPolymorphsWithWarpgate, revertPolymorphWithWarpgate } from "./warpgate.js";
 import { info, revertFlagsOnActor, transferPermissionsActorInner, warn } from "./lib.js";
 export async function revertOriginalFormImpl(sourceToken, sourceActor, renderSheet) {
-    /**
-     * A hook event that fires just before the actor is reverted to original form.
-     * @function dnd5e.transformActor
-     * @memberof hookEvents
-     * @param {Token} sourceToken
-     * @param {Actor} actorThis                 The original actor before transformation.
-     * @param {boolean} renderSheet             Render Sheet after revert the transformation.
-     */
-    Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, sourceActor, renderSheet);
-    const isRendered = sourceActor.sheet?.rendered;
-    if (isRendered) {
-        sourceActor.sheet?.close();
+  /**
+   * A hook event that fires just before the actor is reverted to original form.
+   * @function dnd5e.transformActor
+   * @memberof hookEvents
+   * @param {Token} sourceToken
+   * @param {Actor} actorThis                 The original actor before transformation.
+   * @param {boolean} renderSheet             Render Sheet after revert the transformation.
+   */
+  Hooks.callAll(`${CONSTANTS.MODULE_NAME}.revertOriginalForm`, sourceToken, sourceActor, renderSheet);
+  const isRendered = sourceActor.sheet?.rendered;
+  if (isRendered) {
+    sourceActor.sheet?.close();
+  }
+  const original = sourceActor;
+  const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
+  const hasWarpPolymorphs = Boolean(getPolymorphsWithWarpgate(sourceActor).length);
+  const WarpGateMode = useWarpGate && hasWarpPolymorphs;
+  if (WarpGateMode) {
+    // =============================================
+    // THIS IS THE SOLUTION WITH WARP GATE (AVOID THE CREATION OF ACTOR)
+    // ===========================================
+    const mutations = getPolymorphsWithWarpgate(sourceActor);
+    if (!mutations || mutations.length == 0) {
+      warn(`Array mutation names for the revert is null or empty`);
     }
-    const original = sourceActor;
-    const useWarpGate = game.settings.get(CONSTANTS.MODULE_NAME, "forceUseOfWarpgate");
-    const hasWarpPolymorphs = Boolean(getPolymorphsWithWarpgate(sourceActor).length);
-    const WarpGateMode = useWarpGate && hasWarpPolymorphs;
-    if (WarpGateMode) {
-        // =============================================
-        // THIS IS THE SOLUTION WITH WARP GATE (AVOID THE CREATION OF ACTOR)
-        // ===========================================
-        const mutations = getPolymorphsWithWarpgate(sourceActor);
-        if (!mutations || mutations.length == 0) {
-            warn(`Array mutation names for the revert is null or empty`);
-        }
-        if (mutations.length) {
-            //info(`${sourceToken.actor?.name} reverts to their ${mutations.length === 1 ? 'original' : 'previous'} form`);
-            // TODO show on chat ?
-            //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
-            //@ts-ignore
-            await revertPolymorphWithWarpgate(sourceActor, undefined);
-        }
-        await revertFlagsOnActor(sourceActor);
-        if (isRendered && renderSheet) {
-            sourceActor.sheet?.render(isRendered);
-        }
-        return sourceActor;
+    if (mutations.length) {
+      //info(`${sourceToken.actor?.name} reverts to their ${mutations.length === 1 ? 'original' : 'previous'} form`);
+      // TODO show on chat ?
+      //await ChatMessage.create({content: `${actor.name} reverts to their original form`, speaker:{alias: actor.name}, type: CONST.CHAT_MESSAGE_TYPES.OOC});
+      //@ts-ignore
+      await revertPolymorphWithWarpgate(sourceActor, undefined);
     }
-    else {
-        /*
+    await revertFlagsOnActor(sourceActor);
+    if (isRendered && renderSheet) {
+      sourceActor.sheet?.render(isRendered);
+    }
+    return sourceActor;
+  } else {
+    /*
         if (!sourceToken.actor?.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED)) {
             warn(game.i18n.localize(`${CONSTANTS.MODULE_NAME}.polymorphRevertWarn`) + ` type 1`, true);
             return;
@@ -197,16 +196,16 @@ export async function revertOriginalFormImpl(sourceToken, sourceActor, renderShe
             }
         }
         */
-        await revertFlagsOnActor(original);
-        if (isRendered && renderSheet) {
-            original.sheet?.render(isRendered);
-        }
-        return original;
+    await revertFlagsOnActor(original);
+    if (isRendered && renderSheet) {
+      original.sheet?.render(isRendered);
     }
+    return original;
+  }
 }
 export async function polymorphWithActorLinked(sourceToken, sourceActor, targetActor, d, externalUserId, renderSheet) {
-    const transformTokens = true;
-    /*
+  const transformTokens = true;
+  /*
     // Update unlinked Tokens, and grab a copy of any actorData adjustments to re-apply
     if ( this.isToken ) {
         const tokenData = d.prototypeToken;
@@ -219,88 +218,99 @@ export async function polymorphWithActorLinked(sourceToken, sourceActor, targetA
         return update;
     }
     */
-    // Some info like height and weight of the token are reset to default
-    // after the constructor of the actor is invoked solved with a backup of the info of the token
-    const tokenBackup = duplicate(d.prototypeToken);
-    // Create new Actor with transformed data
-    //@ts-ignore
-    const newActor = await sourceActor.constructor.create(d, { renderSheet: renderSheet });
-    //@ts-ignore
-    // TODO Understand why is not working work like on dnd5e
-    // const newActor = await Actor.implementation.create(d, { renderSheet: renderSheet });
-    // Force this to be true
-    await newActor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
-    await newActor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR, getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`));
-    mergeObject(d.prototypeToken, tokenBackup);
-    let originalActor = (game.actors?.get(sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR)));
-    // If no originalActorIsFounded it must be the orginal itself
-    if (!originalActor) {
-        originalActor = sourceActor;
-        setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, originalActor.id);
+  // Some info like height and weight of the token are reset to default
+  // after the constructor of the actor is invoked solved with a backup of the info of the token
+  const tokenBackup = duplicate(d.prototypeToken);
+  // Create new Actor with transformed data
+  //@ts-ignore
+  const newActor = await sourceActor.constructor.create(d, { renderSheet: renderSheet });
+  //@ts-ignore
+  // TODO Understand why is not working work like on dnd5e
+  // const newActor = await Actor.implementation.create(d, { renderSheet: renderSheet });
+  // Force this to be true
+  await newActor.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
+  await newActor.setFlag(
+    CONSTANTS.MODULE_NAME,
+    PolymorpherFlags.ORIGINAL_ACTOR,
+    getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
+  );
+  mergeObject(d.prototypeToken, tokenBackup);
+  let originalActor = game.actors?.get(sourceActor.getFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR));
+  // If no originalActorIsFounded it must be the orginal itself
+  if (!originalActor) {
+    originalActor = sourceActor;
+    setProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, originalActor.id);
+  }
+  // await transferPermissionsActorInner(originalActor, newActor, externalUserId);
+  // Update placed Token instances
+  // if (!transformTokens) {
+  //   return;
+  // }
+  let tokens = [];
+  if (transformTokens) {
+    tokens = sourceActor.getActiveTokens(true);
+    if (!tokens || tokens.length == 0) {
+      tokens = sourceActor.getActiveTokens();
     }
-    // await transferPermissionsActorInner(originalActor, newActor, externalUserId);
-    // Update placed Token instances
-    // if (!transformTokens) {
-    //   return;
-    // }
-    let tokens = [];
-    if (transformTokens) {
-        tokens = sourceActor.getActiveTokens(true);
-        if (!tokens || tokens.length == 0) {
-            tokens = sourceActor.getActiveTokens();
-        }
-        const tokensTmp = tokens.filter((t) => {
-            return sourceActor.id === t.actor?.id;
-        });
-        tokens = tokensTmp;
-    }
-    else {
-        tokens = [sourceToken];
-    }
-    const updates = tokens.map((t) => {
-        const newTokenData = foundry.utils.deepClone(d.prototypeToken);
-        newTokenData._id = t.id;
-        newTokenData.actorId = newActor.id;
-        newTokenData.actorLink = true;
-        if (!newTokenData.flags) {
-            setProperty(newTokenData, `flags`, {});
-        }
-        setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`, getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`));
-        setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
-        return newTokenData;
+    const tokensTmp = tokens.filter((t) => {
+      return sourceActor.id === t.actor?.id;
     });
-    //@ts-ignore
-    const tokensFinal = await canvas.scene?.updateEmbeddedDocuments("Token", updates);
-    // TODO Understand why is not working work like on dnd5e
-    // const tokensFinal = <TokenDocument[]>[];
-    // for (const tokenUpdate of updates) {
-    // 	//@ts-ignore
-    // 	const token = await TokenDocument.implementation.create(tokenUpdate, {
-    // 		parent: canvas.scene,
-    // 		keepId: false, // MOD 4535992 on dnd5e is true
-    // 		render: false, // MOD 4535992 on dnd5e is true
-    // 	});
-    // 	await token.update({
-    // 		actorId: tokenUpdate.actorId,
-    // 		actorLink: tokenUpdate.actorLink
-    // 	});
-    // 	tokensFinal.push(token);
-    // }
-    for (const tokenFinal of tokensFinal) {
-        await tokenFinal.update({
-            actorId: updates[0].actorId,
-            actorLink: updates[0].actorLink,
-        });
-        await tokenFinal.update({
-            //@ts-ignore
-            flags: mergeObject(tokenFinal.actor.flags, updates[0].flags),
-        });
-        // Force this to be true
-        await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
-        await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.ORIGINAL_ACTOR, getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`));
+    tokens = tokensTmp;
+  } else {
+    tokens = [sourceToken];
+  }
+  const updates = tokens.map((t) => {
+    const newTokenData = foundry.utils.deepClone(d.prototypeToken);
+    newTokenData._id = t.id;
+    newTokenData.actorId = newActor.id;
+    newTokenData.actorLink = true;
+    if (!newTokenData.flags) {
+      setProperty(newTokenData, `flags`, {});
     }
-    await transferPermissionsActorInner(originalActor, newActor, externalUserId);
-    /* run mutation and label it 'powermorph' */
-    info(`${sourceToken.name} mutate into a ${targetActor.name}`);
-    return tokensFinal[0];
+    setProperty(
+      newTokenData.flags,
+      `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`,
+      getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
+    );
+    setProperty(newTokenData.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.IS_POLYMORPHED}`, true);
+    return newTokenData;
+  });
+  //@ts-ignore
+  const tokensFinal = await canvas.scene?.updateEmbeddedDocuments("Token", updates);
+  // TODO Understand why is not working work like on dnd5e
+  // const tokensFinal = <TokenDocument[]>[];
+  // for (const tokenUpdate of updates) {
+  // 	//@ts-ignore
+  // 	const token = await TokenDocument.implementation.create(tokenUpdate, {
+  // 		parent: canvas.scene,
+  // 		keepId: false, // MOD 4535992 on dnd5e is true
+  // 		render: false, // MOD 4535992 on dnd5e is true
+  // 	});
+  // 	await token.update({
+  // 		actorId: tokenUpdate.actorId,
+  // 		actorLink: tokenUpdate.actorLink
+  // 	});
+  // 	tokensFinal.push(token);
+  // }
+  for (const tokenFinal of tokensFinal) {
+    await tokenFinal.update({
+      actorId: updates[0].actorId,
+      actorLink: updates[0].actorLink,
+    });
+    await tokenFinal.update({
+      //@ts-ignore
+      flags: mergeObject(tokenFinal.actor.flags, updates[0].flags),
+    });
+    // Force this to be true
+    await tokenFinal.actor?.setFlag(CONSTANTS.MODULE_NAME, PolymorpherFlags.IS_POLYMORPHED, true);
+    await tokenFinal.actor?.setFlag(
+      CONSTANTS.MODULE_NAME,
+      PolymorpherFlags.ORIGINAL_ACTOR,
+      getProperty(d.flags, `${CONSTANTS.MODULE_NAME}.${PolymorpherFlags.ORIGINAL_ACTOR}`)
+    );
+  }
+  await transferPermissionsActorInner(originalActor, newActor, externalUserId);
+  /* run mutation and label it 'powermorph' */
+  info(`${sourceToken.name} mutate into a ${targetActor.name}`);
+  return tokensFinal[0];
 }
