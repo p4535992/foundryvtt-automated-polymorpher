@@ -487,9 +487,8 @@ export async function rollFromString(rollString, actor) {
       let myresult = 0;
       //roll.roll();
       try {
-        // TODO Roll#evaluate is becoming asynchronous. In the short term you may pass async=true or async=false
         // to evaluation options to nominate your preferred behavior.
-        roll.evaluate({ async: false });
+        await roll.evaluate({ async: true });
         //await roll.evaluate({async: true});
         myresult = roll.total ? roll.total : parseInt(roll.result);
       } catch (e) {
@@ -509,9 +508,8 @@ export async function rollFromString(rollString, actor) {
       let myresult = 0;
       //roll.roll();
       try {
-        // TODO Roll#evaluate is becoming asynchronous. In the short term you may pass async=true or async=false
         // to evaluation options to nominate your preferred behavior.
-        roll.evaluate({ async: false });
+        await roll.evaluate({ async: true });
         //await roll.evaluate({async: true});
         myresult = roll.total ? roll.total : parseInt(roll.result);
       } catch (e) {
