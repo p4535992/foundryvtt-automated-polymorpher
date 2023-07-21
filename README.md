@@ -32,11 +32,9 @@ Should work with all system supported from the [warpgate](https://github.com/tri
 
 ## NOTE this module work very well with this other module [Automated Evocations (Variant Fork)](https://github.com/p4535992/automated-evocations-variant) and  [Automated Evocations](https://github.com/theripper93/automated-evocations)
 
-## NOTE: If you are a javascript developer and not a typescript developer, you can just use the javascript files under the dist folder
-
 ## Known issue/Limitation
 
-- The module need a full rewrite ....
+- The module need some good developer for a upgrade
 
 ## How contribute to your own multisystem
 
